@@ -1,4 +1,15 @@
 ﻿#include "shinobuwidget.h"
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx11.h"
+
+#include "compoundgui.h"
+#include "translator.h"
+#include "llmhome.h"
+#include "./cubism_src/CubismLoom.h"
+#include <string>
+#include "timeconfig.h"
+
 static void HelpMarker(const char* desc)
 {
     ImGui::TextDisabled("(?)");
@@ -11,12 +22,12 @@ static void HelpMarker(const char* desc)
     }
 }
 void ShowShinobuHead() {
-    //ImGui::Text(TT_223);
     ImGui::ProgressBar(-0.5f * (float)ImGui::GetTime(), ImVec2(ImGui::GetContentRegionAvail().x, 7.0f), NULL);
 
 }
 void ShowShinobuStart()
 {
+    return;
     if (ImGui::CollapsingHeader(u8"从这里开始"))
     {
         if (Su::UserConfig::getUserVector().size() <= 0) {
@@ -88,7 +99,8 @@ void ShowShinobuLanguage() {
 void ShowShinobuStyle() {
     static bool ShowStyleEditor = false;
     if (ShowStyleEditor) {
-        ImGui::Begin(TT_39, &ShowStyleEditor);
+        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
+        ImGui::Begin(TT_39,&ShowStyleEditor);
         ImGui::ShowStyleEditor();
         ImGui::End();
     }
@@ -98,6 +110,52 @@ void ShowShinobuStyle() {
         ImGui::SameLine();
         ImGui::Spacing();
     }
+}
+
+void ShowShinobuGlobal()
+{
+    if (ImGui::CollapsingHeader(TT_224))
+    {
+        if (ImGui::TreeNode(TT_231)) {
+            ImGui::SeparatorText(TT_232);
+            static int ws_t = 0, ws_d = 0, ws_dt = 0;
+            ImGui::RadioButton(TT_234, &ws_t, 0); ImGui::SameLine();
+            ImGui::RadioButton(TT_235, &ws_t, 1);
+            ImGui::SeparatorText(TT_239);
+            ImGui::RadioButton(TT_240, &ws_d, 0); ImGui::SameLine();
+            ImGui::RadioButton(TT_241, &ws_d, 1);
+            ImGui::RadioButton(TT_242, &ws_dt, 0); ImGui::SameLine();
+            ImGui::RadioButton(TT_243, &ws_dt, 1);
+
+            ImGui::SeparatorText(TT_233);
+            static float fps = 0.0f, fps_min_stop = 0.0f;
+            ImGui::SliderFloat(TT_236, &fps, 10.0f, 120.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
+            ImGui::SliderFloat(TT_237, &fps_min_stop, 1.0f, 200.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
+
+
+            if (ImGui::Button(TT_8)){
+
+            }
+            ImGuiIO& io = ImGui::GetIO();
+            ImGui::Text(TT_42, 1000.0f / io.Framerate, io.Framerate);
+            ImGui::TreePop();
+        }
+        if (ImGui::TreeNode(TT_225)) {
+            ImGui::SeparatorText(TT_230);
+            static int e = ::GlobalConfig::getInstance()->window_cubism_style_id;
+            ImGui::RadioButton(TT_226, &e, 0); ImGui::SameLine();
+            ImGui::RadioButton(TT_227, &e, 1); ImGui::SameLine();
+            ImGui::RadioButton(TT_228, &e, 2); ImGui::SameLine();
+            ImGui::RadioButton(TT_229, &e, 3);
+            if (GlobalConfig::getInstance()->window_cubism_style_id != e) {
+                CubismLoom::addMessageList(::window_group_mark, ::window_style_mark, std::to_string(e).c_str());
+                ::GlobalConfig::GlobalConfigSave();
+            }
+            ImGui::TreePop();
+        }
+
+
+    }
 
 }
 
@@ -105,7 +163,7 @@ void ShowShinobuUser()
 {
     if (ImGui::CollapsingHeader(TT_32))
     {
-        if (ImGui::BeginTabBar("SettingBar", ImGuiTabBarFlags_None))
+        if (ImGui::BeginTabBar("##SettingBar001", ImGuiTabBarFlags_None))
         {
             if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip))
             {
@@ -130,8 +188,13 @@ void ShowShinobuUser()
                 }
                 if (Su::UserConfig::getUserVector()[i].exist == false) {
                     ImGui::OpenPopup(TT_35);
-                    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-                    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+                    ImVec2 parent_pos = ImGui::GetWindowPos();
+                    ImVec2 parent_size = ImGui::GetWindowSize();
+                    ImVec2 popup_center = ImVec2(
+                        parent_pos.x + parent_size.x * 0.5f,
+                        parent_pos.y + parent_size.y * 0.5f
+                    );
+                    ImGui::SetNextWindowPos(popup_center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
                     if (ImGui::BeginPopupModal(TT_35, NULL, ImGuiWindowFlags_AlwaysAutoResize))
                     {
                         ImGui::Text(TT_34);
@@ -371,11 +434,9 @@ void ShowShinobuAbout() {
             float samples[100];
             for (int n = 0; n < 100; n++)
                 samples[n] = sinf((float)n * 0.2f + (float)ImGui::GetTime() * 1.5f);
-            ImGui::PlotLines("##S_Samples", samples, 100, NULL, NULL, -1.0f, 1.0f, ImVec2(ImGui::GetContentRegionAvail().x, 0.0));
+            ImGui::PlotLines("##S_SamplesPlotLines001", samples, 100, NULL, NULL, -1.0f, 1.0f, ImVec2(ImGui::GetContentRegionAvail().x, 0.0));
             ImGui::ProgressBar(sinf((float)ImGui::GetTime()) * 0.5f + 0.5f, ImVec2(ImGui::GetContentRegionAvail().x, 0.0));
 
-            ImGuiIO& io = ImGui::GetIO();
-            ImGui::Text(TT_42, 1000.0f / io.Framerate, io.Framerate);
         }
     };
     f(TT_0, TT_1, TT_2, TT_3);
@@ -384,12 +445,12 @@ void ShowShinobuAbout() {
 
 void ShowShinobuWindow(bool* p_open) {
     if (*p_open == false) { return; }
-
-    ImGui::Begin(TT_38, p_open/*, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar*/);
-    ImGui::BeginChild(TT_38);
+    char buf[128];
+    sprintf_s(buf, sizeof(buf), TT_38, "|/-\\"[(int)(ImGui::GetTime() / 0.25f) & 3], ::getCurrentTime().c_str());
+    ImGui::SetNextWindowPos(ImVec2(0,0), ImGuiCond_FirstUseEver);
+    ImGui::Begin(buf, p_open);
 
     ShowShinobuHead();
-
     ShowShinobuStart();
     //{
     //    static char text[DEFSIZEK16] =
@@ -425,13 +486,10 @@ void ShowShinobuWindow(bool* p_open) {
 
     ShowShinobuLanguage();
     ShowShinobuStyle();
-
+    ShowShinobuGlobal();
     ShowShinobuUser();
-
- 
     ShowShinobuHelp();
     ShowShinobuAbout();
 
-    ImGui::EndChild();
     ImGui::End();
 }

@@ -17,9 +17,9 @@ void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
     initHas = true;
 
     std::cout << u8"全局配置初始化" << std::endl;
-    gc->select_lan = (LAN)FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[FREEMARK::LANGUAGESEL_ID], INITINT);
-    gc->user_num = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[FREEMARK::USER_NUM], INITINT);
-    gc->select_theme = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[FREEMARK::THEMESEL_ID], INITINT);
+    gc->select_lan = (LAN)FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::LANGUAGESEL_ID], INITINT);
+    gc->user_num = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::USER_NUM], INITINT);
+    gc->select_theme = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::THEMESEL_ID], INITINT);
     gc->defaultStyle = ImGui::GetStyle();
     FILE* fpp;
     if (fopen_s(&fpp, STYLEWAY, "rb") == 0) {
@@ -28,7 +28,8 @@ void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
         ImGui::GetStyle() = st;
         fclose(fpp);
     }
-    gc->select_font = (std::string)FileSetting::S_GetValue(0, INIGROUPMARKSTR, inifreemark_map[FREEMARK::FONTSEL_NAME], INITSTR);
+    gc->select_font = (std::string)FileSetting::S_GetValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::FONTSEL_NAME], INITSTR);
+    gc->window_cubism_style_id = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_STYLE_ID], INITINT);
 
     
 #ifdef IS_WINDOWS
@@ -77,6 +78,16 @@ void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
     FindClose(hFind);
 
 #endif // IS_WINDOWS
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //设置字体
+    ImFont* font_current = ImGui::GetFont();
+    for (int i = 0; i < gc->fonts_size; ++i) {
+        ImFont* font = io.Fonts->AddFontFromFileTTF(gc->fonts_list[i], 30.0f, NULL, io.Fonts->GetGlyphRangesChineseFull());
+        if (strcmp(font->GetDebugName(), gc->select_font.c_str()) == 0) {
+            io.FontDefault = font;
+        }
+    }
+
 }
 
 void GlobalConfig::GlobalConfigSave(GlobalConfig* gc)
@@ -93,6 +104,7 @@ void GlobalConfig::GlobalConfigSave(GlobalConfig* gc)
         fclose(fp);
     }
     FileSetting::S_SetValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::FONTSEL_NAME],::GlobalConfig::getInstance()->select_font.c_str());
+    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_STYLE_ID], ::GlobalConfig::getInstance()->window_cubism_style_id);
 
 }
 

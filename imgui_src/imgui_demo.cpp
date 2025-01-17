@@ -8069,7 +8069,7 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
 
             ImGui::SeparatorText(TT_70);
             //ImGui::SliderFloat(TT_71, &style.WindowRounding, 0.0f, 12.0f, "%.0f");//no function
-            ImGui::SliderFloat(TT_72, &style.ChildRounding, 0.0f, 12.0f, "%.0f");
+            //ImGui::SliderFloat(TT_72, &style.ChildRounding, 0.0f, 12.0f, "%.0f");//no better
             ImGui::SliderFloat(TT_73, &style.FrameRounding, 0.0f, 12.0f, "%.0f");
             ImGui::SliderFloat(TT_74, &style.PopupRounding, 0.0f, 12.0f, "%.0f");
             ImGui::SliderFloat(TT_75, &style.ScrollbarRounding, 0.0f, 12.0f, "%.0f");

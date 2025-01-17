@@ -18,6 +18,8 @@ enum FREEMARK {
     USER_NUM,
     THEMESEL_ID,
     FONTSEL_NAME,
+    WINDOW_MAIN_STYLE_ID,
+    WINDOW_CUBISM_STYLE_ID,
     LLMSEL_ID,
     TTSSEL_ID,
     STTSEL_ID,
@@ -33,6 +35,8 @@ static std::map<FREEMARK, const char*>inifreemark_map = {
     {FREEMARK::USER_NUM,                            "user_num"},
     {FREEMARK::THEMESEL_ID,                         "themesel_id"},
     {FREEMARK::FONTSEL_NAME,                        "fontsel_id"},
+    {FREEMARK::WINDOW_MAIN_STYLE_ID,                "window_main_style_id"},
+    {FREEMARK::WINDOW_CUBISM_STYLE_ID,              "window_cubism_style_id"},
     {FREEMARK::LLMSEL_ID,                           "llmsel_id"},
     {FREEMARK::TTSSEL_ID,                           "ttssel_id"},
     {FREEMARK::STTSEL_ID,                           "sttsel_id"},
@@ -64,7 +68,10 @@ public:
     ::LAN select_lan;
     int user_num                    = 0;
     int select_theme                = 0;/*{ 0,1,2 }*/
-    std::string select_font         = "CEFFontsCJK-Regular.ttf";
+    int window_main_style           = 0;/*{ 0,1 }*/
+    //float window_main_fea         = 0;/*{ 0,1 }*/
+    int window_cubism_style_id      = 0;/*{ 0,1,2,3 }*/
+    std::string select_font         = "";
     const char** fonts_list         = NULL;
     const char** fonts_name_list    = NULL;
     int fonts_size                  = 0;
