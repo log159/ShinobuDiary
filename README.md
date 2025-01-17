@@ -1,2 +1,1 @@
-# ShinobuChat
-小忍日记
+# ShinobuChat [小忍日记]
