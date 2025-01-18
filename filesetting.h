@@ -21,8 +21,6 @@ using std::endl;
 #define DEFSIZEK16 DEFSIZEK * 16
 
 
-extern const char* GetFileWay(int id);
-
 class FileSetting {
 public:
 

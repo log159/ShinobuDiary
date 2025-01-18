@@ -6,7 +6,6 @@ extern void ShowShinobuWindow(bool* p_open);
 extern void ShowShinobuHead();					/*标头*/
 extern void ShowShinobuStart();					/*从这里开始*/
 extern void ShowShinobuLanguage();              /*语言配置*/
-extern void ShowShinobuStyle();					/*样式配置*/
 extern void ShowShinobuGlobal();				/*全局配置*/
 extern void ShowShinobuUser();					/*用户配置*/
 extern void ShowShinobuLLM(Su::UserConfig* _uc);/*LLM配置项*/

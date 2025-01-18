@@ -15,35 +15,11 @@
 
 #include "LAppAllocator.hpp"
 
+#include "CubismWindowStyle.h"
+
 class LAppView;
 class LAppTextureManager;
-class WindowStyle;
 
-enum EnumWinStyle
-{
-    // 置顶不穿透
-    WinTop,
-    // 穿透不置顶
-    WinApha,
-    // 置顶并且穿透
-    WinTopApha,
-    // 不置顶并且不穿透
-    WinNoTopNoApha
-};
-
-class WindowStyle {
-public:
-    static EnumWinStyle winStyle;
-    static bool canTrans;
-public:
-    static void Update(HWND hwnd);
-    static void UpdateWindowStyle(HWND hwnd);
-    static void SetWindowTopApha(HWND hwnd, bool isTop, bool isApha);
-    static BOOL GetPixelRGBA(HWND hwnd, int x, int y, BYTE& r, BYTE& g, BYTE& b, BYTE& a);
-private:
-    WindowStyle();
-    WindowStyle(const WindowStyle&);
-};
 
 /**
  * @brief   アプリケーションクラス。

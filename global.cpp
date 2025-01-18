@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 
+
 //平台支持
 #define IS_WINDOWS
 //#define IS_WCHAR
@@ -10,16 +11,19 @@
 
 #endif // IS_WINDOWS
 
+bool GlobalTemp::ShowStyleEditor = false;
+HWND GlobalTemp::window_main_handle;
+WNDCLASSEXW GlobalTemp::window_main_wc;
 
 void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
-    static bool initHas = false;
-    if (initHas == true) { return; }
-    initHas = true;
+    static bool initHas = false;if (initHas == true) return;initHas = true;
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
 
     std::cout << u8"全局配置初始化" << std::endl;
+
     gc->select_lan = (LAN)FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::LANGUAGESEL_ID], INITINT);
     gc->user_num = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::USER_NUM], INITINT);
-    gc->select_theme = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::THEMESEL_ID], INITINT);
+    gc->select_theme_id = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::THEMESEL_ID], INITINT);
     gc->defaultStyle = ImGui::GetStyle();
     FILE* fpp;
     if (fopen_s(&fpp, STYLEWAY, "rb") == 0) {
@@ -30,6 +34,23 @@ void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
     }
     gc->select_font = (std::string)FileSetting::S_GetValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::FONTSEL_NAME], INITSTR);
     gc->window_cubism_style_id = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_STYLE_ID], INITINT);
+
+    gc->window_main_style_id = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_STYLE_ID], INITINT);
+    gc->window_main_dock_id = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_DOCK_ID], INITINT);
+    gc->window_main_transparent_id = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_TRANSPARENT_ID], INITINT);
+
+    if (gc->window_main_style_id == 0)
+        ::SetWindowPos(GlobalTemp::window_main_handle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    else if (gc->window_main_style_id == 1)
+        ::SetWindowPos(GlobalTemp::window_main_handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+
+    if (gc->window_main_dock_id == 0)  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    else if (gc->window_main_dock_id == 1) io.ConfigFlags &= (~ImGuiConfigFlags_DockingEnable);
+    if (gc->window_main_transparent_id == 0)  io.ConfigDockingTransparentPayload = true;
+    else if (gc->window_main_transparent_id == 1) io.ConfigDockingTransparentPayload = false;
+
+    gc->window_main_forecastfps = (float)FileSetting::S_GetDoubleValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_FORECASTFPS], 120.0f);
+    gc->window_main_addtimefps = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_ADDTIMEFPS], INITINT);
 
     
 #ifdef IS_WINDOWS
@@ -78,24 +99,30 @@ void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
     FindClose(hFind);
 
 #endif // IS_WINDOWS
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
     //设置字体
     ImFont* font_current = ImGui::GetFont();
     for (int i = 0; i < gc->fonts_size; ++i) {
-        ImFont* font = io.Fonts->AddFontFromFileTTF(gc->fonts_list[i], 30.0f, NULL, io.Fonts->GetGlyphRangesChineseFull());
+        ImFont* font = io.Fonts->AddFontFromFileTTF(gc->fonts_list[i],30.0f, NULL, io.Fonts->GetGlyphRangesChineseFull());
         if (strcmp(font->GetDebugName(), gc->select_font.c_str()) == 0) {
             io.FontDefault = font;
         }
     }
+    io.FontGlobalScale =(float)FileSetting::S_GetDoubleValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::FONT_GLOBAL_SCALE], 1.0);
+
 
 }
 
 void GlobalConfig::GlobalConfigSave(GlobalConfig* gc)
 {
+
     std::cout << u8"全局配置保存" << std::endl;
     FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::LANGUAGESEL_ID], (int)::GlobalConfig::getInstance()->select_lan);
     FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::USER_NUM], (int)::GlobalConfig::getInstance()->user_num);
-    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::THEMESEL_ID], (int)::GlobalConfig::getInstance()->select_theme);
+    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::THEMESEL_ID], (int)::GlobalConfig::getInstance()->select_theme_id);
+
+    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_STYLE_ID], (int)::GlobalConfig::getInstance()->window_main_style_id);
+    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_DOCK_ID], (int)::GlobalConfig::getInstance()->window_main_dock_id);
+    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_TRANSPARENT_ID], (int)::GlobalConfig::getInstance()->window_main_transparent_id);
 
     FILE* fp;
     fopen_s(&fp, STYLEWAY, "wb");
@@ -106,6 +133,10 @@ void GlobalConfig::GlobalConfigSave(GlobalConfig* gc)
     FileSetting::S_SetValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::FONTSEL_NAME],::GlobalConfig::getInstance()->select_font.c_str());
     FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_STYLE_ID], ::GlobalConfig::getInstance()->window_cubism_style_id);
 
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    FileSetting::S_SetDoubleValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::FONT_GLOBAL_SCALE], (double)io.FontGlobalScale);
+    FileSetting::S_SetDoubleValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_FORECASTFPS], (double)::GlobalConfig::getInstance()->window_main_forecastfps);
+    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_ADDTIMEFPS], (double)::GlobalConfig::getInstance()->window_main_addtimefps);
 }
 
 GlobalConfig::~GlobalConfig()

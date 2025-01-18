@@ -96,48 +96,64 @@ void ShowShinobuLanguage() {
     f(TT_5);
 }
 
-void ShowShinobuStyle() {
-    static bool ShowStyleEditor = false;
-    if (ShowStyleEditor) {
-        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
-        ImGui::Begin(TT_39,&ShowStyleEditor);
-        ImGui::ShowStyleEditor();
-        ImGui::End();
-    }
-    if (ImGui::CollapsingHeader(TT_40))
-    {
-        ImGui::Checkbox(TT_41, &ShowStyleEditor);
-        ImGui::SameLine();
-        ImGui::Spacing();
-    }
-}
 
 void ShowShinobuGlobal()
 {
+
     if (ImGui::CollapsingHeader(TT_224))
     {
         if (ImGui::TreeNode(TT_231)) {
+            ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+            ImGui::SeparatorText(TT_40);
+            ImGui::Checkbox(TT_41, &GlobalTemp::ShowStyleEditor);
+
             ImGui::SeparatorText(TT_232);
-            static int ws_t = 0, ws_d = 0, ws_dt = 0;
+            static int ws_t = ::GlobalConfig::getInstance()->window_main_style_id, 
+                ws_d = ::GlobalConfig::getInstance()->window_main_dock_id,
+                ws_dt = ::GlobalConfig::getInstance()->window_main_transparent_id;
             ImGui::RadioButton(TT_234, &ws_t, 0); ImGui::SameLine();
             ImGui::RadioButton(TT_235, &ws_t, 1);
+
             ImGui::SeparatorText(TT_239);
             ImGui::RadioButton(TT_240, &ws_d, 0); ImGui::SameLine();
             ImGui::RadioButton(TT_241, &ws_d, 1);
             ImGui::RadioButton(TT_242, &ws_dt, 0); ImGui::SameLine();
             ImGui::RadioButton(TT_243, &ws_dt, 1);
 
-            ImGui::SeparatorText(TT_233);
-            static float fps = 0.0f, fps_min_stop = 0.0f;
-            ImGui::SliderFloat(TT_236, &fps, 10.0f, 120.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
-            ImGui::SliderFloat(TT_237, &fps_min_stop, 1.0f, 200.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
-
-
-            if (ImGui::Button(TT_8)){
-
+            if (::GlobalConfig::getInstance()->window_main_style_id != ws_t){
+                ::GlobalConfig::getInstance()->window_main_style_id = ws_t;
+                if (ws_t == 0) 
+                    ::SetWindowPos(GlobalTemp::window_main_handle, HWND_NOTOPMOST,0, 0,0, 0,SWP_NOMOVE | SWP_NOSIZE );
+                else if(ws_t ==1)
+                    ::SetWindowPos(GlobalTemp::window_main_handle, HWND_TOPMOST , 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+                ::GlobalConfig::GlobalConfigSave();
             }
-            ImGuiIO& io = ImGui::GetIO();
+            if (::GlobalConfig::getInstance()->window_main_dock_id != ws_d) {
+                ::GlobalConfig::getInstance()->window_main_dock_id = ws_d;
+                if (ws_d == 0)  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+                else if(ws_d==1) io.ConfigFlags &= (~ImGuiConfigFlags_DockingEnable); 
+                ::GlobalConfig::GlobalConfigSave();
+
+                //io.ConfigDockingTransparentPayload = true;                // 停靠时透明
+            }
+            if (::GlobalConfig::getInstance()->window_main_transparent_id != ws_dt) {
+                ::GlobalConfig::getInstance()->window_main_transparent_id = ws_dt;
+                if (ws_dt == 0)  io.ConfigDockingTransparentPayload = true;
+                else if (ws_dt == 1) io.ConfigDockingTransparentPayload = false;;
+                ::GlobalConfig::GlobalConfigSave();
+            }
+
+
+            ImGui::SeparatorText(TT_233);
+            //static float fps = 0.0f, fps_min_stop = 0.0f;
+            ImGui::SliderFloat(TT_236, &GlobalConfig::getInstance()->window_main_forecastfps, 10.0f, 120.0f, "%.2f", ImGuiSliderFlags_None);
+            ImGui::SliderInt(TT_237, &GlobalConfig::getInstance()->window_main_addtimefps, 0, 200, "%d", ImGuiSliderFlags_None);
+
             ImGui::Text(TT_42, 1000.0f / io.Framerate, io.Framerate);
+            if (ImGui::Button(TT_8)) {
+                ::GlobalConfig::GlobalConfigSave();
+            }
             ImGui::TreePop();
         }
         if (ImGui::TreeNode(TT_225)) {
@@ -153,8 +169,6 @@ void ShowShinobuGlobal()
             }
             ImGui::TreePop();
         }
-
-
     }
 
 }
@@ -485,7 +499,6 @@ void ShowShinobuWindow(bool* p_open) {
 
 
     ShowShinobuLanguage();
-    ShowShinobuStyle();
     ShowShinobuGlobal();
     ShowShinobuUser();
     ShowShinobuHelp();

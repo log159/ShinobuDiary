@@ -7980,9 +7980,9 @@ void ImGui::ShowFontSelector(const char* label)
 bool ImGui::ShowStyleSelector(const char* label)
 {
     //static int style_idx = ::GlobalConfig::getInstance()->select_theme;
-    if (ImGui::Combo(label, &::GlobalConfig::getInstance()->select_theme, TT_69))
+    if (ImGui::Combo(label, &::GlobalConfig::getInstance()->select_theme_id, TT_69))
     {
-        switch (::GlobalConfig::getInstance()->select_theme)
+        switch (::GlobalConfig::getInstance()->select_theme_id)
         {
         case 0: ImGui::StyleColorsDark(); break;
         case 1: ImGui::StyleColorsLight(); break;
@@ -8034,7 +8034,8 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
     if (ImGui::Button(TT_50)) {
         //style = *ref;
         style = ::GlobalConfig::getInstance()->defaultStyle;
-        ::GlobalConfig::getInstance()->select_theme = 0;
+        ::GlobalConfig::getInstance()->select_theme_id = 0;
+        ImGui::GetIO().FontGlobalScale = 1.0f;
     }
     ImGui::SameLine();
     //HelpMarker(

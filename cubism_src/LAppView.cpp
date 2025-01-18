@@ -182,7 +182,7 @@ void LAppView::InitializeSprite()
     float fHeight = 0.0f;
 
     //Shinobu Debug
-    string imageName = resourcesPath + BackImageName;
+    string imageName = ""/*resourcesPath + BackImageName*/;
     //LAppTextureManager::TextureInfo* backgroundTexture = textureManager->CreateTextureFromPngFile(imageName, false);
     //x = width * 0.5f;
     //y = height * 0.5f;
@@ -343,6 +343,7 @@ void LAppView::OnTouchesEnded(float px, float py) const
         {
             LAppPal::PrintLogLn("[APP]touchesEnded x:%.2f y:%.2f", x, y);
         }
+
         live2DManager->OnTap(x, y);
 
         // 歯車にタップしたか

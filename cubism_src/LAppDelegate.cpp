@@ -30,8 +30,7 @@ namespace {
     const csmInt32 BackBufferNum = 1; // バックバッファ枚数
 }
 
-EnumWinStyle WindowStyle::winStyle= EnumWinStyle::WinTop;
-bool WindowStyle::canTrans;
+
 
 
 //
@@ -144,7 +143,7 @@ bool LAppDelegate::Initialize()
     //ウインドウ表示
     ShowWindow(_windowHandle, SW_SHOWDEFAULT);
     UpdateWindow(_windowHandle);
-    WindowStyle::SetWindowTopApha(_windowHandle, false, false);
+    CubismWindowStyle::Update(_windowHandle);
 
     // 現在のウィンドウサイズ
     int windowWidth, windowHeight;
@@ -350,7 +349,7 @@ void LAppDelegate::Run()
         {
 
             // 窗口更新
-            WindowStyle::Update(_windowHandle);
+            CubismWindowStyle::Update(_windowHandle);
 
             // 時間更新
             LAppPal::UpdateTime();
@@ -571,19 +570,22 @@ void LAppDelegate::ResizeDevice()
 
 LRESULT WINAPI LAppDelegate::MsgProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+
     switch (msg)
     {
-    case WM_DESTROY:    // 終了
+    case WM_DESTROY:    // 终了
+        printf(u8"[File: %s][Line: %d][%s]: 退出消息\n!\n", __FILE__, __LINE__, __func__);
         PostQuitMessage(0);
         return 0;
 
-    case WM_PAINT:  // ウインドウ描画時
+    case WM_PAINT:  // 重绘
         ValidateRect(wnd, NULL);
         return 0;
 
-    case WM_SIZE:   // ウィンドウサイズ変更
+    case WM_SIZE:   // 适应窗体变化
         if(s_instance != NULL && s_instance->_view!=NULL && s_instance->_device && s_instance->_deviceStep!=DeviceStep_Lost)
-        {// _device作成前にCreateWindowをやった時もここに来るので、_deviceのNullチェックは必須
+        {
+            // _device作成前にCreateWindowをやった時もここに来るので、_deviceのNullチェックは必須
             // Resize指示を出す
             s_instance->_deviceStep = DeviceStep_Size;
         }
@@ -672,129 +674,3 @@ ID3D11DeviceContext* LAppDelegate::GetD3dContext()
 }
 
 
-
-void WindowStyle::SetWindowTopApha(HWND hwnd,bool isTop, bool isApha)
-{
-    static int currentX = 0, currentY = 0, resWidth = GetSystemMetrics(SM_CXSCREEN), resHeight = GetSystemMetrics(SM_CYSCREEN);
-    int intExTemp = GetWindowLong(hwnd, GWL_EXSTYLE);
-    if (isTop)
-    {
-        intExTemp |= WS_EX_TOPMOST;
-        if (!isApha) intExTemp &= ~(WS_EX_TRANSPARENT | WS_EX_LAYERED);
-        else intExTemp |= (WS_EX_TRANSPARENT | WS_EX_LAYERED);
-    }
-    else
-    {
-        intExTemp &= ~WS_EX_TOPMOST;
-        if (isApha) intExTemp |= (WS_EX_LAYERED | WS_EX_TRANSPARENT);
-        else intExTemp &= ~(WS_EX_TRANSPARENT | WS_EX_LAYERED);
-    }
-    SetWindowLong(hwnd, GWL_EXSTYLE, intExTemp);
-    if (isTop) SetWindowPos(hwnd, HWND_TOPMOST, currentX, currentY, resWidth, resHeight, SWP_SHOWWINDOW);
-    else SetWindowPos(hwnd, HWND_NOTOPMOST, currentX, currentY, resWidth, resHeight, SWP_SHOWWINDOW);
-
-    MARGINS margins = { -1 };
-    DwmExtendFrameIntoClientArea(hwnd, &margins);
-}
-
-BOOL WindowStyle::GetPixelRGBA(HWND hwnd, int x, int y, BYTE& r, BYTE& g, BYTE& b, BYTE& a)
-{
-    // 获取窗口设备上下文
-    HDC hdcWindow = GetDC(hwnd);
-    if (!hdcWindow) {
-        return FALSE;
-    }
-    // 创建内存DC和位图
-    HDC hdcMem = CreateCompatibleDC(hdcWindow);
-    if (!hdcMem) {
-        ReleaseDC(hwnd, hdcWindow);
-        return FALSE;
-    }
-    HBITMAP hbm = CreateCompatibleBitmap(hdcWindow, 1, 1);
-    if (!hbm) {
-        DeleteDC(hdcMem);
-        ReleaseDC(hwnd, hdcWindow);
-        return FALSE;
-    }
-    HGDIOBJ hOldBitmap = SelectObject(hdcMem, hbm);
-    // 将目标像素区域复制到内存DC
-    if (!BitBlt(hdcMem, 0, 0, 1, 1, hdcWindow, x, y, SRCCOPY)) {
-        SelectObject(hdcMem, hOldBitmap);
-        DeleteObject(hbm);
-        DeleteDC(hdcMem);
-        ReleaseDC(hwnd, hdcWindow);
-        return FALSE;
-    }
-    // 准备位图信息
-    BITMAPINFO bi = {};
-    bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bi.bmiHeader.biWidth = 1;
-    bi.bmiHeader.biHeight = -1;
-    bi.bmiHeader.biPlanes = 1;
-    bi.bmiHeader.biBitCount = 32;
-    bi.bmiHeader.biCompression = BI_RGB;
-    // 读取像素数据
-    DWORD pixelData = 0;
-    if (!GetDIBits(hdcMem, hbm, 0, 1, &pixelData, &bi, DIB_RGB_COLORS)) {
-        SelectObject(hdcMem, hOldBitmap);
-        DeleteObject(hbm);
-        DeleteDC(hdcMem);
-        ReleaseDC(hwnd, hdcWindow);
-        return FALSE;
-    }
-    // 提取RGBA
-    BYTE* color = reinterpret_cast<BYTE*>(&pixelData);
-    b = color[0]; // 蓝色分量
-    g = color[1]; // 绿色分量
-    r = color[2]; // 红色分量
-    a = color[3]; // Alpha分量
-    SelectObject(hdcMem, hOldBitmap);
-    DeleteObject(hbm);
-    DeleteDC(hdcMem);
-    ReleaseDC(hwnd, hdcWindow);
-    return TRUE;
-}
-
-void WindowStyle::UpdateWindowStyle(HWND hwnd)
-{
-    if (WindowStyle::canTrans)
-    {
-        if (winStyle == EnumWinStyle::WinTop)
-            SetWindowTopApha(hwnd,true, true);
-        else if (winStyle == EnumWinStyle::WinApha)
-            SetWindowTopApha(hwnd, false, true);
-        else if (winStyle == EnumWinStyle::WinTopApha)
-            SetWindowTopApha(hwnd, true, true);
-        else if (winStyle == EnumWinStyle::WinNoTopNoApha)
-            SetWindowTopApha(hwnd, false, true);
-    }
-    else
-    {
-        if (winStyle == EnumWinStyle::WinTop)
-            SetWindowTopApha(hwnd, true, false);
-        else if (winStyle == EnumWinStyle::WinApha)
-            SetWindowTopApha(hwnd, false, true);
-        else if (winStyle == EnumWinStyle::WinTopApha)
-            SetWindowTopApha(hwnd, true, true);
-        else if (winStyle == EnumWinStyle::WinNoTopNoApha)
-            SetWindowTopApha(hwnd, false, false);
-    }
-}
-
-void WindowStyle::Update(HWND hwnd)
-{
-    POINT Mouse_X_Y;	//存放鼠标坐标结构体
-    //获取鼠标坐标
-    if (FALSE == GetCursorPos(&Mouse_X_Y)) {
-        printf("error：无法获取鼠标指针位于屏幕的坐标值");
-    }
-    else {
-        //printf("鼠标的X坐标：%d,鼠标的Y坐标：%d\n", Mouse_X_Y.x, Mouse_X_Y.y);
-        BYTE r, g, b, a;
-        WindowStyle::GetPixelRGBA(hwnd, Mouse_X_Y.x, Mouse_X_Y.y, r, g, b, a);
-        //printf("%d %d %d %d\n", r, g, b, a);
-        if (r == 0 && g == 0 && b == 0 && a == 0)WindowStyle::canTrans = true;
-        else WindowStyle::canTrans = false;
-    }
-    WindowStyle::UpdateWindowStyle(hwnd);
-}

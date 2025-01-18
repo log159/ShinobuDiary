@@ -141,23 +141,41 @@ void LAppLive2DManager::SetUpModel()
             csmString model3jsonPath(ResourcesPath);
             model3jsonPath += name;
             model3jsonPath.Append(1, '/');
-            model3jsonPath += name;
-            model3jsonPath += ".model3.json";
-
-            LAppPal::ConvertMultiByteToWide(model3jsonPath.GetRawString(), wideStr, MAX_PATH);
-
-            struct _wfinddata_t fdata2;
-            if (_wfindfirst(wideStr, &fdata2) != -1)
             {
-                _modelDir.PushBack(csmString(name));
+                csmString crawlPath(model3jsonPath);
+                crawlPath += "*.*";
+                wchar_t wideStr[MAX_PATH];
+                csmChar name[MAX_PATH];
+                LAppPal::ConvertMultiByteToWide(crawlPath.GetRawString(), wideStr, MAX_PATH);
+                struct _wfinddata_t fdata;
+                intptr_t fh = _wfindfirst(wideStr, &fdata);
+                if (fh == -1)
+                {
+                    return;
+                }
+                while (_wfindnext(fh, &fdata) == 0)
+                {
+                    if (!(fdata.attrib & _A_SUBDIR))
+                    {
+                        if (wcslen(fdata.name) >= 11 && wcscmp(fdata.name + wcslen(fdata.name) - 11, L"model3.json") == 0)
+                        {
+                            LAppPal::ConvertWideToMultiByte(fdata.name, name, MAX_PATH);
+                            _modelDir.PushBack(csmString(model3jsonPath)+ csmString(name));
+                        }
+                    }
+
+                }
             }
         }
     }
-    for (int i = 0; i < _modelDir.GetSize(); ++i) {
+    for (csmUint32 i = 0; i < _modelDir.GetSize(); ++i) {
         printf("%hs\n", _modelDir[i].GetRawString());
     }
-
+    printf("Cubism find end\n");
     qsort(_modelDir.GetPtr(), _modelDir.GetSize(), sizeof(csmString), CompareCsmString);
+
+
+    
 }
 
 csmVector<csmString> LAppLive2DManager::GetModelDir() const
@@ -291,18 +309,40 @@ void LAppLive2DManager::ChangeScene(Csm::csmInt32 index)
 
     // model3.jsonのパスを決定する.
     // ディレクトリ名とmodel3.jsonの名前を一致していることが条件
-    const csmString& model = _modelDir[index];
+    const csmChar* modelptr = _modelDir[index].GetRawString();
+    const csmChar* lastSlash = strrchr(modelptr, '/');
+    csmChar modelPath[512] = { 0 };
+    csmChar modelJsonName[512] = { 0 };
+    size_t pathLength = lastSlash - modelptr+1;
+    strncpy_s(modelPath, modelptr, pathLength);
+    modelPath[pathLength] = '\0';
 
-    csmString modelPath(ResourcesPath);
-    modelPath += model;
-    modelPath.Append(1, '/');
-
-    csmString modelJsonName(model);
-    modelJsonName += ".model3.json";
-
+    // 斜杠之后部分拷贝到modelJsonName
+    strncpy_s(modelJsonName, lastSlash + 1, sizeof(modelJsonName) - 1);
+    modelJsonName[sizeof(modelJsonName) - 1] = '\0';
+    printf("Change Cubism |%hs|\n", modelPath);
+    printf("Change Cubism |%hs|\n", modelJsonName);
     ReleaseAllModel();
     _models.PushBack(new LAppModel());
-    _models[0]->LoadAssets(modelPath.GetRawString(), modelJsonName.GetRawString());
+    _models[0]->LoadAssets(modelPath, modelJsonName);
+
+    //model->GetModel()->SetOverwriteFlagForMultiplyColors(true); // 正片叠底色覆盖标志
+    //model->GetModel()->SetOverwriteFlagForScreenColors(true); // 屏幕色覆盖标志
+    // 
+        // model3.jsonのパスを決定する.
+    // ディレクトリ名とmodel3.jsonの名前を一致していることが条件
+    //const csmString& model = _modelDir[index];
+
+    //csmString modelPath(ResourcesPath);
+    //modelPath += model;
+    //modelPath.Append(1, '/');
+
+    //csmString modelJsonName(model);
+    //modelJsonName += ".model3.json";
+
+    //ReleaseAllModel();
+    //_models.PushBack(new LAppModel());
+    //_models[0]->LoadAssets(modelPath.GetRawString(), modelJsonName.GetRawString());
 
     /*
      * モデル半透明表示を行うサンプルを提示する。

@@ -145,16 +145,19 @@ void CubismUserModelExtend::SetupModel()
 
     //ポーズデータの読み込み
     LoadAsset(_modelJson->GetPoseFileName(), [=](Csm::csmByte* buffer, Csm::csmSizeInt bufferSize) {
-       LoadPose(buffer, bufferSize);
+        printf("%s\n",_modelJson->GetPoseFileName());
+        LoadPose(buffer, bufferSize);
     });
 
     // 物理演算データの読み込み
     LoadAsset(_modelJson->GetPhysicsFileName(), [=](Csm::csmByte* buffer, Csm::csmSizeInt bufferSize) {
+        printf("%s\n", _modelJson->GetPhysicsFileName());
         LoadPhysics(buffer, bufferSize);
     });
 
     // モデルに付属するユーザーデータの読み込み
     LoadAsset(_modelJson->GetUserDataFile(), [=](Csm::csmByte* buffer, Csm::csmSizeInt bufferSize) {
+        printf("%s\n", _modelJson->GetUserDataFile());
         LoadUserData(buffer, bufferSize);
     });
 

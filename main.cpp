@@ -27,28 +27,16 @@ static bool                     g_SwapChainOccluded = false;
 static UINT                     g_ResizeWidth = 0, g_ResizeHeight = 0;
 static ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
 
-// Forward declarations of helper functions
 bool CreateDeviceD3D(HWND hWnd);
 void CleanupDeviceD3D();
 void CreateRenderTarget();
 void CleanupRenderTarget();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-
-DWORD WINAPI CubismThread(LPVOID lpParam)
-{
-    return 0;
-    if (!LAppDelegate::GetInstance()->Initialize())
-    {
-        // 初期化失敗
-        LAppDelegate::GetInstance()->Release();
-        LAppDelegate::ReleaseInstance();
-    }
-    else {
-        LAppDelegate::GetInstance()->Run();
-    }
-    return 0;
-}
+void FrontPart();
+void PosteriorPart();
+// Shinobu Function
+DWORD WINAPI CubismThread(LPVOID lpParam);
 
 // Main code
 int main(int, char**)
@@ -58,62 +46,18 @@ int main(int, char**)
 //                     _In_ int       nCmdShow)
 //int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int)
 {
-    //全局UTF-8
-    SetConsoleOutputCP(CP_UTF8);
-    //调用这个函数解决字体发虚的问题
-    ImGui_ImplWin32_EnableDpiAwareness();
-
-    WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"Shinobu Example", nullptr };
-    ::RegisterClassExW(&wc);
-    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Dear Shinobu", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, nullptr, nullptr, wc.hInstance, nullptr);
-    ImGui_ImplWin32_EnableAlphaCompositing(hwnd);
-
-    if (!CreateDeviceD3D(hwnd))
-    {
-        CleanupDeviceD3D();
-        ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
-    }
-    ::ShowWindow(hwnd, SW_HIDE);
-    ::UpdateWindow(hwnd);
-
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // 启用停靠
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
-    //io.ConfigFlags |= ImGuiTabBarFlags_DrawSelectedOverline;
-    io.ConfigViewportsNoAutoMerge = true;
-    io.ConfigViewportsNoTaskBarIcon = true;
-    io.ConfigDockingTransparentPayload = true;                // 停靠时透明
-
-    //全局初始化
+    //---------------------前部分--------------------
+    FrontPart();
+    //--------------------中间部分---------------------
+    // 全局初始化
     ::GlobalConfig::getInstance();
-
-    //初始化配置
+    // 初始化配置
     Su::S_AllConfigInit();
-
-    //这一段是ImGui默认这样做的
-    ImGuiStyle& style = ImGui::GetStyle();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    {
-        style.WindowRounding = 0.0f;
-        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-    }
-
-    // Setup Platform/Renderer backends
-    ImGui_ImplWin32_Init(hwnd);
-    ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
-
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-    DWORD threadID;
-    HANDLE hThread;
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    DWORD threadID; HANDLE hThread;
     hThread = CreateThread(NULL, 0, CubismThread, NULL, 0, &threadID);	// 创建线程
-
-     //Main loop
-    bool done = false;
+    //Main loop
+    static bool done = false;
     while (!done)
     {
         // Poll and handle messages (inputs, window resize, etc.)
@@ -126,8 +70,6 @@ int main(int, char**)
             if (msg.message == WM_QUIT)
                 done = true;
         }
-
-
         // Handle window being minimized or screen locked
         if (g_SwapChainOccluded && g_pSwapChain->Present(0, DXGI_PRESENT_TEST) == DXGI_STATUS_OCCLUDED)
         {
@@ -151,28 +93,26 @@ int main(int, char**)
         ImGui::NewFrame();
 
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-
         bool show_demo_window = true;
-        if (show_demo_window)
-            ImGui::ShowDemoWindow(&show_demo_window);
-
+        if (show_demo_window)ImGui::ShowDemoWindow(&show_demo_window);
         static bool show_shinobu_window = true;
-        if (show_shinobu_window) {
-            ShowShinobuWindow(&show_shinobu_window);
+        if (show_shinobu_window)ShowShinobuWindow(&show_shinobu_window);
+        else done = true;
+        if (GlobalTemp::ShowStyleEditor) {
+            ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
+            ImGui::Begin(TT_39, &GlobalTemp::ShowStyleEditor);
+            ImGui::ShowStyleEditor();
+            ImGui::End();
         }
-        else {
-            done = true;
-        }
-
         // Rendering
         ImGui::Render();
 
-        if (ImGui::GetIO().Framerate > 61.f)
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
+        //限制帧率
+        if (ImGui::GetIO().Framerate > GlobalConfig::getInstance()->window_main_forecastfps)
+            std::this_thread::sleep_for(std::chrono::milliseconds(GlobalConfig::getInstance()->window_main_addtimefps));
 
-        const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
+        static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+        static const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
         g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, nullptr);
         g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color_with_alpha);
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -184,25 +124,86 @@ int main(int, char**)
             ImGui::RenderPlatformWindowsDefault();
         }
 
-        // Present
-        HRESULT hr = g_pSwapChain->Present(1, 0);   // Present with vsync
+        HRESULT hr = g_pSwapChain->Present(1, 0);
         g_SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
-
     }
 
+    //---------------------后部分--------------------------
+    PosteriorPart();
+
+    if (hThread != 0) {
+        CloseHandle(hThread);	// 关闭Cubism内核对象
+    }
+    return 0;
+}
+
+//Cubism Thread
+DWORD WINAPI CubismThread(LPVOID lpParam)
+{
+    return 0;
+    if (!LAppDelegate::GetInstance()->Initialize())
+    {
+        // 初期化失敗
+        LAppDelegate::GetInstance()->Release();
+        LAppDelegate::ReleaseInstance();
+    }
+    else {
+        LAppDelegate::GetInstance()->Run();
+    }
+    return 0;
+}
+void FrontPart() {
+    //全局UTF-8
+    SetConsoleOutputCP(CP_UTF8);
+    //调用这个函数解决字体发虚的问题
+    ImGui_ImplWin32_EnableDpiAwareness();
+
+    WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"Shinobu Example", nullptr };
+    ::RegisterClassExW(&wc);
+    static int currentX = 0, currentY = 0, resWidth = GetSystemMetrics(SM_CXSCREEN), resHeight = GetSystemMetrics(SM_CYSCREEN);
+    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Dear Shinobu", WS_OVERLAPPEDWINDOW, currentX, currentY, resWidth, resHeight, nullptr, nullptr, wc.hInstance, nullptr);
+    GlobalTemp::window_main_wc = wc;
+    GlobalTemp::window_main_handle = hwnd;
+    ImGui_ImplWin32_EnableAlphaCompositing(hwnd);
+    if (!CreateDeviceD3D(hwnd))
+    {
+        CleanupDeviceD3D();
+        ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
+    }
+    ::ShowWindow(hwnd, SW_HIDE);
+    ::UpdateWindow(hwnd);
+    // Setup context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // 启用停靠
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+    io.ConfigViewportsNoAutoMerge = true;
+    io.ConfigViewportsNoTaskBarIcon = true;
+    io.ConfigDockingTransparentPayload = true;                // 停靠时透明
+
+    // 这一段是默认这样做的
+    ImGuiStyle& style = ImGui::GetStyle();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        style.WindowRounding = 0.0f;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    }
+    // 设置平台、渲染后端
+    ImGui_ImplWin32_Init(GlobalTemp::window_main_handle);
+    ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
+}
+void PosteriorPart() {
     // Cleanup
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
 
     CleanupDeviceD3D();
-    ::DestroyWindow(hwnd);
-    ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
-
-    if (hThread != 0) {
-        CloseHandle(hThread);	// 关闭内核对象
-    }
-    return 0;
+    ::DestroyWindow(GlobalTemp::window_main_handle);
+    ::UnregisterClassW(GlobalTemp::window_main_wc.lpszClassName, GlobalTemp::window_main_wc.hInstance);
 }
 
 // Helper functions
