@@ -97,7 +97,10 @@ int main(int, char**)
         if (show_demo_window)ImGui::ShowDemoWindow(&show_demo_window);
         static bool show_shinobu_window = true;
         if (show_shinobu_window)ShowShinobuWindow(&show_shinobu_window);
-        else done = true;
+        else { 
+            ::GlobalConfig::GlobalConfigSave();
+            done = true; 
+        }
         if (GlobalTemp::ShowStyleEditor) {
             ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
             ImGui::Begin(TT_39, &GlobalTemp::ShowStyleEditor);
@@ -140,7 +143,7 @@ int main(int, char**)
 //Cubism Thread
 DWORD WINAPI CubismThread(LPVOID lpParam)
 {
-    return 0;
+    //return 0;
     if (!LAppDelegate::GetInstance()->Initialize())
     {
         // 初期化失敗
@@ -157,13 +160,16 @@ void FrontPart() {
     SetConsoleOutputCP(CP_UTF8);
     //调用这个函数解决字体发虚的问题
     ImGui_ImplWin32_EnableDpiAwareness();
+    // DPI 感知启用
+    SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+
 
     WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"Shinobu Example", nullptr };
     ::RegisterClassExW(&wc);
     static int currentX = 0, currentY = 0, resWidth = GetSystemMetrics(SM_CXSCREEN), resHeight = GetSystemMetrics(SM_CYSCREEN);
     HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Dear Shinobu", WS_OVERLAPPEDWINDOW, currentX, currentY, resWidth, resHeight, nullptr, nullptr, wc.hInstance, nullptr);
-    GlobalTemp::window_main_wc = wc;
-    GlobalTemp::window_main_handle = hwnd;
+    GlobalTemp::WindowMainWc = wc;
+    GlobalTemp::WindowMainHandle = hwnd;
     ImGui_ImplWin32_EnableAlphaCompositing(hwnd);
     if (!CreateDeviceD3D(hwnd))
     {
@@ -192,7 +198,7 @@ void FrontPart() {
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
     // 设置平台、渲染后端
-    ImGui_ImplWin32_Init(GlobalTemp::window_main_handle);
+    ImGui_ImplWin32_Init(GlobalTemp::WindowMainHandle);
     ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 }
 void PosteriorPart() {
@@ -202,8 +208,8 @@ void PosteriorPart() {
     ImGui::DestroyContext();
 
     CleanupDeviceD3D();
-    ::DestroyWindow(GlobalTemp::window_main_handle);
-    ::UnregisterClassW(GlobalTemp::window_main_wc.lpszClassName, GlobalTemp::window_main_wc.hInstance);
+    ::DestroyWindow(GlobalTemp::WindowMainHandle);
+    ::UnregisterClassW(GlobalTemp::WindowMainWc.lpszClassName, GlobalTemp::WindowMainWc.hInstance);
 }
 
 // Helper functions
@@ -305,5 +311,4 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     return ::DefWindowProcW(hWnd, msg, wParam, lParam);
 }
-
 

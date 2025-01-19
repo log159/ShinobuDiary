@@ -71,6 +71,6 @@ namespace LAppDefine {
     //const csmInt32 RenderTargetWidth = 700;
     //const csmInt32 RenderTargetHeight = 700;
 
-    csmInt32 RenderTargetWidth = 0;
-    csmInt32 RenderTargetHeight = 0;
+    csmInt32 RenderTargetWidth;
+    csmInt32 RenderTargetHeight;
 }

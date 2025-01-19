@@ -12,8 +12,10 @@
 #endif // IS_WINDOWS
 
 bool GlobalTemp::ShowStyleEditor = false;
-HWND GlobalTemp::window_main_handle;
-WNDCLASSEXW GlobalTemp::window_main_wc;
+HWND GlobalTemp::WindowMainHandle;
+WNDCLASSEXW GlobalTemp::WindowMainWc;
+int GlobalTemp::CubismFrameCount = 0;
+
 
 void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
     static bool initHas = false;if (initHas == true) return;initHas = true;
@@ -40,9 +42,9 @@ void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
     gc->window_main_transparent_id = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_TRANSPARENT_ID], INITINT);
 
     if (gc->window_main_style_id == 0)
-        ::SetWindowPos(GlobalTemp::window_main_handle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+        ::SetWindowPos(GlobalTemp::WindowMainHandle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
     else if (gc->window_main_style_id == 1)
-        ::SetWindowPos(GlobalTemp::window_main_handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+        ::SetWindowPos(GlobalTemp::WindowMainHandle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
     if (gc->window_main_dock_id == 0)  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     else if (gc->window_main_dock_id == 1) io.ConfigFlags &= (~ImGuiConfigFlags_DockingEnable);
@@ -50,7 +52,10 @@ void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
     else if (gc->window_main_transparent_id == 1) io.ConfigDockingTransparentPayload = false;
 
     gc->window_main_forecastfps = (float)FileSetting::S_GetDoubleValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_FORECASTFPS], 120.0f);
-    gc->window_main_addtimefps = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_ADDTIMEFPS], INITINT);
+    gc->window_main_addtimefps = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_ADDTIMEFPS], 0);
+
+    gc->window_cubism_addtimefps = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_ADDTIMEFPS], 0);
+
 
     
 #ifdef IS_WINDOWS
@@ -136,7 +141,10 @@ void GlobalConfig::GlobalConfigSave(GlobalConfig* gc)
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     FileSetting::S_SetDoubleValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::FONT_GLOBAL_SCALE], (double)io.FontGlobalScale);
     FileSetting::S_SetDoubleValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_FORECASTFPS], (double)::GlobalConfig::getInstance()->window_main_forecastfps);
-    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_ADDTIMEFPS], (double)::GlobalConfig::getInstance()->window_main_addtimefps);
+    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_ADDTIMEFPS],::GlobalConfig::getInstance()->window_main_addtimefps);
+
+    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_ADDTIMEFPS], ::GlobalConfig::getInstance()->window_cubism_addtimefps);
+
 }
 
 GlobalConfig::~GlobalConfig()

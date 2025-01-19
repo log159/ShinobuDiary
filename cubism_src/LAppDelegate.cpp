@@ -17,6 +17,9 @@
 #include "LAppModel.hpp"
 #include <dwmapi.h>
 #include <vector>
+#include <thread>
+#include <functional>
+#include <chrono>
 
 using namespace std;
 using namespace Csm;
@@ -25,7 +28,7 @@ using namespace LAppDefine;
 namespace {
     LAppDelegate* s_instance = NULL;
 
-    const LPCSTR ClassName = "Cubism DirectX11 Sample";
+    const LPCSTR ClassName = "ShinobuDiary Cubism";
 
     const csmInt32 BackBufferNum = 1; // バックバッファ枚数
 }
@@ -111,7 +114,6 @@ void LAppDelegate::ReleaseInstance()
 }
 bool LAppDelegate::Initialize()
 {
-
     if (DebugLogEnable)
     {
         LAppPal::PrintLogLn("START");
@@ -122,7 +124,7 @@ bool LAppDelegate::Initialize()
     RegisterClassEx(&_windowClass);
     RenderTargetWidth = GetSystemMetrics(SM_CXSCREEN);
     RenderTargetHeight = GetSystemMetrics(SM_CYSCREEN);
-
+    cout << RenderTargetWidth << " " << RenderTargetHeight << endl;
     // タイトルバー、ウィンドウ枠の分サイズを増やす
     RECT rect;
     SetRect(&rect, 0, 0, RenderTargetWidth, RenderTargetHeight);
@@ -332,21 +334,70 @@ void LAppDelegate::Release()
 
     UnregisterClass(ClassName, _windowClass.hInstance);
 }
+//不限制帧率的Run
+//void LAppDelegate::Run()
+//{
+//    MSG msg;
+//
+//    do
+//    {
+//        //メッセージループ
+//        if(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+//        {
+//            TranslateMessage(&msg);
+//            DispatchMessage(&msg);
+//        }
+//        else
+//        {
+//            //std::this_thread::sleep_for(std::chrono::milliseconds(10));
+//            // 窗口更新
+//            CubismWindowStyle::Update(_windowHandle);
+//
+//            // 時間更新
+//            LAppPal::UpdateTime();
+//
+//            // 画面クリアなど
+//            StartFrame();
+//
+//            // 描画
+//            _view->Render();
+//
+//            // フレーム末端処理
+//            EndFrame();
+//
+//            // アプリケーション終了メッセージでウィンドウを破棄する
+//            if (GetIsEnd() && _windowHandle!=NULL)
+//            {// ウィンドウ破壊
+//                DestroyWindow(_windowHandle);
+//                _windowHandle = NULL;
+//            }
+//        }
+//    } while (msg.message != WM_QUIT);
+//
+//    // 解放
+//    Release();
+//    // インスタンス削除
+//    ReleaseInstance();
+//}
+
 
 void LAppDelegate::Run()
 {
     MSG msg;
+    int frameCount = 0;
+    ULONGLONG startTime = GetTickCount64(); // 获取当前时间（毫秒）
 
     do
     {
-        //メッセージループ
-        if(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        // メッセージループ
+        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
         else
         {
+            std::this_thread::sleep_for(std::chrono::milliseconds(GlobalConfig::getInstance()->window_cubism_addtimefps));
 
             // 窗口更新
             CubismWindowStyle::Update(_windowHandle);
@@ -363,9 +414,19 @@ void LAppDelegate::Run()
             // フレーム末端処理
             EndFrame();
 
+            // 统计循环次数
+            frameCount++;
+            ULONGLONG currentTime = GetTickCount64();
+            if (currentTime - startTime >= 1000) // 一秒时间已过
+            {
+                GlobalTemp::CubismFrameCount = frameCount;
+                frameCount = 0;
+                startTime = currentTime;
+            }
+
             // アプリケーション終了メッセージでウィンドウを破棄する
-            if (GetIsEnd() && _windowHandle!=NULL)
-            {// ウィンドウ破壊
+            if (GetIsEnd() && _windowHandle != NULL)
+            {
                 DestroyWindow(_windowHandle);
                 _windowHandle = NULL;
             }
@@ -672,5 +733,3 @@ ID3D11DeviceContext* LAppDelegate::GetD3dContext()
     }
     return s_instance->_deviceContext;
 }
-
-

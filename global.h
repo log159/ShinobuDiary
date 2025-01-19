@@ -16,8 +16,9 @@ class FileSetting;
 class GlobalTemp {
 public:
     static bool ShowStyleEditor;
-    static HWND window_main_handle;
-    static WNDCLASSEXW window_main_wc;
+    static int CubismFrameCount;
+    static HWND WindowMainHandle;
+    static WNDCLASSEXW WindowMainWc;
 };
 
 
@@ -41,7 +42,8 @@ enum FREEMARK {
     MYSELF_VITS_URL,
     FONT_GLOBAL_SCALE,
     WINDOW_MAIN_FORECASTFPS,
-    WINDOW_MAIN_ADDTIMEFPS
+    WINDOW_MAIN_ADDTIMEFPS,
+    WINDOW_CUBISM_ADDTIMEFPS
 };
 static std::map<FREEMARK, const char*>inifreemark_map = {
     {FREEMARK::LANGUAGESEL_ID,                      "languagesel_id"},
@@ -63,7 +65,8 @@ static std::map<FREEMARK, const char*>inifreemark_map = {
     {FREEMARK::MYSELF_VITS_URL,                     "myself_vits_url"},
     {FREEMARK::FONT_GLOBAL_SCALE,                   "font_global_scale"},
     {FREEMARK::WINDOW_MAIN_FORECASTFPS,             "window_main_forecastfps"},
-    {FREEMARK::WINDOW_MAIN_ADDTIMEFPS,              "window_main_addtimefps"}
+    {FREEMARK::WINDOW_MAIN_ADDTIMEFPS,              "window_main_addtimefps"},
+    {FREEMARK::WINDOW_CUBISM_ADDTIMEFPS,            "window_cubism_addtimefps"}
 };
 enum INIMARK { KEY, APPID, SECRET, BASEURL, ADDRESS, PORT };
 static std::map<INIMARK, const char*>inimark_map = {
@@ -84,15 +87,17 @@ LANGUAGE_ENUM_DEF(CN, EN /*other*/)
 class GlobalConfig {
 public:
     ::LAN select_lan;
-    int user_num                    = 0;
+    int user_num                       = 0;
     int select_theme_id                = 0;        /*{ 0,1,2 }*/
     int window_main_style_id           = 0;        /*{ 0,1 }*/
     int window_main_dock_id            = 0;        /*{ 0,1 }*/
     int window_main_transparent_id     = 0;        /*{ 0,1 }*/
     float window_main_forecastfps   = 120.0f;   /*10.0f-120.0f*/
-    int window_main_addtimefps      = 0;        /*0-200*/
+    int window_main_addtimefps      = 0;        /*0-100*/
 
     int window_cubism_style_id      = 0;        /*{ 0,1,2,3 }*/
+    int window_cubism_addtimefps    = 0;        /*0-100*/
+
     std::string select_font         = "";
     const char** fonts_list         = NULL;
     const char** fonts_name_list    = NULL;

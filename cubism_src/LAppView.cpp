@@ -408,7 +408,9 @@ void LAppView::PreModelDraw(LAppModel& refModel)
 
         // レンダリング開始
         useTarget->BeginDraw(LAppDelegate::GetInstance()->GetD3dContext());
-        useTarget->Clear(LAppDelegate::GetInstance()->GetD3dContext(), _clearColor[0], _clearColor[1], _clearColor[2], _clearColor[3]); // 背景クリアカラー
+        //Shinobu Debug
+        //不需要背景
+        //useTarget->Clear(LAppDelegate::GetInstance()->GetD3dContext(), _clearColor[0], _clearColor[1], _clearColor[2], _clearColor[3]); // 背景クリアカラー
     }
 }
 

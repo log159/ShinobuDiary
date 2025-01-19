@@ -103,6 +103,7 @@ void ShowShinobuGlobal()
     if (ImGui::CollapsingHeader(TT_224))
     {
         if (ImGui::TreeNode(TT_231)) {
+
             ImGuiIO& io = ImGui::GetIO(); (void)io;
 
             ImGui::SeparatorText(TT_40);
@@ -124,9 +125,9 @@ void ShowShinobuGlobal()
             if (::GlobalConfig::getInstance()->window_main_style_id != ws_t){
                 ::GlobalConfig::getInstance()->window_main_style_id = ws_t;
                 if (ws_t == 0) 
-                    ::SetWindowPos(GlobalTemp::window_main_handle, HWND_NOTOPMOST,0, 0,0, 0,SWP_NOMOVE | SWP_NOSIZE );
+                    ::SetWindowPos(GlobalTemp::WindowMainHandle, HWND_NOTOPMOST,0, 0,0, 0,SWP_NOMOVE | SWP_NOSIZE );
                 else if(ws_t ==1)
-                    ::SetWindowPos(GlobalTemp::window_main_handle, HWND_TOPMOST , 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+                    ::SetWindowPos(GlobalTemp::WindowMainHandle, HWND_TOPMOST , 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
                 ::GlobalConfig::GlobalConfigSave();
             }
             if (::GlobalConfig::getInstance()->window_main_dock_id != ws_d) {
@@ -134,8 +135,6 @@ void ShowShinobuGlobal()
                 if (ws_d == 0)  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
                 else if(ws_d==1) io.ConfigFlags &= (~ImGuiConfigFlags_DockingEnable); 
                 ::GlobalConfig::GlobalConfigSave();
-
-                //io.ConfigDockingTransparentPayload = true;                // 停靠时透明
             }
             if (::GlobalConfig::getInstance()->window_main_transparent_id != ws_dt) {
                 ::GlobalConfig::getInstance()->window_main_transparent_id = ws_dt;
@@ -146,14 +145,12 @@ void ShowShinobuGlobal()
 
 
             ImGui::SeparatorText(TT_233);
-            //static float fps = 0.0f, fps_min_stop = 0.0f;
-            ImGui::SliderFloat(TT_236, &GlobalConfig::getInstance()->window_main_forecastfps, 10.0f, 120.0f, "%.2f", ImGuiSliderFlags_None);
-            ImGui::SliderInt(TT_237, &GlobalConfig::getInstance()->window_main_addtimefps, 0, 200, "%d", ImGuiSliderFlags_None);
+            ImGui::SliderFloat(TT_236, &GlobalConfig::getInstance()->window_main_forecastfps, 10.0f, 120.0f, "%.2f fps", ImGuiSliderFlags_None);
+            ImGui::SliderInt(TT_237, &GlobalConfig::getInstance()->window_main_addtimefps, 0, 100, TT_247, ImGuiSliderFlags_None);
+            ImGui::SameLine(); HelpMarker(TT_246);
 
             ImGui::Text(TT_42, 1000.0f / io.Framerate, io.Framerate);
-            if (ImGui::Button(TT_8)) {
-                ::GlobalConfig::GlobalConfigSave();
-            }
+
             ImGui::TreePop();
         }
         if (ImGui::TreeNode(TT_225)) {
@@ -167,6 +164,14 @@ void ShowShinobuGlobal()
                 CubismLoom::addMessageList(::window_group_mark, ::window_style_mark, std::to_string(e).c_str());
                 ::GlobalConfig::GlobalConfigSave();
             }
+
+            ImGui::SeparatorText(TT_248);
+            ImGui::Text(TT_250);
+
+            ImGui::SliderInt(TT_237, &GlobalConfig::getInstance()->window_cubism_addtimefps, 0, 100, TT_247, ImGuiSliderFlags_None);
+            ImGui::SameLine(); HelpMarker(TT_246);
+
+            ImGui::Text(TT_249, GlobalTemp::CubismFrameCount);
             ImGui::TreePop();
         }
     }

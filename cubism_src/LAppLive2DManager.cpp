@@ -257,7 +257,6 @@ void LAppLive2DManager::OnUpdate() const
             LAppPal::PrintLogLn("Failed to model->GetModel().");
             continue;
         }
-
         if (model->GetModel()->GetCanvasWidth() > 1.0f && windowWidth < windowHeight)
         {
             // 横に長いモデルを縦長ウィンドウに表示する際モデルの横サイズでscaleを算出する

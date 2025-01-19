@@ -75,7 +75,7 @@ csmByte* LAppPal::LoadFileAsBytes(const string filePath, csmSizeInt* outSize)
     std::wfilebuf* fileBuf = file.rdbuf();
     for (csmUint32 i = 0; i < *outSize; i++)
     {
-        buf[i] = fileBuf->sbumpc();
+        buf[i] = static_cast<csmChar>(fileBuf->sbumpc());
     }
     file.close();
 

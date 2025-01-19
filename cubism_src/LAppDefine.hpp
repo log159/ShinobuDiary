@@ -68,3 +68,4 @@ namespace LAppDefine {
     extern csmInt32 RenderTargetWidth;
     extern csmInt32 RenderTargetHeight;
 }
+
