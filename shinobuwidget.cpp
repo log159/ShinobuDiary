@@ -25,6 +25,11 @@ void ShowShinobuHead() {
     ImGui::ProgressBar(-0.5f * (float)ImGui::GetTime(), ImVec2(ImGui::GetContentRegionAvail().x, 7.0f), NULL);
 
 }
+void ShowShinobuLunar()
+{
+    ImGui::Text(GlobalTemp::LunarCalendar.c_str());
+
+}
 void ShowShinobuStart()
 {
     return;
@@ -189,7 +194,7 @@ void ShowShinobuUser()
                 int pos = Su::UserConfig::getUserVector().size();
                 Su::UserConfig::getUserVector().push_back(Su::UserConfig(pos + 1));
                 ::GlobalConfig::getInstance()->user_num = Su::UserConfig::getUserVector().size();
-                Su::S_AllConfigSave();
+                Su::AllConfigSave();
             }
             static char tabname[DEFSIZE];
             int erase_pos = -1;
@@ -240,7 +245,7 @@ void ShowShinobuUser()
                 }
                 erase_pos = -1;
                 ::GlobalConfig::getInstance()->user_num = Su::UserConfig::getUserVector().size();
-                Su::S_AllConfigSave();
+                Su::AllConfigSave();
             }
             ImGui::EndTabBar();
         }
@@ -252,12 +257,12 @@ void ShowShinobuLLM(Su::UserConfig* _uc) {
         if (ImGui::Button(butname))
         {
             std::cout << butname << std::endl;
-            S_SaveKasb(_uc, llmc);
+            SaveKasb(_uc, llmc);
         }
     };
     auto ft = [fb](const char* nodename, Su::LLMConfig* llmc, const char* butname) {
         static char button[DEFSIZE];
-        Su::S_GetGuiMark(button, sizeof(button), butname, llmc->name);
+        Su::GetGuiMark(button, sizeof(button), butname, llmc->name);
         KASB_FUNCTION(llmc)
         fb(button, llmc);
     };
@@ -282,7 +287,7 @@ void ShowShinibuTTS(Su::UserConfig* _uc) {
         if (ImGui::Button(butname))
         {
             std::cout << butname << std::endl;
-            S_UserConfigSave(_uc);
+            UserConfigSave(_uc);
 
         }
     };
@@ -293,7 +298,7 @@ void ShowShinibuTTS(Su::UserConfig* _uc) {
         static char input_value[DEFSIZE];
         if (ttsc->tts == Su::TTS::VITS_SIMPLE_API) {
             AP_FUNCTION(ttsc);
-            Su::S_MemsetStr(input,sizeof(input));
+            Su::MemsetStr(input,sizeof(input));
             strcpy_s(input, sizeof(input),TT_27);
             {
                 if (ImGui::BeginCombo(input, ::vits_simple_api_model_list[_uc->vits_simple_api_model_id])) {
@@ -301,7 +306,7 @@ void ShowShinibuTTS(Su::UserConfig* _uc) {
                         const bool is_selected = ((int)_uc->vits_simple_api_model_id == n);
                         if (ImGui::Selectable(::vits_simple_api_model_list[n], is_selected)) {
                             _uc->vits_simple_api_model_id = n;
-                            S_UserConfigSave(_uc);
+                            UserConfigSave(_uc);
                         }
                         if (is_selected)ImGui::SetItemDefaultFocus();
                     }
@@ -323,7 +328,7 @@ void ShowShinibuTTS(Su::UserConfig* _uc) {
         else if(ttsc->tts== Su::TTS::GPT_SOVITS) {
             
             AP_FUNCTION(ttsc);
-            Su::S_MemsetStr(input, sizeof(input));
+            Su::MemsetStr(input, sizeof(input));
             strcpy_s(input, sizeof(input), TT_27);
             {
                 if (ImGui::BeginCombo(input, ::gpt_sovits_target_language_list[_uc->gpt_sovits_target_language_id])) {
@@ -331,7 +336,7 @@ void ShowShinibuTTS(Su::UserConfig* _uc) {
                         const bool is_selected = ((int)_uc->gpt_sovits_target_language_id == n);
                         if (ImGui::Selectable(::gpt_sovits_target_language_list[n], is_selected)) {
                             _uc->gpt_sovits_target_language_id = n;
-                            S_UserConfigSave(_uc);
+                            UserConfigSave(_uc);
                         }
                         if (is_selected)ImGui::SetItemDefaultFocus();
                     }
@@ -343,13 +348,13 @@ void ShowShinibuTTS(Su::UserConfig* _uc) {
             static char url[DEFSIZE];
             static char input_url[DEFSIZE16]; 
             strcpy_s(input_url, sizeof(input_url), _uc->myself_vits.c_str());
-            Su::S_GetGuiMark(url, sizeof(url), TT_31, ttsc->name);
+            Su::GetGuiMark(url, sizeof(url), TT_31, ttsc->name);
             ImGui::InputText(url, input_url, IM_ARRAYSIZE(input_url));
             _uc->myself_vits.assign(input_url);
 
         }
 
-        Su::S_GetGuiMark(button, sizeof(button), butname, ttsc->name);
+        Su::GetGuiMark(button, sizeof(button), butname, ttsc->name);
         fb(button, ttsc);
 
     };
@@ -374,13 +379,13 @@ void ShowShinobuSTT(Su::UserConfig* _uc) {
         if (ImGui::Button(butname))
         {
             std::cout << butname << std::endl;
-            S_SaveKasb(_uc, sttc);
+            SaveKasb(_uc, sttc);
         }
     };
     auto ft = [fb](const char* nodename, Su::STTConfig* sttc, const char* butname) {
 
         static char button[DEFSIZE];
-        Su::S_GetGuiMark(button, sizeof(button), butname, sttc->name);
+        Su::GetGuiMark(button, sizeof(button), butname, sttc->name);
         KASB_FUNCTION(sttc)
         fb(button, sttc);
     };
@@ -407,13 +412,13 @@ void ShowShinobuMT(Su::UserConfig* _uc) {
         if (ImGui::Button(butname))
         {
             std::cout << butname << std::endl;
-            S_SaveKasb(_uc, mtc);
+            SaveKasb(_uc, mtc);
         }
     };
     auto ft = [fb](const char* nodename, Su::MTConfig* mtc, const char* butname) {
 
             static char button[DEFSIZE];
-            Su::S_GetGuiMark(button, sizeof(button), butname, mtc->name);
+            Su::GetGuiMark(button, sizeof(button), butname, mtc->name);
             KASB_FUNCTION(mtc)
             fb(button, mtc);
     };
@@ -470,6 +475,7 @@ void ShowShinobuWindow(bool* p_open) {
     ImGui::Begin(buf, p_open);
 
     ShowShinobuHead();
+    ShowShinobuLunar();
     ShowShinobuStart();
     //{
     //    static char text[DEFSIZEK16] =
@@ -494,7 +500,7 @@ void ShowShinobuWindow(bool* p_open) {
     //    ImGui::InputTextMultiline("##source", text, IM_ARRAYSIZE(text), ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 5), flags);
     //    ImGui::InputTextMultiline("##source2", text2, IM_ARRAYSIZE(text2), ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 5), flags2);
     //    if (ImGui::Button("Send Button")) {
-    //        Su::S_SparkDesk(&Su::UserConfig::getUserVector()[0].getLLMConfig(Su::LLM::SPARKDESK)->kasb, text, sizeof(text), text2);
+    //        Su::SparkDesk(&Su::UserConfig::getUserVector()[0].getLLMConfig(Su::LLM::SPARKDESK)->kasb, text, sizeof(text), text2);
     //    }
 
     //    //static char user[DEFSIZEK16];

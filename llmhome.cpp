@@ -1,7 +1,7 @@
 ﻿#include "llmhome.h"
 
 namespace Su {
-    void S_SparkDesk(Su::Kasb* kasb, char* const buf, size_t bufsize, const char* question) {
+    void SparkDesk(Su::Kasb* kasb, char* const buf, size_t bufsize, const char* question) {
 
         SparkChainConfig* config = SparkChainConfig::builder();
         config->appID(kasb->appid)          // 你的appid

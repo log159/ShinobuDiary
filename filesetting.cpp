@@ -1,7 +1,7 @@
 ﻿#include "filesetting.h"
 
 #define SS(SET_FUNCTION) CSimpleIniA ini;\
-static char ss[DEFSIZE4];\
+static char ss[DEFPATHSIZE];\
 memset(ss, sizeof(ss), 0);\
 snprintf(ss, sizeof(ss), s, id);\
 ini.SetUnicode(true);\
@@ -11,7 +11,7 @@ ini.SET_FUNCTION(ss, k, n);\
 ini.SaveFile(INITFILE);
 
 #define SG(GET_FUNCTION,RETURN_TYPE) CSimpleIniA ini;\
-static char ss[DEFSIZE4];\
+static char ss[DEFPATHSIZE];\
 memset(ss, sizeof(ss), 0);\
 snprintf(ss, sizeof(ss), s, id);\
 ini.SetUnicode(true);\
@@ -30,28 +30,28 @@ return RETURN_TYPE(ini.GET_FUNCTION(ss, k, n));
 //constexpr int SI_FILE = -3;     //!< File error (see errno for detail error)
 
 
-void FileSetting::S_SetValue(int id, const char* s, const char* k, const char* n){
+void FileSetting::SetValue(int id, const char* s, const char* k, const char* n){
     SS(SetValue);
 }
-std::string FileSetting::S_GetValue(int id, const char* s, const char* k, const char* n){
+std::string FileSetting::GetValue(int id, const char* s, const char* k, const char* n){
     SG(GetValue,std::string)
 }
-void FileSetting::S_SetLongValue(int id, const char* s, const char* k, int n){
+void FileSetting::SetLongValue(int id, const char* s, const char* k, int n){
     SS(SetLongValue)
 }
-int FileSetting::S_GetLongValue(int id, const char* s, const char* k, int n){
+int FileSetting::GetLongValue(int id, const char* s, const char* k, int n){
     SG(GetLongValue,int)
 }
-void FileSetting::S_SetDoubleValue(int id, const char* s, const char* k, double n){
+void FileSetting::SetDoubleValue(int id, const char* s, const char* k, double n){
     SS(SetDoubleValue)
 }
-double FileSetting::S_GetDoubleValue(int id, const char* s, const char* k, double n){
+double FileSetting::GetDoubleValue(int id, const char* s, const char* k, double n){
     SG(GetDoubleValue,double)
 }
-void FileSetting::S_SetBoolValue(int id, const char* s, const char* k, bool n){
+void FileSetting::SetBoolValue(int id, const char* s, const char* k, bool n){
     SS(SetBoolValue)
 }
-bool FileSetting::S_GetBoolValue(int id, const char* s, const char* k, bool n){
+bool FileSetting::GetBoolValue(int id, const char* s, const char* k, bool n){
     SG(GetBoolValue, bool)
 }
 

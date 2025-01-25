@@ -15,7 +15,7 @@ bool GlobalTemp::ShowStyleEditor = false;
 HWND GlobalTemp::WindowMainHandle;
 WNDCLASSEXW GlobalTemp::WindowMainWc;
 int GlobalTemp::CubismFrameCount = 0;
-
+std::string GlobalTemp::LunarCalendar = Su::GetLunar();
 
 void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
     static bool initHas = false;if (initHas == true) return;initHas = true;
@@ -23,9 +23,9 @@ void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
 
     std::cout << u8"全局配置初始化" << std::endl;
 
-    gc->select_lan = (LAN)FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::LANGUAGESEL_ID], INITINT);
-    gc->user_num = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::USER_NUM], INITINT);
-    gc->select_theme_id = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::THEMESEL_ID], INITINT);
+    gc->select_lan = (LAN)FileSetting::GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::LANGUAGESEL_ID], INITINT);
+    gc->user_num = FileSetting::GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::USER_NUM], INITINT);
+    gc->select_theme_id = FileSetting::GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::THEMESEL_ID], INITINT);
     gc->defaultStyle = ImGui::GetStyle();
     FILE* fpp;
     if (fopen_s(&fpp, STYLEWAY, "rb") == 0) {
@@ -34,12 +34,12 @@ void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
         ImGui::GetStyle() = st;
         fclose(fpp);
     }
-    gc->select_font = (std::string)FileSetting::S_GetValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::FONTSEL_NAME], INITSTR);
-    gc->window_cubism_style_id = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_STYLE_ID], INITINT);
+    gc->select_font = (std::string)FileSetting::GetValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::FONTSEL_NAME], INITSTR);
+    gc->window_cubism_style_id = FileSetting::GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_STYLE_ID], INITINT);
 
-    gc->window_main_style_id = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_STYLE_ID], INITINT);
-    gc->window_main_dock_id = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_DOCK_ID], INITINT);
-    gc->window_main_transparent_id = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_TRANSPARENT_ID], INITINT);
+    gc->window_main_style_id = FileSetting::GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_STYLE_ID], INITINT);
+    gc->window_main_dock_id = FileSetting::GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_DOCK_ID], INITINT);
+    gc->window_main_transparent_id = FileSetting::GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_TRANSPARENT_ID], INITINT);
 
     if (gc->window_main_style_id == 0)
         ::SetWindowPos(GlobalTemp::WindowMainHandle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
@@ -51,10 +51,10 @@ void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
     if (gc->window_main_transparent_id == 0)  io.ConfigDockingTransparentPayload = true;
     else if (gc->window_main_transparent_id == 1) io.ConfigDockingTransparentPayload = false;
 
-    gc->window_main_forecastfps = (float)FileSetting::S_GetDoubleValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_FORECASTFPS], 120.0f);
-    gc->window_main_addtimefps = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_ADDTIMEFPS], 0);
+    gc->window_main_forecastfps = (float)FileSetting::GetDoubleValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_FORECASTFPS], 120.0f);
+    gc->window_main_addtimefps = FileSetting::GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_ADDTIMEFPS], 0);
 
-    gc->window_cubism_addtimefps = FileSetting::S_GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_ADDTIMEFPS], 0);
+    gc->window_cubism_addtimefps = FileSetting::GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_ADDTIMEFPS], 0);
 
 
     
@@ -112,7 +112,7 @@ void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
             io.FontDefault = font;
         }
     }
-    io.FontGlobalScale =(float)FileSetting::S_GetDoubleValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::FONT_GLOBAL_SCALE], 1.0);
+    io.FontGlobalScale =(float)FileSetting::GetDoubleValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::FONT_GLOBAL_SCALE], 1.0);
 
 
 }
@@ -121,13 +121,13 @@ void GlobalConfig::GlobalConfigSave(GlobalConfig* gc)
 {
 
     std::cout << u8"全局配置保存" << std::endl;
-    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::LANGUAGESEL_ID], (int)::GlobalConfig::getInstance()->select_lan);
-    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::USER_NUM], (int)::GlobalConfig::getInstance()->user_num);
-    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::THEMESEL_ID], (int)::GlobalConfig::getInstance()->select_theme_id);
+    FileSetting::SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::LANGUAGESEL_ID], (int)::GlobalConfig::getInstance()->select_lan);
+    FileSetting::SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::USER_NUM], (int)::GlobalConfig::getInstance()->user_num);
+    FileSetting::SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::THEMESEL_ID], (int)::GlobalConfig::getInstance()->select_theme_id);
 
-    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_STYLE_ID], (int)::GlobalConfig::getInstance()->window_main_style_id);
-    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_DOCK_ID], (int)::GlobalConfig::getInstance()->window_main_dock_id);
-    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_TRANSPARENT_ID], (int)::GlobalConfig::getInstance()->window_main_transparent_id);
+    FileSetting::SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_STYLE_ID], (int)::GlobalConfig::getInstance()->window_main_style_id);
+    FileSetting::SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_DOCK_ID], (int)::GlobalConfig::getInstance()->window_main_dock_id);
+    FileSetting::SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_TRANSPARENT_ID], (int)::GlobalConfig::getInstance()->window_main_transparent_id);
 
     FILE* fp;
     fopen_s(&fp, STYLEWAY, "wb");
@@ -135,15 +135,15 @@ void GlobalConfig::GlobalConfigSave(GlobalConfig* gc)
         fwrite(&ImGui::GetStyle(), sizeof(ImGuiStyle), 1, fp);
         fclose(fp);
     }
-    FileSetting::S_SetValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::FONTSEL_NAME],::GlobalConfig::getInstance()->select_font.c_str());
-    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_STYLE_ID], ::GlobalConfig::getInstance()->window_cubism_style_id);
+    FileSetting::SetValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::FONTSEL_NAME],::GlobalConfig::getInstance()->select_font.c_str());
+    FileSetting::SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_STYLE_ID], ::GlobalConfig::getInstance()->window_cubism_style_id);
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    FileSetting::S_SetDoubleValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::FONT_GLOBAL_SCALE], (double)io.FontGlobalScale);
-    FileSetting::S_SetDoubleValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_FORECASTFPS], (double)::GlobalConfig::getInstance()->window_main_forecastfps);
-    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_ADDTIMEFPS],::GlobalConfig::getInstance()->window_main_addtimefps);
+    FileSetting::SetDoubleValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::FONT_GLOBAL_SCALE], (double)io.FontGlobalScale);
+    FileSetting::SetDoubleValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_FORECASTFPS], (double)::GlobalConfig::getInstance()->window_main_forecastfps);
+    FileSetting::SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_ADDTIMEFPS],::GlobalConfig::getInstance()->window_main_addtimefps);
 
-    FileSetting::S_SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_ADDTIMEFPS], ::GlobalConfig::getInstance()->window_cubism_addtimefps);
+    FileSetting::SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_ADDTIMEFPS], ::GlobalConfig::getInstance()->window_cubism_addtimefps);
 
 }
 

@@ -253,3 +253,5 @@
 #define TT_249 AT(u8"Live2d 实际帧率(%d FPS)","Live2d frame (%d FPS)")
 #define TT_250 AT(u8"Live2d 预估帧率(此项默认系统最大帧率)",u8"Live2d estimated frame rate (the default system maximum frame rate)")
 #define TT_251 AT(u8"颜色",u8"Color")
+#define TT_252 AT(u8"隐藏标签栏###HideTabBar",u8"Hide tab bar###HideTabBar")
+#define TT_253 AT(u8"单击并拖动以移动或取消停靠整个节点。",u8"Click and drag to move or undock whole node.")

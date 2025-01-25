@@ -144,6 +144,9 @@
     <ClCompile Include="timeconfig.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="sufunction.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui_src\imconfig.h">
@@ -297,6 +300,12 @@
       <Filter>cubism_src</Filter>
     </ClInclude>
     <ClInclude Include="timeconfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sufunction.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sizedef.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

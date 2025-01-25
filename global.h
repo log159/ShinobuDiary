@@ -1,10 +1,12 @@
 ﻿#pragma once
 
 #include <map>
+#include "sizedef.h"
 #include "filesetting.h"
 #include "imgui.h"
+#include "sufunction.h"
 #define FONTSWAY "./Fonts/*.ttf"
-#define FONTSTR "./Fonts/%s"
+#define FONTSTR  "./Fonts/%s"
 #define STYLEWAY "./Saves/style.data"
 #define POS_0 uint32_t(0x1)
 #define POS_1 uint32_t(0x2)
@@ -19,6 +21,7 @@ public:
     static int CubismFrameCount;
     static HWND WindowMainHandle;
     static WNDCLASSEXW WindowMainWc;
+    static std::string LunarCalendar;
 };
 
 

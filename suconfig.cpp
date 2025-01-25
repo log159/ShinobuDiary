@@ -106,19 +106,7 @@ namespace Su {
         return nullptr;
     }
 
-
-    void S_MemsetStr(char* str, size_t size) {
-        memset(str, 0, size);
-    }
-
-    void S_GetGuiMark(char* markbuf, size_t size, const char* name, const char* id) {
-        S_MemsetStr(markbuf, size);
-        strcpy_s(markbuf, size, name);
-        strcat_s(markbuf, size, "##");
-        strcat_s(markbuf, size, id);
-    }
-
-    void S_AllConfigInit()
+    void AllConfigInit()
     {
         std::cout << u8"Su配置初始化" << std::endl;
         UserConfig::getUserVector().clear();
@@ -126,53 +114,53 @@ namespace Su {
             UserConfig::getUserVector().push_back(UserConfig(i));
         }
         for (auto& val : UserConfig::getUserVector())
-            S_UserConfigInit(&val);
+            UserConfigInit(&val);
     }
-    void S_AllConfigSave()
+    void AllConfigSave()
     {
         std::cout << u8"Su配置保存" << std::endl;
         GlobalConfig::GlobalConfigSave();
         for (auto& val : UserConfig::getUserVector())
-            S_UserConfigSave(&val);
+            UserConfigSave(&val);
     }
 
-    void S_UserConfigInit(UserConfig* uc)
+    void UserConfigInit(UserConfig* uc)
     {
         std::cout << uc->file_id <<u8" 用户配置初始化" << std::endl;
 
-        for (auto& val : uc->llms) S_InitKasb(uc, &val);
-        for (auto& val : uc->ttss) S_InitAp(uc, &val);
-        for (auto& val : uc->stts) S_InitKasb(uc, &val);
-        for (auto& val : uc->mts) S_InitKasb(uc, &val);
+        for (auto& val : uc->llms) InitKasb(uc, &val);
+        for (auto& val : uc->ttss) InitAp(uc, &val);
+        for (auto& val : uc->stts) InitKasb(uc, &val);
+        for (auto& val : uc->mts) InitKasb(uc, &val);
 
-        uc->select_llm = (LLM)FileSetting::S_GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::LLMSEL_ID], INITINT);
-        uc->select_tts = (TTS)FileSetting::S_GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::TTSSEL_ID], INITINT);
-        uc->select_stt = (STT)FileSetting::S_GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::STTSEL_ID], INITINT);
-        uc->select_mt = (MT)FileSetting::S_GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::MTSEL_ID], INITINT);
-        uc->vits_simple_api_model_id = FileSetting::S_GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::VITS_SIMPLE_API_MODEL_ID], INITINT);
-        uc->vits_simple_api_speaker_id = FileSetting::S_GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::VITS_SIMPLE_API_SPEAKER_ID], INITINT);
-        uc->vits_simple_api_emotion_id = FileSetting::S_GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::VITS_SIMPLE_API_EMOTION_ID], INITINT);
-        uc->gpt_sovits_target_language_id = FileSetting::S_GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::GPT_SOVITS_TARGET_LANGUAGE_ID], INITINT);
-        uc->myself_vits = FileSetting::S_GetValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::MYSELF_VITS_URL], INITSTR);
+        uc->select_llm = (LLM)FileSetting::GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::LLMSEL_ID], INITINT);
+        uc->select_tts = (TTS)FileSetting::GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::TTSSEL_ID], INITINT);
+        uc->select_stt = (STT)FileSetting::GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::STTSEL_ID], INITINT);
+        uc->select_mt = (MT)FileSetting::GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::MTSEL_ID], INITINT);
+        uc->vits_simple_api_model_id = FileSetting::GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::VITS_SIMPLE_API_MODEL_ID], INITINT);
+        uc->vits_simple_api_speaker_id = FileSetting::GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::VITS_SIMPLE_API_SPEAKER_ID], INITINT);
+        uc->vits_simple_api_emotion_id = FileSetting::GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::VITS_SIMPLE_API_EMOTION_ID], INITINT);
+        uc->gpt_sovits_target_language_id = FileSetting::GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::GPT_SOVITS_TARGET_LANGUAGE_ID], INITINT);
+        uc->myself_vits = FileSetting::GetValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::MYSELF_VITS_URL], INITSTR);
 
     }
-    void S_UserConfigSave(UserConfig* uc) {
+    void UserConfigSave(UserConfig* uc) {
         std::cout << uc->file_id <<u8" 用户配置保存" << std::endl;
 
-        for (auto& val : uc->llms) S_SaveKasb(uc, &val);
-        for (auto& val : uc->ttss) S_SaveAp(uc, &val);
-        for (auto& val : uc->stts) S_SaveKasb(uc, &val);
-        for (auto& val : uc->mts) S_SaveKasb(uc, &val);
+        for (auto& val : uc->llms) SaveKasb(uc, &val);
+        for (auto& val : uc->ttss) SaveAp(uc, &val);
+        for (auto& val : uc->stts) SaveKasb(uc, &val);
+        for (auto& val : uc->mts) SaveKasb(uc, &val);
 
-        FileSetting::S_SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::LLMSEL_ID], uc->select_llm);
-        FileSetting::S_SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::TTSSEL_ID], uc->select_tts);
-        FileSetting::S_SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::STTSEL_ID], uc->select_stt);
-        FileSetting::S_SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::MTSEL_ID], uc->select_mt);
-        FileSetting::S_SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::VITS_SIMPLE_API_MODEL_ID], uc->vits_simple_api_model_id);
-        FileSetting::S_SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::VITS_SIMPLE_API_SPEAKER_ID], uc->vits_simple_api_speaker_id);
-        FileSetting::S_SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::VITS_SIMPLE_API_EMOTION_ID], uc->vits_simple_api_emotion_id);
-        FileSetting::S_SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::GPT_SOVITS_TARGET_LANGUAGE_ID], uc->gpt_sovits_target_language_id);
-        FileSetting::S_SetValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::MYSELF_VITS_URL], uc->myself_vits.c_str());
+        FileSetting::SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::LLMSEL_ID], uc->select_llm);
+        FileSetting::SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::TTSSEL_ID], uc->select_tts);
+        FileSetting::SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::STTSEL_ID], uc->select_stt);
+        FileSetting::SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::MTSEL_ID], uc->select_mt);
+        FileSetting::SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::VITS_SIMPLE_API_MODEL_ID], uc->vits_simple_api_model_id);
+        FileSetting::SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::VITS_SIMPLE_API_SPEAKER_ID], uc->vits_simple_api_speaker_id);
+        FileSetting::SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::VITS_SIMPLE_API_EMOTION_ID], uc->vits_simple_api_emotion_id);
+        FileSetting::SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::GPT_SOVITS_TARGET_LANGUAGE_ID], uc->gpt_sovits_target_language_id);
+        FileSetting::SetValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::MYSELF_VITS_URL], uc->myself_vits.c_str());
 
     }
 

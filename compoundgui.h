@@ -6,10 +6,10 @@ static char key[DEFSIZE2];\
 static char appid[DEFSIZE2];\
 static char secret[DEFSIZE2];\
 static char baseurl[DEFSIZE2];\
-Su::S_GetGuiMark(key, sizeof(key), ::inimark_map[::INIMARK::KEY], ct->name);\
-Su::S_GetGuiMark(appid, sizeof(appid), ::inimark_map[::INIMARK::APPID], ct->name);\
-Su::S_GetGuiMark(secret, sizeof(secret), ::inimark_map[::INIMARK::SECRET], ct->name);\
-Su::S_GetGuiMark(baseurl, sizeof(baseurl), ::inimark_map[::INIMARK::BASEURL], ct->name);\
+Su::GetGuiMark(key, sizeof(key), ::inimark_map[::INIMARK::KEY], ct->name);\
+Su::GetGuiMark(appid, sizeof(appid), ::inimark_map[::INIMARK::APPID], ct->name);\
+Su::GetGuiMark(secret, sizeof(secret), ::inimark_map[::INIMARK::SECRET], ct->name);\
+Su::GetGuiMark(baseurl, sizeof(baseurl), ::inimark_map[::INIMARK::BASEURL], ct->name);\
 if (POS_0 & ct->kasb.needpos)ImGui::InputText(key, ct->kasb.key, IM_ARRAYSIZE(ct->kasb.key));\
 if (POS_1 & ct->kasb.needpos)ImGui::InputText(appid, ct->kasb.appid, IM_ARRAYSIZE(ct->kasb.appid));\
 if (POS_2 & ct->kasb.needpos)ImGui::InputText(secret, ct->kasb.secret, IM_ARRAYSIZE(ct->kasb.secret));\
@@ -18,8 +18,8 @@ if (POS_3 & ct->kasb.needpos)ImGui::InputText(baseurl, ct->kasb.baseurl, IM_ARRA
 #define AP_FUNCTION(ct)\
 static char address[DEFSIZE2];\
 static char port[DEFSIZE2];\
-Su::S_GetGuiMark(address, sizeof(address), ::inimark_map[::INIMARK::ADDRESS], ct->name);\
-Su::S_GetGuiMark(port, sizeof(port), ::inimark_map[::INIMARK::PORT], ct->name);\
+Su::GetGuiMark(address, sizeof(address), ::inimark_map[::INIMARK::ADDRESS], ct->name);\
+Su::GetGuiMark(port, sizeof(port), ::inimark_map[::INIMARK::PORT], ct->name);\
 ImGui::InputText(address, ct->ap.address, IM_ARRAYSIZE(ct->ap.address));\
 ImGui::InputText(port, ct->ap.port, IM_ARRAYSIZE(ct->ap.port));
 
@@ -35,7 +35,7 @@ if (ImGui::BeginCombo(ct, name))\
         if (ImGui::Selectable(name, isSelected)) {\
             s = (tp)i;\
             std::cout << "Setting Index :" << s << std::endl;\
-            Su::S_UserConfigSave(_uc);\
+            Su::UserConfigSave(_uc);\
         }\
         if (isSelected) ImGui::SetItemDefaultFocus();\
     }\

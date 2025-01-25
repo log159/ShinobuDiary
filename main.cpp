@@ -17,7 +17,6 @@
 #include "./cubism_src/LAppDelegate.hpp"
 #include <iostream>
 #include <thread>
-#include <functional>
 
 // Data
 static ID3D11Device* g_pd3dDevice = nullptr;
@@ -38,6 +37,7 @@ void PosteriorPart();
 // Shinobu Function
 DWORD WINAPI CubismThread(LPVOID lpParam);
 
+
 // Main code
 int main(int, char**)
 //int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -52,7 +52,7 @@ int main(int, char**)
     // 全局初始化
     ::GlobalConfig::getInstance();
     // 初始化配置
-    Su::S_AllConfigInit();
+    Su::AllConfigInit();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     DWORD threadID; HANDLE hThread;
     hThread = CreateThread(NULL, 0, CubismThread, NULL, 0, &threadID);	// 创建线程
@@ -143,7 +143,7 @@ int main(int, char**)
 //Cubism Thread
 DWORD WINAPI CubismThread(LPVOID lpParam)
 {
-    //return 0;
+    return 0;
     if (!LAppDelegate::GetInstance()->Initialize())
     {
         // 初期化失敗

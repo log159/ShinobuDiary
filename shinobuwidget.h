@@ -4,6 +4,7 @@
 
 extern void ShowShinobuWindow(bool* p_open);
 extern void ShowShinobuHead();					/*标头*/
+extern void ShowShinobuLunar();					/*日历*/
 extern void ShowShinobuStart();					/*从这里开始*/
 extern void ShowShinobuLanguage();              /*语言配置*/
 extern void ShowShinobuGlobal();				/*全局配置*/

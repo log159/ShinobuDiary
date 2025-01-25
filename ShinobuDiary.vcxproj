@@ -192,6 +192,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="shinobuwidget.cpp" />
     <ClCompile Include="sparkdesk.cpp" />
+    <ClCompile Include="sufunction.cpp" />
     <ClCompile Include="timeconfig.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -226,6 +227,7 @@
     <ClInclude Include="shinobuwidget.h" />
     <ClInclude Include="simpleini-4.22_src\ConvertUTF.h" />
     <ClInclude Include="simpleini-4.22_src\SimpleIni.h" />
+    <ClInclude Include="sizedef.h" />
     <ClInclude Include="sparkdesk.h" />
     <ClInclude Include="imgui_src\imconfig.h" />
     <ClInclude Include="imgui_src\imgui.h" />
@@ -244,6 +246,7 @@
     <ClInclude Include="sparkdesk_src\include\sc_type.h" />
     <ClInclude Include="sparkdesk_src\include\sparkchain.h" />
     <ClInclude Include="suconfig.h" />
+    <ClInclude Include="sufunction.h" />
     <ClInclude Include="timeconfig.h" />
     <ClInclude Include="translator.h" />
   </ItemGroup>

@@ -18206,8 +18206,9 @@ void ImGui::DockNodeWindowMenuHandler_Default(ImGuiContext* ctx, ImGuiDockNode* 
     IM_UNUSED(ctx);
     if (tab_bar->Tabs.Size == 1)
     {
+        //Shinobu Debug
         // "Hide tab bar" option. Being one of our rare user-facing string we pull it from a table.
-        if (MenuItem(LocalizeGetMsg(ImGuiLocKey_DockingHideTabBar), NULL, node->IsHiddenTabBar()))
+        if (MenuItem(/*LocalizeGetMsg(ImGuiLocKey_DockingHideTabBar)*/TT_252, NULL, node->IsHiddenTabBar()))
             node->WantHiddenTabBarToggle = true;
     }
     else
@@ -18391,7 +18392,7 @@ static void ImGui::DockNodeUpdateTabBar(ImGuiDockNode* node, ImGuiWindow* host_w
         if (IsItemActive())
             focus_tab_id = tab_bar->SelectedTabId;
         if (IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_DelayNormal) && g.HoveredIdTimer > 0.5f)
-            SetTooltip("%s", LocalizeGetMsg(ImGuiLocKey_DockingDragToUndockOrMoveNode));
+            SetTooltip("%s", /*LocalizeGetMsg(ImGuiLocKey_DockingDragToUndockOrMoveNode)*/TT_253);
     }
 
     // If multiple tabs are appearing on the same frame, sort them based on their persistent DockOrder value
