@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <direct.h>
 #include <Windows.h>
+#include <map>
+#include "global.h"
 
 namespace Su {
     void MemsetStr(char* str, size_t size) {
@@ -14,6 +16,32 @@ namespace Su {
         strcpy_s(markbuf, size, name);
         strcat_s(markbuf, size, "##");
         strcat_s(markbuf, size, id);
+    }
+
+    void StringSplit(std::string str, const char split,std::vector<std::string>& sv)
+    {
+        sv.clear();
+        std::istringstream iss(str);	    // 输入流
+        std::string token;			        // 接收缓冲区
+        while (getline(iss, token, split))	// 以split为分隔符
+            sv.push_back(token);
+    }
+    std::string replaceNewlinesInRange(const std::string& input, char start, char end) {
+        std::string result = input;
+        size_t startIdx = result.find(start);
+        while (startIdx != std::string::npos) {
+            size_t endIdx = result.find(end, startIdx);
+            if (endIdx == std::string::npos) {
+                break;
+            }
+            for (size_t i = startIdx; i < endIdx; ++i) {
+                if (result[i] == '\n') {
+                    result[i] = ' ';
+                }
+            }
+            startIdx = result.find(start, endIdx + 1);
+        }
+        return result;
     }
     std::string GetLunar()
     {
@@ -27,8 +55,14 @@ namespace Su {
         command += (" " + ::getCurrentYear());
         command += (" " + ::getCurrentMonth());
         command += (" " + ::getCurrentDay());
+        command += (" " + ::getCurrentHours());
+        command += (" " + ::getCurrentMinutes());
+        command += (" " + ::getCurrentSeconds());
+
         try {
             std::string output = execCommandWithPipe(command);
+            std::replace(output.begin(), output.end(),' ', '\n');
+            output=replaceNewlinesInRange(output, '[', ']');
             return output;
         }
         catch (const std::exception& e) {

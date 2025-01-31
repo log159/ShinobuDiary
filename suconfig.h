@@ -7,6 +7,7 @@
 #include "translator.h"
 #include "imgui.h"
 #include "sufunction.h"
+#include "./framework_src/include/Type/csmString.hpp"
 
 using std::cout;
 using std::endl;
@@ -26,11 +27,28 @@ namespace Su{
     enum TTS { VITS_SIMPLE_API, GPT_SOVITS, MYSELF_VITS };
     enum STT { BAIDUZHINENGYUN };
     enum MT { BAIDUFANYI };
+
+
+    class CubismConfig {
+    public:
+        Csm::csmString model_dir;
+    };
+
     class UserConfig {
     public:
-        bool exist  = true;/*存在标识*/
-        std::string                  user_name;
-        int                          file_id;
+        bool                         exist      = true; //存在标识
+        int                          file_id;           //文件标识
+        std::string                  user_name;         //
+        std::string                  user_explain;      //
+        std::string                  user_template;     //
+        bool                         enable_widget;     //交互面板  [0]
+        bool                         enable_cubism;     //虚拟形象  [1]
+        bool                         enable_template;   //设定角色  [2]
+        bool                         enable_tts;        //TTS       [3]
+        bool                         enable_mt;         //MT        [4]
+        bool                         enable_original;   //原文本对比[5]
+        bool                         enable_stt;        //STT       [6]
+
         Su::LLM                      select_llm;
         Su::TTS                      select_tts;
         Su::STT                      select_stt;
@@ -40,6 +58,7 @@ namespace Su{
         int                          vits_simple_api_emotion_id;
         int                          gpt_sovits_target_language_id;
         std::string                  myself_vits;
+        CubismConfig                 cubism_config;
         std::vector<LLMConfig>       llms;
         std::vector<TTSConfig>       ttss;
         std::vector<STTConfig>       stts;

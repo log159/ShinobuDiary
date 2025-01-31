@@ -132,9 +132,6 @@
     <ClCompile Include="cubism_src\TouchManager.cpp">
       <Filter>cubism_src</Filter>
     </ClCompile>
-    <ClCompile Include="cubism_src\_main.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="cubism_src\CubismWindowStyle.cpp">
       <Filter>cubism_src</Filter>
     </ClCompile>

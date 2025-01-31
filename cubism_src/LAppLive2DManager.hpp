@@ -12,7 +12,10 @@
 #include <Math/CubismMatrix44.hpp>
 #include <Type/csmVector.hpp>
 #include <Type/csmMap.hpp>
-
+struct ModelJsonConfig {
+    Csm::csmString modelPath;
+    Csm::csmString modelJsonName;
+};
 class LAppModel;
 
 /**
@@ -24,6 +27,13 @@ class LAppLive2DManager
 {
 
 public:
+
+    ModelJsonConfig GetModelJsonConfig(int index);
+
+    void AddScene(Csm::csmInt32 index);
+
+
+    Csm::csmVector<Csm::csmString>& GetModelDir();; ///< モデルディレクトリ名のコンテナ
 
     /**
      * @brief 解放するモデル格納
@@ -154,7 +164,7 @@ private:
 
     Csm::CubismMatrix44* _viewMatrix; ///< モデル描画に用いるView行列
     Csm::csmVector<LAppModel*> _models; ///< モデルインスタンスのコンテナ
-    Csm::csmInt32 _sceneIndex; ///< 表示するシーンのインデックス値
+    //Csm::csmInt32 _sceneIndex; ///< 表示するシーンのインデックス値
 
     Csm::csmVector<Csm::csmString> _modelDir; ///< モデルディレクトリ名のコンテナ
 

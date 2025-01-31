@@ -5,8 +5,6 @@
 #include "filesetting.h"
 #include "imgui.h"
 #include "sufunction.h"
-#define FONTSWAY "./Fonts/*.ttf"
-#define FONTSTR  "./Fonts/%s"
 #define STYLEWAY "./Saves/style.data"
 #define POS_0 uint32_t(0x1)
 #define POS_1 uint32_t(0x2)
@@ -22,6 +20,7 @@ public:
     static HWND WindowMainHandle;
     static WNDCLASSEXW WindowMainWc;
     static std::string LunarCalendar;
+    static bool RefreshTable;
 };
 
 
@@ -46,7 +45,14 @@ enum FREEMARK {
     FONT_GLOBAL_SCALE,
     WINDOW_MAIN_FORECASTFPS,
     WINDOW_MAIN_ADDTIMEFPS,
-    WINDOW_CUBISM_ADDTIMEFPS
+    WINDOW_CUBISM_ADDTIMEFPS,
+    ENABLE_WIDGET,
+    ENABLE_CUBISM,
+    ENABLE_TEMPLATE,
+    ENABLE_TTS,
+    ENABLE_MT,
+    ENABLE_ORIGINAL,
+    ENABLE_STT
 };
 static std::map<FREEMARK, const char*>inifreemark_map = {
     {FREEMARK::LANGUAGESEL_ID,                      "languagesel_id"},
@@ -69,7 +75,14 @@ static std::map<FREEMARK, const char*>inifreemark_map = {
     {FREEMARK::FONT_GLOBAL_SCALE,                   "font_global_scale"},
     {FREEMARK::WINDOW_MAIN_FORECASTFPS,             "window_main_forecastfps"},
     {FREEMARK::WINDOW_MAIN_ADDTIMEFPS,              "window_main_addtimefps"},
-    {FREEMARK::WINDOW_CUBISM_ADDTIMEFPS,            "window_cubism_addtimefps"}
+    {FREEMARK::WINDOW_CUBISM_ADDTIMEFPS,            "window_cubism_addtimefps"},
+    {FREEMARK::ENABLE_WIDGET,                       "enable_widget"},
+    {FREEMARK::ENABLE_CUBISM,                       "enable_cubism"},
+    {FREEMARK::ENABLE_TEMPLATE,                     "enable_template" },
+    {FREEMARK::ENABLE_TTS,                          "enable_tts" },
+    {FREEMARK::ENABLE_MT,                           "enable_mt" },
+    {FREEMARK::ENABLE_ORIGINAL,                     "enable_original" },
+    {FREEMARK::ENABLE_STT,                          "enable_stt" }
 };
 enum INIMARK { KEY, APPID, SECRET, BASEURL, ADDRESS, PORT };
 static std::map<INIMARK, const char*>inimark_map = {
@@ -91,15 +104,15 @@ class GlobalConfig {
 public:
     ::LAN select_lan;
     int user_num                       = 0;
-    int select_theme_id                = 0;        /*{ 0,1,2 }*/
-    int window_main_style_id           = 0;        /*{ 0,1 }*/
-    int window_main_dock_id            = 0;        /*{ 0,1 }*/
-    int window_main_transparent_id     = 0;        /*{ 0,1 }*/
-    float window_main_forecastfps   = 120.0f;   /*10.0f-120.0f*/
-    int window_main_addtimefps      = 0;        /*0-100*/
+    int select_theme_id                = 0;         /*{ 0,1,2 }*/
+    int window_main_style_id           = 0;         /*{ 0,1 }*/
+    int window_main_dock_id            = 0;         /*{ 0,1 }*/
+    int window_main_transparent_id     = 0;         /*{ 0,1 }*/
+    float window_main_forecastfps   = 120.0f;       /*10.0f-120.0f*/
+    int window_main_addtimefps      = 0;            /*0-100*/
 
-    int window_cubism_style_id      = 0;        /*{ 0,1,2,3 }*/
-    int window_cubism_addtimefps    = 0;        /*0-100*/
+    int window_cubism_style_id      = 0;            /*{ 0,1,2,3 }*/
+    int window_cubism_addtimefps    = 0;            /*0-100*/
 
     std::string select_font         = "";
     const char** fonts_list         = NULL;
@@ -116,6 +129,10 @@ public:
 
 private:
     GlobalConfig() {
+        //GlobalConfigTemp
+        GlobalTemp::LunarCalendar = Su::GetLunar();
+
+        //GlobalConfig
         GlobalConfigInit(this);
     }
     GlobalConfig(const GlobalConfig&);

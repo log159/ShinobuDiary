@@ -143,6 +143,14 @@ namespace Su {
         uc->gpt_sovits_target_language_id = FileSetting::GetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::GPT_SOVITS_TARGET_LANGUAGE_ID], INITINT);
         uc->myself_vits = FileSetting::GetValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::MYSELF_VITS_URL], INITSTR);
 
+        uc->enable_widget = FileSetting::GetBoolValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::ENABLE_WIDGET], INITBOOL);
+        uc->enable_cubism = FileSetting::GetBoolValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::ENABLE_CUBISM], INITBOOL);
+        uc->enable_template = FileSetting::GetBoolValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::ENABLE_TEMPLATE], INITBOOL);
+        uc->enable_tts = FileSetting::GetBoolValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::ENABLE_TTS], INITBOOL);
+        uc->enable_mt = FileSetting::GetBoolValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::ENABLE_MT], INITBOOL);
+        uc->enable_original = FileSetting::GetBoolValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::ENABLE_ORIGINAL], INITBOOL);
+        uc->enable_stt = FileSetting::GetBoolValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::ENABLE_STT], INITBOOL);
+
     }
     void UserConfigSave(UserConfig* uc) {
         std::cout << uc->file_id <<u8" 用户配置保存" << std::endl;
@@ -162,6 +170,13 @@ namespace Su {
         FileSetting::SetLongValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::GPT_SOVITS_TARGET_LANGUAGE_ID], uc->gpt_sovits_target_language_id);
         FileSetting::SetValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::MYSELF_VITS_URL], uc->myself_vits.c_str());
 
+        FileSetting::SetBoolValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::ENABLE_WIDGET], uc->enable_widget);
+        FileSetting::SetBoolValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::ENABLE_CUBISM], uc->enable_cubism );
+        FileSetting::SetBoolValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::ENABLE_TEMPLATE], uc->enable_template);
+        FileSetting::SetBoolValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::ENABLE_TTS], uc->enable_tts);
+        FileSetting::SetBoolValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::ENABLE_MT], uc->enable_mt);
+        FileSetting::SetBoolValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::ENABLE_ORIGINAL], uc->enable_original);
+        FileSetting::SetBoolValue(uc->file_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::ENABLE_STT], uc->enable_stt);
     }
 
 }

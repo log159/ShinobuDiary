@@ -8,14 +8,15 @@
 //#define IS_WCHAR
 #ifdef IS_WINDOWS
 #include <windows.h>
-
+#include <io.h>
 #endif // IS_WINDOWS
 
 bool GlobalTemp::ShowStyleEditor = false;
 HWND GlobalTemp::WindowMainHandle;
 WNDCLASSEXW GlobalTemp::WindowMainWc;
 int GlobalTemp::CubismFrameCount = 0;
-std::string GlobalTemp::LunarCalendar = Su::GetLunar();
+std::string GlobalTemp::LunarCalendar = "";
+bool GlobalTemp::RefreshTable = true;
 
 void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
     static bool initHas = false;if (initHas == true) return;initHas = true;
@@ -56,54 +57,41 @@ void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
 
     gc->window_cubism_addtimefps = FileSetting::GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_ADDTIMEFPS], 0);
 
-
-    
 #ifdef IS_WINDOWS
-    WIN32_FIND_DATA wfd;
-    HANDLE hFind;
-    hFind = FindFirstFile(FONTSWAY, &wfd);
-    if (hFind == INVALID_HANDLE_VALUE) {
-        cout << "Invalid File Handle. GetLastError reports " << GetLastError() << endl;
+    static std::vector<std::pair<std::string,std::string>> temp_fonts;
+    std::string basePath = "./Fonts/";
+    std::string searchPattern = basePath + "*.ttf";
+    wchar_t widePattern[MAX_PATH];
+    MultiByteToWideChar(CP_UTF8, 0, searchPattern.c_str(), -1, widePattern, MAX_PATH);
+    struct _wfinddata_t fdata;
+    intptr_t fh = _wfindfirst(widePattern, &fdata);
+    if (fh == -1) {
+        std::cout << "No .ttf files found.\n";
     }
-    else {
-        std::vector<const char*> temp_fonts;
-        std::vector<const char*> temp_name_fonts;
+    temp_fonts.clear();
+    do {
+        if (!(fdata.attrib & _A_SUBDIR)) {
+            char fileName[MAX_PATH];
+            WideCharToMultiByte(CP_UTF8, 0, fdata.name, -1, fileName, MAX_PATH, NULL, NULL);
 
-        char fileName[MAX_PATH];
-        char fileNameWay[MAX_PATH];
-        cout << " File Handle. GetLastError reports " << GetLastError() << endl;
-#if defined(IS_WCHAR)
-        WideCharToMultiByte(CP_UTF8, 0, wfd.cFileName, -1, fileName, MAX_PATH, NULL, NULL);
-#elif !defined(IS_WCHAR)
-        strcpy_s(fileName, sizeof(fileName), wfd.cFileName);
-#endif
-        temp_name_fonts.push_back(_strdup(fileName));
-        snprintf(fileNameWay,sizeof(fileNameWay),FONTSTR,fileName);
-        temp_fonts.push_back(_strdup(fileNameWay));
-        while (FindNextFile(hFind, &wfd)) {
-#if defined(IS_WCHAR)
-            WideCharToMultiByte(CP_UTF8, 0, wfd.cFileName, -1, fileName, MAX_PATH, NULL, NULL);
-#elif !defined(IS_WCHAR)
-            strcpy_s(fileName, sizeof(fileName), wfd.cFileName);
-#endif
-            temp_name_fonts.push_back(_strdup(fileName));
-            snprintf(fileNameWay, sizeof(fileNameWay), FONTSTR, fileName);
-            temp_fonts.push_back(_strdup(fileNameWay));
+            temp_fonts.push_back(std::pair<std::string,std::string>(fileName,basePath + fileName));
         }
-        gc->fonts_size = temp_fonts.size();
-        gc->fonts_list = new const char* [gc->fonts_size];
-        gc->fonts_name_list = new const char* [gc->fonts_size];
-        for (int i = 0; i < gc->fonts_size; ++i) {
-            gc->fonts_list[i] = temp_fonts[i];
-            gc->fonts_name_list[i] = temp_name_fonts[i];
-            cout <<i<<" "<< gc->fonts_list[i] << endl;
-        }
-        cout << "--------------------------------" << endl;
-        temp_fonts.clear();
+    } while (_wfindnext(fh, &fdata) == 0);
+    _findclose(fh);
+    for (const auto& file : temp_fonts) {
+        std::cout << file.second << std::endl;
     }
-    FindClose(hFind);
+    std::cout << "TTF file search end\n";
+    gc->fonts_size = temp_fonts.size();
+    gc->fonts_list = new const char* [gc->fonts_size];
+    gc->fonts_name_list = new const char* [gc->fonts_size];
+    for (int i = 0; i < gc->fonts_size; ++i) {
+        gc->fonts_list[i] = temp_fonts[i].second.c_str();
+        gc->fonts_name_list[i] = temp_fonts[i].first.c_str();
+        //cout << i << " " << gc->fonts_list[i] << endl;
+    }
+#endif //IS_WINDOWS
 
-#endif // IS_WINDOWS
     //设置字体
     ImFont* font_current = ImGui::GetFont();
     for (int i = 0; i < gc->fonts_size; ++i) {

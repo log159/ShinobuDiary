@@ -174,7 +174,6 @@
     <ClCompile Include="cubism_src\LAppTextureManager.cpp" />
     <ClCompile Include="cubism_src\LAppView.cpp" />
     <ClCompile Include="cubism_src\LAppWavFileHandler.cpp" />
-    <ClCompile Include="cubism_src\_main.cpp" />
     <ClCompile Include="cubism_src\MouseActionManager.cpp" />
     <ClCompile Include="cubism_src\TouchManager.cpp" />
     <ClCompile Include="filesetting.cpp" />

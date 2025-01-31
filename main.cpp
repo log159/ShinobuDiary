@@ -35,8 +35,9 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void FrontPart();
 void PosteriorPart();
 // Shinobu Function
+std::vector<HANDLE>threadVector;
 DWORD WINAPI CubismThread(LPVOID lpParam);
-
+DWORD WINAPI OtherConfigThread(LPVOID lpParam);
 
 // Main code
 int main(int, char**)
@@ -46,6 +47,7 @@ int main(int, char**)
 //                     _In_ int       nCmdShow)
 //int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int)
 {
+
     //---------------------前部分--------------------
     FrontPart();
     //--------------------中间部分---------------------
@@ -53,10 +55,13 @@ int main(int, char**)
     ::GlobalConfig::getInstance();
     // 初始化配置
     Su::AllConfigInit();
+
+    DWORD cubismThreadId, otherThreadId;
+    threadVector.clear();
+    threadVector.push_back(CreateThread(NULL, 0, CubismThread, NULL, 0, &cubismThreadId));
+    threadVector.push_back(CreateThread(NULL, 0, OtherConfigThread, NULL, 0, &otherThreadId));
+
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    DWORD threadID; HANDLE hThread;
-    hThread = CreateThread(NULL, 0, CubismThread, NULL, 0, &threadID);	// 创建线程
-    //Main loop
     static bool done = false;
     while (!done)
     {
@@ -93,8 +98,11 @@ int main(int, char**)
         ImGui::NewFrame();
 
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        bool show_demo_window = true;
+        static bool show_demo_window = true;
         if (show_demo_window)ImGui::ShowDemoWindow(&show_demo_window);
+
+
+
         static bool show_shinobu_window = true;
         if (show_shinobu_window)ShowShinobuWindow(&show_shinobu_window);
         else { 
@@ -134,8 +142,26 @@ int main(int, char**)
     //---------------------后部分--------------------------
     PosteriorPart();
 
-    if (hThread != 0) {
-        CloseHandle(hThread);	// 关闭Cubism内核对象
+    for (auto& hThread : threadVector) {
+        if (hThread != 0) 
+            CloseHandle(hThread);	// 关闭内核对象
+    }
+
+    return 0;
+}
+
+DWORD WINAPI OtherConfigThread(LPVOID lpParam)
+{
+    while (true) {
+
+        static std::string lastMinutes = "";
+        std::string thisMinutes = ::getCurrentMinutes();
+        if (lastMinutes.compare(thisMinutes)!=0) {
+            lastMinutes = thisMinutes;
+            std::cout << u8"更新时间" << std::endl;
+            GlobalTemp::LunarCalendar = Su::GetLunar();
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
     return 0;
 }
@@ -143,7 +169,6 @@ int main(int, char**)
 //Cubism Thread
 DWORD WINAPI CubismThread(LPVOID lpParam)
 {
-    return 0;
     if (!LAppDelegate::GetInstance()->Initialize())
     {
         // 初期化失敗

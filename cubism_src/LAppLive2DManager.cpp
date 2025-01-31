@@ -19,6 +19,8 @@
 #include "LAppModel.hpp"
 #include "LAppView.hpp"
 
+
+
 using namespace Csm;
 using namespace LAppDefine;
 
@@ -64,12 +66,13 @@ void LAppLive2DManager::ReleaseInstance()
 
 LAppLive2DManager::LAppLive2DManager()
     : _viewMatrix(NULL)
-    , _sceneIndex(0)
+    //, _sceneIndex(0)
 {
     _viewMatrix = new CubismMatrix44();
     SetUpModel();
 
-    ChangeScene(_sceneIndex);
+    //ChangeScene(_sceneIndex);
+    //ChangeScene(0);
 }
 
 LAppLive2DManager::~LAppLive2DManager()
@@ -173,8 +176,6 @@ void LAppLive2DManager::SetUpModel()
     }
     printf("Cubism find end\n");
     qsort(_modelDir.GetPtr(), _modelDir.GetSize(), sizeof(csmString), CompareCsmString);
-
-
     
 }
 
@@ -292,38 +293,78 @@ void LAppLive2DManager::OnUpdate() const
 
 void LAppLive2DManager::NextScene()
 {
+    //std::cout << "Cubism Scene Id: " << _sceneIndex << std::endl;
     //Shinobu debug
-    csmInt32 no = (_sceneIndex + 1) % GetModelDirSize();
+    //csmInt32 no = (_sceneIndex + 1) % GetModelDirSize();
     //csmInt32 no = 0;
-    ChangeScene(no);
+    //ChangeScene(no);
+    //ChangeScene(0);
+
 }
-
-void LAppLive2DManager::ChangeScene(Csm::csmInt32 index)
-{
-    _sceneIndex = index;
-    if (DebugLogEnable)
-    {
-        LAppPal::PrintLogLn("[APP]model index: %d", _sceneIndex);
-    }
-
-    // model3.jsonのパスを決定する.
-    // ディレクトリ名とmodel3.jsonの名前を一致していることが条件
+ModelJsonConfig LAppLive2DManager::GetModelJsonConfig(int index) {
     const csmChar* modelptr = _modelDir[index].GetRawString();
     const csmChar* lastSlash = strrchr(modelptr, '/');
-    csmChar modelPath[512] = { 0 };
-    csmChar modelJsonName[512] = { 0 };
-    size_t pathLength = lastSlash - modelptr+1;
+    static csmChar modelPath[512] = { 0 };
+    static csmChar modelJsonName[512] = { 0 };
+    memset(modelPath, 0, sizeof(modelPath));
+    memset(modelJsonName, 0, sizeof(modelJsonName));
+    size_t pathLength = lastSlash - modelptr + 1;
     strncpy_s(modelPath, modelptr, pathLength);
     modelPath[pathLength] = '\0';
-
     // 斜杠之后部分拷贝到modelJsonName
     strncpy_s(modelJsonName, lastSlash + 1, sizeof(modelJsonName) - 1);
     modelJsonName[sizeof(modelJsonName) - 1] = '\0';
     printf("Change Cubism |%hs|\n", modelPath);
     printf("Change Cubism |%hs|\n", modelJsonName);
-    ReleaseAllModel();
+    ModelJsonConfig mjc;
+    mjc.modelPath = modelPath;
+    mjc.modelJsonName = modelJsonName;
+    return mjc;
+}
+void LAppLive2DManager::AddScene(Csm::csmInt32 index)
+{
+    ModelJsonConfig mjc = GetModelJsonConfig(index);
+
     _models.PushBack(new LAppModel());
-    _models[0]->LoadAssets(modelPath, modelJsonName);
+    _models[0]->LoadAssets(mjc.modelPath.GetRawString(), mjc.modelJsonName.GetRawString());
+
+    _models[0]->GetModelMatrix()->TranslateX(0.9f);
+    _models[0]->GetModelMatrix()->Scale(1.f, 1.f);
+}
+Csm::csmVector<Csm::csmString>& LAppLive2DManager::GetModelDir()
+{
+    return  _modelDir;
+}
+void LAppLive2DManager::ChangeScene(Csm::csmInt32 index)
+{
+    //_sceneIndex = index;
+    //if (DebugLogEnable)
+    //{
+    //    LAppPal::PrintLogLn("[APP]model index: %d", _sceneIndex);
+    //}
+
+    // model3.jsonのパスを決定する.
+    // ディレクトリ名とmodel3.jsonの名前を一致していることが条件
+    ReleaseAllModel();
+    {
+        ModelJsonConfig mjc = GetModelJsonConfig(0);
+
+        _models.PushBack(new LAppModel());
+        _models[0]->LoadAssets(mjc.modelPath.GetRawString(), mjc.modelJsonName.GetRawString());
+
+        _models[0]->GetModelMatrix()->TranslateX(0.9f);
+        _models[0]->GetModelMatrix()->Scale(1.f, 1.f);
+    }
+    //Shinobu Debug
+    {
+        ModelJsonConfig mjc = GetModelJsonConfig(1);
+
+        _models.PushBack(new LAppModel());
+        _models[1]->LoadAssets(mjc.modelPath.GetRawString(), mjc.modelJsonName.GetRawString());
+
+        _models[1]->GetModelMatrix()->TranslateX(0.1f);
+        _models[1]->GetModelMatrix()->Scale(1.5f, 1.5f);
+    }
 
     //model->GetModel()->SetOverwriteFlagForMultiplyColors(true); // 正片叠底色覆盖标志
     //model->GetModel()->SetOverwriteFlagForScreenColors(true); // 屏幕色覆盖标志

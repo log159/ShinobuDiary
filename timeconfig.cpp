@@ -21,6 +21,7 @@ std::string getCurrentTime() {
     oss << std::put_time(&timeStruct, "%Y-%m-%d %H:%M:%S"); 
     oss << "." << std::setfill('0') << std::setw(3) << milliseconds; 
     return oss.str();
+
 }
 
 std::string getCurrentYear()
@@ -36,4 +37,19 @@ std::string getCurrentMonth()
 std::string getCurrentDay()
 {
     GETCURRENT("%d")
+}
+
+std::string getCurrentHours()
+{
+    GETCURRENT("%H")
+}
+
+std::string getCurrentMinutes()
+{
+    GETCURRENT("%M")
+}
+
+std::string getCurrentSeconds()
+{
+    GETCURRENT("%S")
 }

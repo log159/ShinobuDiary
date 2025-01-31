@@ -9,6 +9,7 @@
 #include "./cubism_src/CubismLoom.h"
 #include <string>
 #include "timeconfig.h"
+#include "./cubism_src/LAppLive2DManager.hpp"
 
 static void HelpMarker(const char* desc)
 {
@@ -27,38 +28,92 @@ void ShowShinobuHead() {
 }
 void ShowShinobuLunar()
 {
-    ImGui::Text(GlobalTemp::LunarCalendar.c_str());
-
+    if (ImGui::CollapsingHeader(TT_254)) {
+        if (GlobalConfig::getInstance()->select_lan == LAN::CN) {
+            ImGui::Text(GlobalTemp::LunarCalendar.c_str());
+        }
+        else {
+            ImGui::Text(TT_255);
+        }
+    }
 }
+
+
 void ShowShinobuStart()
 {
-    return;
-    if (ImGui::CollapsingHeader(u8"从这里开始"))
+    if (ImGui::CollapsingHeader(TT_256))
     {
         if (Su::UserConfig::getUserVector().size() <= 0) {
-            ImGui::Text(u8"至少创建一个用户配置实例！");
-
+            ImGui::Text(TT_257);
+            return;
         }
-        const char* column_names[] = { u8"用户","2","3"};
-        const char* rows_names[]= {  u8"启用设定角色", u8"启用语音输出", u8"启用百度翻译", u8"启用翻译与原文对比", u8"启用语音输入" };
-        const int columns_count = IM_ARRAYSIZE(column_names);
-        const int rows_count = IM_ARRAYSIZE(rows_names);
-
-        static ImGuiTableFlags table_flags =   ImGuiTableFlags_ScrollX  | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_Hideable | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_HighlightHoveredColumn;
+        static std::vector<std::string>column_names_v;
+        static int column_names_size = -1;
+        static const char* column_names[DEFSIZE] = {  };
+        const char* rows_names[] = { TT_258,TT_259 ,TT_260, TT_261, TT_262,TT_263,TT_264 };
+        static ImGuiTableFlags table_flags = ImGuiTableFlags_ScrollX | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_Hideable | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_HighlightHoveredColumn;
         static ImGuiTableColumnFlags column_flags = ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
-        static bool bools[columns_count * rows_count] = {}; // Dummy storage selection storage
+
+        if (column_names_size != (int)Su::UserConfig::getUserVector().size() + 1) {
+            column_names_size = (int)Su::UserConfig::getUserVector().size() + 1;
+            GlobalTemp::RefreshTable = true;
+        }
+        if (GlobalTemp::RefreshTable == true) {
+            std::cout << u8"变化用户表格实例" << std::endl;
+            GlobalTemp::RefreshTable = false;
+            column_names_v.clear();
+            column_names_v.reserve(column_names_size);
+            static char tabname[DEFSIZE];
+            memset(tabname, 0, sizeof(tabname));
+            column_names[0] = TT_265;
+            for (int i = 0; i < column_names_size; ++i) {
+                strcpy_s(tabname, sizeof(tabname), TT_33);
+                snprintf(tabname, sizeof(tabname), tabname, Su::UserConfig::getUserVector()[i].file_id);
+                column_names_v.push_back(std::string(tabname));
+                column_names[i + 1] = column_names_v.back().c_str();
+            }
+        }
+        static bool bools[DEFSIZEK16] = { false };
         static int frozen_cols = 1;
         static int frozen_rows = 2;
+        static bool init_bools_mark = true;
 
-        if (ImGui::BeginTable("table_angled_headers", columns_count, table_flags, ImVec2(0.0f, 0.0f)))
+        int columns_count = column_names_size;
+        const int rows_count = IM_ARRAYSIZE(rows_names);
+        float row_height = ImGui::GetTextLineHeightWithSpacing();
+        float table_height = row_height * rows_count + 10.0f;
+        
+        table_height = max(table_height, 500.f);
+        table_height = min(table_height, 1000.f);
+
+        if (init_bools_mark == true) {
+            init_bools_mark = false;
+            for (int col = 1; col < columns_count; ++col) {
+                for (int row = 0; row < rows_count; ++row) {
+                    bool& bo = bools[row * columns_count + col];
+                    Su::UserConfig& uc = Su::UserConfig::getUserVector()[col - 1];
+                    switch (row) {
+                        case 0:bo = uc.enable_widget; break;
+                        case 1:bo = uc.enable_cubism ; break;
+                        case 2:bo = uc.enable_template; break;
+                        case 3:bo = uc.enable_tts; break;
+                        case 4:bo = uc.enable_mt; break;
+                        case 5:bo = uc.enable_original; break;
+                        case 6:bo = uc.enable_stt; break;
+                    }
+                }
+            }
+        }
+
+        if (ImGui::BeginTable("###table_angled_headers", columns_count, table_flags, ImVec2(0.0f, table_height)))
         {
             ImGui::TableSetupColumn(column_names[0], ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder);
             for (int n = 1; n < columns_count; n++)
                 ImGui::TableSetupColumn(column_names[n], column_flags);
             ImGui::TableSetupScrollFreeze(frozen_cols, frozen_rows);
 
-            ImGui::TableAngledHeadersRow(); // Draw angled headers for all columns with the ImGuiTableColumnFlags_AngledHeader flag.
-            ImGui::TableHeadersRow();       // Draw remaining headers and allow access to context-menu and other functions.
+            ImGui::TableAngledHeadersRow();
+            ImGui::TableHeadersRow();
             for (int row = 0; row < rows_count; row++)
             {
                 ImGui::PushID(row);
@@ -70,14 +125,86 @@ void ShowShinobuStart()
                     if (ImGui::TableSetColumnIndex(column))
                     {
                         ImGui::PushID(column);
-                        ImGui::Checkbox("", &bools[row * columns_count + column]);
+                        ImGui::Checkbox("###Checkbox", &bools[row * columns_count + column]);
                         ImGui::PopID();
                     }
                 ImGui::PopID();
             }
             ImGui::EndTable();
         }
+
+        if (ImGui::Button(TT_117)) {
+            for (int col = 1; col < columns_count; ++col) {
+                for (int row = 0; row < rows_count; ++row) { 
+                    const bool& bo = bools[row * columns_count + col];
+                    Su::UserConfig& uc = Su::UserConfig::getUserVector()[col - 1];
+                    switch (row) {
+                        case 0:uc.enable_widget = bo; break;
+                        case 1:uc.enable_cubism = bo; break;
+                        case 2:uc.enable_template = bo; break;
+                        case 3:uc.enable_tts=bo; break;
+                        case 4:uc.enable_mt=bo; break;
+                        case 5:uc.enable_original=bo; break;
+                        case 6:uc.enable_stt=bo; break;
+                    }
+                }
+            }
+            Su::AllConfigSave();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button(TT_266)) {
+            for (int col = 1; col < columns_count; ++col) {
+                for (int row = 0; row < rows_count; ++row) {
+                    bool& bo = bools[row * columns_count + col];
+                    bo = false;
+                    Su::UserConfig& uc = Su::UserConfig::getUserVector()[col - 1];
+                    switch (row) {
+                        case 0:uc.enable_widget = bo; break;
+                        case 1:uc.enable_cubism = bo; break;
+                        case 2:uc.enable_template = bo; break;
+                        case 3:uc.enable_tts = bo; break;
+                        case 4:uc.enable_mt = bo; break;
+                        case 5:uc.enable_original = bo; break;
+                        case 6:uc.enable_stt = bo; break;
+                    }
+                }
+            }
+        }
+
     }
+}
+void ShowShinobuCubism(Su::UserConfig* _uc)
+{
+    return;
+    static Csm::csmVector<Csm::csmString>& csmModelDir = LAppLive2DManager::GetInstance()->GetModelDir();
+    static const char* modelDirs[DEFSIZEK16] = { 0 };
+    static int modelDirsSize = -1;
+    static int select = 0;
+    if (modelDirsSize != csmModelDir.GetSize()) {
+        modelDirsSize = csmModelDir.GetSize();
+        for (int i = 0; i < modelDirsSize; ++i) {
+            modelDirs[i] = csmModelDir[i].GetRawString();
+        }
+    }
+    if (ImGui::BeginCombo(u8"Cubism", modelDirs[select])) {
+        for (int n = 0; n < modelDirsSize; n++) {
+            const bool is_selected = (select == n);
+            if (ImGui::Selectable(modelDirs[n], is_selected)) {
+                select = n;
+            }
+            if (is_selected)ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+
+    //const char* preview_text = (idx < IM_ARRAYSIZE(policies)) ? policies[idx].Name + (idx > 0 ? strlen("ImGuiTableFlags") : 0) : "";
+    //if (ImGui::BeginCombo("Sizing Policy", preview_text))
+    //{
+    //    for (int n = 0; n < IM_ARRAYSIZE(policies); n++)
+    //        if (ImGui::Selectable(policies[n].Name, idx == n))
+    //            *p_flags = (*p_flags & ~ImGuiTableFlags_SizingMask_) | policies[n].Value;
+    //    ImGui::EndCombo();
+    //}
 
 }
 void ShowShinobuLanguage() {
@@ -88,6 +215,7 @@ void ShowShinobuLanguage() {
                 const bool is_selected = ((int)GlobalConfig::getInstance()->select_lan == n);
                 if (ImGui::Selectable(language_list[n], is_selected)) {
                     GlobalConfig::getInstance()->select_lan = (LAN)n;
+                    GlobalTemp::RefreshTable = true;
                     GlobalConfig::GlobalConfigSave();
                 }
                 if (is_selected)ImGui::SetItemDefaultFocus();
@@ -187,7 +315,7 @@ void ShowShinobuUser()
 {
     if (ImGui::CollapsingHeader(TT_32))
     {
-        if (ImGui::BeginTabBar("##SettingBar001", ImGuiTabBarFlags_None))
+        if (ImGui::BeginTabBar("###SettingBar", ImGuiTabBarFlags_None))
         {
             if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip))
             {
@@ -197,13 +325,17 @@ void ShowShinobuUser()
                 Su::AllConfigSave();
             }
             static char tabname[DEFSIZE];
+            memset(tabname, 0, sizeof(tabname));
             int erase_pos = -1;
             for (int i = 0; i < (int)Su::UserConfig::getUserVector().size(); ++i) {
                 strcpy_s(tabname, sizeof(tabname), TT_33);
                 snprintf(tabname, sizeof(tabname), tabname, Su::UserConfig::getUserVector()[i].file_id);
+                sprintf_s(tabname,sizeof(tabname), "%s###%d", tabname, Su::UserConfig::getUserVector()[i].file_id);
+
                 if (ImGui::BeginTabItem(tabname, &Su::UserConfig::getUserVector()[i].exist, ImGuiTabItemFlags_None))
                 {
                     Su::UserConfig* _uc = &Su::UserConfig::getUserVector()[i];
+                    ShowShinobuCubism(_uc);
                     ShowShinobuLLM(_uc);
                     ShowShinibuTTS(_uc);
                     ShowShinobuSTT(_uc);
@@ -458,7 +590,7 @@ void ShowShinobuAbout() {
             float samples[100];
             for (int n = 0; n < 100; n++)
                 samples[n] = sinf((float)n * 0.2f + (float)ImGui::GetTime() * 1.5f);
-            ImGui::PlotLines("##S_SamplesPlotLines001", samples, 100, NULL, NULL, -1.0f, 1.0f, ImVec2(ImGui::GetContentRegionAvail().x, 0.0));
+            ImGui::PlotLines("###PlotLines", samples, 100, NULL, NULL, -1.0f, 1.0f, ImVec2(ImGui::GetContentRegionAvail().x, 0.0));
             ImGui::ProgressBar(sinf((float)ImGui::GetTime()) * 0.5f + 0.5f, ImVec2(ImGui::GetContentRegionAvail().x, 0.0));
 
         }
