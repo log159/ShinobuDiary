@@ -17,6 +17,11 @@ WNDCLASSEXW GlobalTemp::WindowMainWc;
 int GlobalTemp::CubismFrameCount = 0;
 std::string GlobalTemp::LunarCalendar = "";
 bool GlobalTemp::RefreshTable = true;
+bool GlobalTemp::RefreshCubism = true;
+bool GlobalTemp::CubismQuit = false;
+bool GlobalTemp::RefreshCubismScene = false;
+const LPCSTR GlobalTemp::CubismDirectXClassName = "Cubism DirectX11 Sample";
+const LPCSTR GlobalTemp::CubismWindowClassName = "ShinobuDiary Cubism";
 
 void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
     static bool initHas = false;if (initHas == true) return;initHas = true;
@@ -57,8 +62,10 @@ void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
 
     gc->window_cubism_addtimefps = FileSetting::GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_ADDTIMEFPS], 0);
 
+    gc->window_main_fast_id = FileSetting::GetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_FAST_ID], INITINT);
+
 #ifdef IS_WINDOWS
-    static std::vector<std::pair<std::string,std::string>> temp_fonts;
+    std::vector<std::pair<std::string,std::string>> temp_fonts;
     std::string basePath = "./Fonts/";
     std::string searchPattern = basePath + "*.ttf";
     wchar_t widePattern[MAX_PATH];
@@ -86,8 +93,14 @@ void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
     gc->fonts_list = new const char* [gc->fonts_size];
     gc->fonts_name_list = new const char* [gc->fonts_size];
     for (int i = 0; i < gc->fonts_size; ++i) {
-        gc->fonts_list[i] = temp_fonts[i].second.c_str();
-        gc->fonts_name_list[i] = temp_fonts[i].first.c_str();
+        size_t length = strlen(temp_fonts[i].second.c_str());
+        char* temp = new char[length + 1];
+        strcpy_s(temp, length + 1, temp_fonts[i].second.c_str());
+        gc->fonts_list[i] = temp;
+        length = strlen(temp_fonts[i].first.c_str());
+        temp= new char[length + 1];
+        strcpy_s(temp, length + 1, temp_fonts[i].first.c_str());
+        gc->fonts_name_list[i] = temp;
         //cout << i << " " << gc->fonts_list[i] << endl;
     }
 #endif //IS_WINDOWS
@@ -132,15 +145,16 @@ void GlobalConfig::GlobalConfigSave(GlobalConfig* gc)
     FileSetting::SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_ADDTIMEFPS],::GlobalConfig::getInstance()->window_main_addtimefps);
 
     FileSetting::SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_CUBISM_ADDTIMEFPS], ::GlobalConfig::getInstance()->window_cubism_addtimefps);
-
+    FileSetting::SetLongValue(0, INIGROUPMARKSTR, inifreemark_map[::FREEMARK::WINDOW_MAIN_FAST_ID], ::GlobalConfig::getInstance()->window_main_fast_id);
+    GlobalTemp::RefreshTable = true;
 }
 
 GlobalConfig::~GlobalConfig()
 {
-    if (fonts_size == 0 && fonts_list == NULL) { return; }
+    if (fonts_size == 0 || fonts_list == NULL) { return; }
     for (int i = 0; i < fonts_size; ++i) {
-        free((void*)fonts_list[i]);
-        free((void*)fonts_name_list[i]);
+        delete[] fonts_list[i];
+        delete[] fonts_name_list[i];
     }
     delete[] fonts_list;
     delete[] fonts_name_list;

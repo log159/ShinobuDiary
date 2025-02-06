@@ -18206,7 +18206,6 @@ void ImGui::DockNodeWindowMenuHandler_Default(ImGuiContext* ctx, ImGuiDockNode* 
     IM_UNUSED(ctx);
     if (tab_bar->Tabs.Size == 1)
     {
-        //Shinobu Debug
         // "Hide tab bar" option. Being one of our rare user-facing string we pull it from a table.
         if (MenuItem(/*LocalizeGetMsg(ImGuiLocKey_DockingHideTabBar)*/TT_252, NULL, node->IsHiddenTabBar()))
             node->WantHiddenTabBarToggle = true;

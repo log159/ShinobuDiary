@@ -68,8 +68,6 @@ namespace LAppDefine {
     const CubismFramework::Option::LogLevel CubismLoggingLevel = CubismFramework::Option::LogLevel_Verbose;
 
     // デフォルトのレンダーターゲットサイズ
-    //const csmInt32 RenderTargetWidth = 700;
-    //const csmInt32 RenderTargetHeight = 700;
 
     csmInt32 RenderTargetWidth;
     csmInt32 RenderTargetHeight;

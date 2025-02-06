@@ -24,6 +24,8 @@
 class LAppModel : public Csm::CubismUserModel
 {
 public:
+
+
     /**
      * @brief コンストラクタ
      */

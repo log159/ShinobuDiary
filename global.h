@@ -21,6 +21,12 @@ public:
     static WNDCLASSEXW WindowMainWc;
     static std::string LunarCalendar;
     static bool RefreshTable;
+    static bool RefreshCubism;
+    static bool CubismQuit;
+    static bool RefreshCubismScene;
+    static const LPCSTR CubismDirectXClassName;
+    static const LPCSTR CubismWindowClassName;
+
 };
 
 
@@ -52,7 +58,9 @@ enum FREEMARK {
     ENABLE_TTS,
     ENABLE_MT,
     ENABLE_ORIGINAL,
-    ENABLE_STT
+    ENABLE_STT,
+    CUBISM_CONFIG_MODEL_DIR,
+    WINDOW_MAIN_FAST_ID
 };
 static std::map<FREEMARK, const char*>inifreemark_map = {
     {FREEMARK::LANGUAGESEL_ID,                      "languagesel_id"},
@@ -75,6 +83,7 @@ static std::map<FREEMARK, const char*>inifreemark_map = {
     {FREEMARK::FONT_GLOBAL_SCALE,                   "font_global_scale"},
     {FREEMARK::WINDOW_MAIN_FORECASTFPS,             "window_main_forecastfps"},
     {FREEMARK::WINDOW_MAIN_ADDTIMEFPS,              "window_main_addtimefps"},
+    {FREEMARK::WINDOW_MAIN_FAST_ID,                 "window_main_fast_id"},
     {FREEMARK::WINDOW_CUBISM_ADDTIMEFPS,            "window_cubism_addtimefps"},
     {FREEMARK::ENABLE_WIDGET,                       "enable_widget"},
     {FREEMARK::ENABLE_CUBISM,                       "enable_cubism"},
@@ -82,7 +91,8 @@ static std::map<FREEMARK, const char*>inifreemark_map = {
     {FREEMARK::ENABLE_TTS,                          "enable_tts" },
     {FREEMARK::ENABLE_MT,                           "enable_mt" },
     {FREEMARK::ENABLE_ORIGINAL,                     "enable_original" },
-    {FREEMARK::ENABLE_STT,                          "enable_stt" }
+    {FREEMARK::ENABLE_STT,                          "enable_stt" },
+    {FREEMARK::CUBISM_CONFIG_MODEL_DIR,             "cubism_config_model_dir"}
 };
 enum INIMARK { KEY, APPID, SECRET, BASEURL, ADDRESS, PORT };
 static std::map<INIMARK, const char*>inimark_map = {
@@ -109,7 +119,8 @@ public:
     int window_main_dock_id            = 0;         /*{ 0,1 }*/
     int window_main_transparent_id     = 0;         /*{ 0,1 }*/
     float window_main_forecastfps   = 120.0f;       /*10.0f-120.0f*/
-    int window_main_addtimefps      = 0;            /*0-100*/
+    int window_main_addtimefps      = 0;            /* 0-100 */
+    int window_main_fast_id         = 0;            /*{ 0,1 }*/
 
     int window_cubism_style_id      = 0;            /*{ 0,1,2,3 }*/
     int window_cubism_addtimefps    = 0;            /*0-100*/

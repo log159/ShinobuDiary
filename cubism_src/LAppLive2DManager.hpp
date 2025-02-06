@@ -12,6 +12,9 @@
 #include <Math/CubismMatrix44.hpp>
 #include <Type/csmVector.hpp>
 #include <Type/csmMap.hpp>
+#include <map>
+#include <string>
+
 struct ModelJsonConfig {
     Csm::csmString modelPath;
     Csm::csmString modelJsonName;
@@ -27,10 +30,11 @@ class LAppLive2DManager
 {
 
 public:
+    std::map<int, std::pair<int, std::string>> UserCubismMap;
 
     ModelJsonConfig GetModelJsonConfig(int index);
 
-    void AddScene(Csm::csmInt32 index);
+    void RefreshScene();
 
 
     Csm::csmVector<Csm::csmString>& GetModelDir();; ///< モデルディレクトリ名のコンテナ
@@ -117,18 +121,6 @@ public:
     *          モデルの更新処理および描画処理を行う
     */
     void OnUpdate() const;
-
-    /**
-    * @brief   次のシーンに切り替える<br>
-    *           サンプルアプリケーションではモデルセットの切り替えを行う。
-    */
-    void NextScene();
-
-    /**
-    * @brief   シーンを切り替える<br>
-    *           サンプルアプリケーションではモデルセットの切り替えを行う。
-    */
-    void ChangeScene(Csm::csmInt32 index);
 
     /**
      * @brief   フレーム末端の処理

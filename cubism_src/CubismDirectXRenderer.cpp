@@ -84,7 +84,7 @@ void CubismDirectXRenderer::Release()
     }
 
     //ウィンドウの削除
-    UnregisterClass(ClassName, _windowClass.hInstance);
+    UnregisterClass(GlobalTemp::CubismWindowClassName, _windowClass.hInstance);
 }
 
 void CubismDirectXRenderer::ReleaseInstance()

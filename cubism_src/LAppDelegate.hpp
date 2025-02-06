@@ -15,7 +15,6 @@
 
 #include "LAppAllocator.hpp"
 
-#include "CubismWindowStyle.h"
 
 class LAppView;
 class LAppTextureManager;

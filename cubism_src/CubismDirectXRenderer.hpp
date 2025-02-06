@@ -11,7 +11,7 @@
 
 #include "CubismTextureManager.hpp"
 #include "Model/CubismUserModel.hpp"
-
+#include "../global.h"
 using namespace Csm;
 
 class CubismDirectXView;
@@ -81,7 +81,6 @@ public:
     */
     void EndFrame(CubismUserModel* userModel);
 
-    const LPCSTR ClassName = "Cubism DirectX11 Sample";
     const csmInt32 BackBufferNum = 1; // バックバッファ枚数
 
     enum DeviceStep

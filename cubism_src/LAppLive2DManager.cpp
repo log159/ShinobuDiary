@@ -18,7 +18,7 @@
 #include "LAppDelegate.hpp"
 #include "LAppModel.hpp"
 #include "LAppView.hpp"
-
+#include <iostream>
 
 
 using namespace Csm;
@@ -174,7 +174,8 @@ void LAppLive2DManager::SetUpModel()
     for (csmUint32 i = 0; i < _modelDir.GetSize(); ++i) {
         printf("%hs\n", _modelDir[i].GetRawString());
     }
-    printf("Cubism find end\n");
+    std::cout << u8"Cubism find end " << u8"共加载 " << _modelDir.GetSize() << u8" 个模型" << std::endl;
+    
     qsort(_modelDir.GetPtr(), _modelDir.GetSize(), sizeof(csmString), CompareCsmString);
     
 }
@@ -291,16 +292,7 @@ void LAppLive2DManager::OnUpdate() const
     Rendering::CubismRenderer_D3D11::EndFrame(LAppDelegate::GetInstance()->GetD3dDevice());
 }
 
-void LAppLive2DManager::NextScene()
-{
-    //std::cout << "Cubism Scene Id: " << _sceneIndex << std::endl;
-    //Shinobu debug
-    //csmInt32 no = (_sceneIndex + 1) % GetModelDirSize();
-    //csmInt32 no = 0;
-    //ChangeScene(no);
-    //ChangeScene(0);
 
-}
 ModelJsonConfig LAppLive2DManager::GetModelJsonConfig(int index) {
     const csmChar* modelptr = _modelDir[index].GetRawString();
     const csmChar* lastSlash = strrchr(modelptr, '/');
@@ -314,76 +306,37 @@ ModelJsonConfig LAppLive2DManager::GetModelJsonConfig(int index) {
     // 斜杠之后部分拷贝到modelJsonName
     strncpy_s(modelJsonName, lastSlash + 1, sizeof(modelJsonName) - 1);
     modelJsonName[sizeof(modelJsonName) - 1] = '\0';
-    printf("Change Cubism |%hs|\n", modelPath);
-    printf("Change Cubism |%hs|\n", modelJsonName);
+    printf("Change Cubism |%hs| -> |%hs|\n", modelPath, modelJsonName);
     ModelJsonConfig mjc;
     mjc.modelPath = modelPath;
     mjc.modelJsonName = modelJsonName;
     return mjc;
 }
-void LAppLive2DManager::AddScene(Csm::csmInt32 index)
+//#define USE_RENDER_TARGET
+//#define USE_MODEL_RENDER_TARGET
+void LAppLive2DManager::RefreshScene()
 {
-    ModelJsonConfig mjc = GetModelJsonConfig(index);
+    if (_modelDir.GetSize() <= 0)
+        return;
 
-    _models.PushBack(new LAppModel());
-    _models[0]->LoadAssets(mjc.modelPath.GetRawString(), mjc.modelJsonName.GetRawString());
-
-    _models[0]->GetModelMatrix()->TranslateX(0.9f);
-    _models[0]->GetModelMatrix()->Scale(1.f, 1.f);
-}
-Csm::csmVector<Csm::csmString>& LAppLive2DManager::GetModelDir()
-{
-    return  _modelDir;
-}
-void LAppLive2DManager::ChangeScene(Csm::csmInt32 index)
-{
-    //_sceneIndex = index;
-    //if (DebugLogEnable)
-    //{
-    //    LAppPal::PrintLogLn("[APP]model index: %d", _sceneIndex);
-    //}
-
-    // model3.jsonのパスを決定する.
-    // ディレクトリ名とmodel3.jsonの名前を一致していることが条件
+    std::cout << u8"Cubism 刷新" << std::endl;
     ReleaseAllModel();
-    {
-        ModelJsonConfig mjc = GetModelJsonConfig(0);
-
+    for (auto it = UserCubismMap.begin(); it != UserCubismMap.end();++it) {
+        int index = 0;
+        for (int i=0; i < _modelDir.GetSize(); ++i) {
+            if (strcmp(it->second.second.c_str(), _modelDir[i].GetRawString()) == 0) {
+                index = i;
+                break;
+            }
+        }
+        ModelJsonConfig mjc = GetModelJsonConfig(index);
         _models.PushBack(new LAppModel());
-        _models[0]->LoadAssets(mjc.modelPath.GetRawString(), mjc.modelJsonName.GetRawString());
-
-        _models[0]->GetModelMatrix()->TranslateX(0.9f);
-        _models[0]->GetModelMatrix()->Scale(1.f, 1.f);
+        LAppModel* lam = _models[_models.GetSize() - 1];
+        lam->LoadAssets(mjc.modelPath.GetRawString(), mjc.modelJsonName.GetRawString());
+        //Shinobu Debug
+        lam->GetModelMatrix()->TranslateX(-0.5f+it->second.first * 0.1f);
+        std::cout << u8"用户 ID：" << it->first << u8" Cubism ID：" << it->second.first << u8" Cubism Model：" << it->second.second.c_str() << std::endl;
     }
-    //Shinobu Debug
-    {
-        ModelJsonConfig mjc = GetModelJsonConfig(1);
-
-        _models.PushBack(new LAppModel());
-        _models[1]->LoadAssets(mjc.modelPath.GetRawString(), mjc.modelJsonName.GetRawString());
-
-        _models[1]->GetModelMatrix()->TranslateX(0.1f);
-        _models[1]->GetModelMatrix()->Scale(1.5f, 1.5f);
-    }
-
-    //model->GetModel()->SetOverwriteFlagForMultiplyColors(true); // 正片叠底色覆盖标志
-    //model->GetModel()->SetOverwriteFlagForScreenColors(true); // 屏幕色覆盖标志
-    // 
-        // model3.jsonのパスを決定する.
-    // ディレクトリ名とmodel3.jsonの名前を一致していることが条件
-    //const csmString& model = _modelDir[index];
-
-    //csmString modelPath(ResourcesPath);
-    //modelPath += model;
-    //modelPath.Append(1, '/');
-
-    //csmString modelJsonName(model);
-    //modelJsonName += ".model3.json";
-
-    //ReleaseAllModel();
-    //_models.PushBack(new LAppModel());
-    //_models[0]->LoadAssets(modelPath.GetRawString(), modelJsonName.GetRawString());
-
     /*
      * モデル半透明表示を行うサンプルを提示する。
      * ここでUSE_RENDER_TARGET、USE_MODEL_RENDER_TARGETが定義されている場合
@@ -403,11 +356,8 @@ void LAppLive2DManager::ChangeScene(Csm::csmInt32 index)
 
 #if defined(USE_RENDER_TARGET) || defined(USE_MODEL_RENDER_TARGET)
         // モデル個別にαを付けるサンプルとして、もう1体モデルを作成し、少し位置をずらす
-        _models.PushBack(new LAppModel());
-        _models[1]->LoadAssets(modelPath.GetRawString(), modelJsonName.GetRawString());
-        _models[1]->GetModelMatrix()->TranslateX(0.2f);
-#endif
 
+#endif
         LAppDelegate::GetInstance()->GetView()->SwitchRenderingTarget(useRenderTarget);
 
         // 別レンダリング先を選択した際の背景クリア色
@@ -415,6 +365,12 @@ void LAppLive2DManager::ChangeScene(Csm::csmInt32 index)
         LAppDelegate::GetInstance()->GetView()->SetRenderTargetClearColor(clearColor[0], clearColor[1], clearColor[2]);
     }
 }
+
+Csm::csmVector<Csm::csmString>& LAppLive2DManager::GetModelDir()
+{
+    return  _modelDir;
+}
+
 
 csmUint32 LAppLive2DManager::GetModelNum() const
 {
@@ -433,6 +389,7 @@ void LAppLive2DManager::EndFrame()
             if (_releaseModel[i]._model)
             {
                 delete _releaseModel[i]._model;
+                _releaseModel[i]._model = nullptr;
             }
             // コンテナも削除
             _releaseModel.Remove(i);
@@ -456,3 +413,4 @@ void LAppLive2DManager::SetViewMatrix(CubismMatrix44* m)
         _viewMatrix->GetArray()[i] = m->GetArray()[i];
     }
 }
+

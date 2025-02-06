@@ -45,6 +45,8 @@ namespace {
     }
 }
 
+
+
 LAppModel::LAppModel()
     : CubismUserModel()
     , _modelSetting(NULL)

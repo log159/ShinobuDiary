@@ -20,6 +20,11 @@
 #include <thread>
 #include <functional>
 #include <chrono>
+#include <iostream>
+
+#include "CubismWindowStyle.h"
+
+#include "../global.h"
 
 using namespace std;
 using namespace Csm;
@@ -28,13 +33,8 @@ using namespace LAppDefine;
 namespace {
     LAppDelegate* s_instance = NULL;
 
-    const LPCSTR ClassName = "ShinobuDiary Cubism";
-
     const csmInt32 BackBufferNum = 1; // バックバッファ枚数
 }
-
-
-
 
 //
 //void LAppDelegate::PosHandler()
@@ -99,7 +99,6 @@ LAppDelegate* LAppDelegate::GetInstance()
     {
         s_instance = new LAppDelegate();
     }
-
     return s_instance;
 }
 
@@ -120,17 +119,18 @@ bool LAppDelegate::Initialize()
     }
 
     // ウィンドウクラス
-    _windowClass = { sizeof(WNDCLASSEX), CS_CLASSDC, MsgProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, ClassName, NULL };
+    _windowClass = { sizeof(WNDCLASSEX), CS_CLASSDC, MsgProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, GlobalTemp::CubismWindowClassName, NULL };
     RegisterClassEx(&_windowClass);
     RenderTargetWidth = GetSystemMetrics(SM_CXSCREEN);
     RenderTargetHeight = GetSystemMetrics(SM_CYSCREEN);
-    cout << RenderTargetWidth << " " << RenderTargetHeight << endl;
+    
+    std::cout <<u8"窗体大小：" << RenderTargetWidth << " " << RenderTargetHeight << std::endl;
     // タイトルバー、ウィンドウ枠の分サイズを増やす
     RECT rect;
     SetRect(&rect, 0, 0, RenderTargetWidth, RenderTargetHeight);
 
     //ウインドウの生成
-    _windowHandle = CreateWindow(ClassName, ClassName,
+    _windowHandle = CreateWindow(GlobalTemp::CubismWindowClassName, GlobalTemp::CubismWindowClassName,
         WS_POPUP,
         0, 0, rect.right, rect.bottom, NULL, NULL, _windowClass.hInstance, NULL);
     MARGINS margins = { -1 }; 
@@ -332,53 +332,9 @@ void LAppDelegate::Release()
         _device = NULL;
     }
 
-    UnregisterClass(ClassName, _windowClass.hInstance);
+    UnregisterClass(GlobalTemp::CubismWindowClassName, _windowClass.hInstance);
 }
-//不限制帧率的Run
-//void LAppDelegate::Run()
-//{
-//    MSG msg;
-//
-//    do
-//    {
-//        //メッセージループ
-//        if(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-//        {
-//            TranslateMessage(&msg);
-//            DispatchMessage(&msg);
-//        }
-//        else
-//        {
-//            //std::this_thread::sleep_for(std::chrono::milliseconds(10));
-//            // 窗口更新
-//            CubismWindowStyle::Update(_windowHandle);
-//
-//            // 時間更新
-//            LAppPal::UpdateTime();
-//
-//            // 画面クリアなど
-//            StartFrame();
-//
-//            // 描画
-//            _view->Render();
-//
-//            // フレーム末端処理
-//            EndFrame();
-//
-//            // アプリケーション終了メッセージでウィンドウを破棄する
-//            if (GetIsEnd() && _windowHandle!=NULL)
-//            {// ウィンドウ破壊
-//                DestroyWindow(_windowHandle);
-//                _windowHandle = NULL;
-//            }
-//        }
-//    } while (msg.message != WM_QUIT);
-//
-//    // 解放
-//    Release();
-//    // インスタンス削除
-//    ReleaseInstance();
-//}
+
 
 
 void LAppDelegate::Run()
@@ -427,6 +383,7 @@ void LAppDelegate::Run()
             // アプリケーション終了メッセージでウィンドウを破棄する
             if (GetIsEnd() && _windowHandle != NULL)
             {
+                GlobalTemp::CubismQuit = true;
                 DestroyWindow(_windowHandle);
                 _windowHandle = NULL;
             }
@@ -495,7 +452,6 @@ void LAppDelegate::StartFrame()
     {
         return;
     }
-    //Shinobu debug
     // バックバッファのクリア
     float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     _deviceContext->OMSetRenderTargets(1, &_renderTargetView, _depthStencilView);
@@ -635,7 +591,6 @@ LRESULT WINAPI LAppDelegate::MsgProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM l
     switch (msg)
     {
     case WM_DESTROY:    // 终了
-        printf(u8"[File: %s][Line: %d][%s]: 退出消息\n!\n", __FILE__, __LINE__, __func__);
         PostQuitMessage(0);
         return 0;
 
@@ -662,7 +617,6 @@ LRESULT WINAPI LAppDelegate::MsgProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM l
 
             s_instance->_mouseX = static_cast<float>(LOWORD(lParam));
             s_instance->_mouseY = static_cast<float>(HIWORD(lParam));
-
             {
                 s_instance->_captured = true;
                 s_instance->_view->OnTouchesBegan(s_instance->_mouseX, s_instance->_mouseY);

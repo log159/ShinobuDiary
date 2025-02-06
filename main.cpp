@@ -32,12 +32,14 @@ void CreateRenderTarget();
 void CleanupRenderTarget();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+static bool OtherConfigThreadMark = false;
 void FrontPart();
 void PosteriorPart();
 // Shinobu Function
 std::vector<HANDLE>threadVector;
 DWORD WINAPI CubismThread(LPVOID lpParam);
 DWORD WINAPI OtherConfigThread(LPVOID lpParam);
+
 
 // Main code
 int main(int, char**)
@@ -47,7 +49,6 @@ int main(int, char**)
 //                     _In_ int       nCmdShow)
 //int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int)
 {
-
     //---------------------前部分--------------------
     FrontPart();
     //--------------------中间部分---------------------
@@ -59,22 +60,36 @@ int main(int, char**)
     DWORD cubismThreadId, otherThreadId;
     threadVector.clear();
     threadVector.push_back(CreateThread(NULL, 0, CubismThread, NULL, 0, &cubismThreadId));
+    cout << u8"Cubism 进程ID" << cubismThreadId <<std::endl;
     threadVector.push_back(CreateThread(NULL, 0, OtherConfigThread, NULL, 0, &otherThreadId));
+    cout << u8"Other 进程ID" << otherThreadId << std::endl;
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+    MSG msg;
     static bool done = false;
-    while (!done)
-    {
-        // Poll and handle messages (inputs, window resize, etc.)
-        // See the WndProc() function below for our to dispatch events to the Win32 backend.
-        MSG msg;
-        while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
-        {
+    do{
+        if (GlobalConfig::getInstance()->window_main_fast_id==0) {
+            MSG msg;
+            while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
+            {
+                ::TranslateMessage(&msg);
+                ::DispatchMessage(&msg);
+                if (msg.message == WM_QUIT) {
+                    done = true;
+                    cout << u8"全局退出消息" << endl;
+                }
+            }
+        }
+        else {
             ::TranslateMessage(&msg);
             ::DispatchMessage(&msg);
-            if (msg.message == WM_QUIT)
+            if (msg.message == WM_QUIT) {
                 done = true;
+                cout << u8"全局退出消息" << endl;
+            }
         }
+
+        if (done == true)break;
         // Handle window being minimized or screen locked
         if (g_SwapChainOccluded && g_pSwapChain->Present(0, DXGI_PRESENT_TEST) == DXGI_STATUS_OCCLUDED)
         {
@@ -101,13 +116,11 @@ int main(int, char**)
         static bool show_demo_window = true;
         if (show_demo_window)ImGui::ShowDemoWindow(&show_demo_window);
 
-
-
         static bool show_shinobu_window = true;
         if (show_shinobu_window)ShowShinobuWindow(&show_shinobu_window);
-        else { 
+        else {
             ::GlobalConfig::GlobalConfigSave();
-            done = true; 
+            done = true;
         }
         if (GlobalTemp::ShowStyleEditor) {
             ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
@@ -137,22 +150,22 @@ int main(int, char**)
 
         HRESULT hr = g_pSwapChain->Present(1, 0);
         g_SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
-    }
+    }while (GlobalConfig::getInstance()->window_main_fast_id==0 ||GetMessage(&msg, NULL, 0, 0));
 
     //---------------------后部分--------------------------
     PosteriorPart();
+    
 
-    for (auto& hThread : threadVector) {
-        if (hThread != 0) 
-            CloseHandle(hThread);	// 关闭内核对象
-    }
+    std::cout << u8"全局终了" << std::endl;
 
     return 0;
 }
 
 DWORD WINAPI OtherConfigThread(LPVOID lpParam)
 {
-    while (true) {
+    std::cout << u8"Other 信息更新开始执行" << std::endl;
+
+    while (!OtherConfigThreadMark) {
 
         static std::string lastMinutes = "";
         std::string thisMinutes = ::getCurrentMinutes();
@@ -163,21 +176,24 @@ DWORD WINAPI OtherConfigThread(LPVOID lpParam)
         }
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
+    std::cout << u8"更新时间 终了" << std::endl;
+
     return 0;
 }
 
 //Cubism Thread
 DWORD WINAPI CubismThread(LPVOID lpParam)
 {
-    if (!LAppDelegate::GetInstance()->Initialize())
-    {
-        // 初期化失敗
+    bool CubismInitMark = LAppDelegate::GetInstance()->Initialize();
+    if (!CubismInitMark) {
         LAppDelegate::GetInstance()->Release();
         LAppDelegate::ReleaseInstance();
     }
     else {
+        cout << u8"Cubism 开始执行" << endl;
         LAppDelegate::GetInstance()->Run();
     }
+    std::cout << u8"Cubism 终了" << std::endl;
     return 0;
 }
 void FrontPart() {

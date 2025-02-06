@@ -7,7 +7,6 @@
 #include "translator.h"
 #include "imgui.h"
 #include "sufunction.h"
-#include "./framework_src/include/Type/csmString.hpp"
 
 using std::cout;
 using std::endl;
@@ -31,13 +30,15 @@ namespace Su{
 
     class CubismConfig {
     public:
-        Csm::csmString model_dir;
+        std::string model_dir;
     };
 
     class UserConfig {
     public:
+        //temp
         bool                         exist      = true; //存在标识
-        int                          file_id;           //文件标识
+        //normal
+        int                          user_id;           //文件标识
         std::string                  user_name;         //
         std::string                  user_explain;      //
         std::string                  user_template;     //
@@ -59,6 +60,8 @@ namespace Su{
         int                          gpt_sovits_target_language_id;
         std::string                  myself_vits;
         CubismConfig                 cubism_config;
+
+        //change
         std::vector<LLMConfig>       llms;
         std::vector<TTSConfig>       ttss;
         std::vector<STTConfig>       stts;
@@ -160,10 +163,10 @@ namespace Su{
         GetGuiMark(appid, sizeof(appid), inimark_map[INIMARK::APPID], tc->name);
         GetGuiMark(secret, sizeof(secret), inimark_map[INIMARK::SECRET], tc->name);
         GetGuiMark(baseurl, sizeof(baseurl), inimark_map[INIMARK::BASEURL], tc->name);
-        if (POS_0 & tc->kasb.needpos)FileSetting::SetValue(uc->file_id, INIGROUPMARKSTR, key, tc->kasb.key);
-        if (POS_1 & tc->kasb.needpos)FileSetting::SetValue(uc->file_id, INIGROUPMARKSTR, appid, tc->kasb.appid);
-        if (POS_2 & tc->kasb.needpos)FileSetting::SetValue(uc->file_id, INIGROUPMARKSTR, secret, tc->kasb.secret);
-        if (POS_3 & tc->kasb.needpos)FileSetting::SetValue(uc->file_id, INIGROUPMARKSTR, baseurl, tc->kasb.baseurl);
+        if (POS_0 & tc->kasb.needpos)FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, key, tc->kasb.key);
+        if (POS_1 & tc->kasb.needpos)FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, appid, tc->kasb.appid);
+        if (POS_2 & tc->kasb.needpos)FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, secret, tc->kasb.secret);
+        if (POS_3 & tc->kasb.needpos)FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, baseurl, tc->kasb.baseurl);
     }
     template<typename FT, typename T>
     void SaveAp(FT* uc, T* tc) {
@@ -171,8 +174,8 @@ namespace Su{
         static char port[DEFSIZE2];
         GetGuiMark(address, sizeof(address), inimark_map[INIMARK::ADDRESS], tc->name);
         GetGuiMark(port, sizeof(port), inimark_map[INIMARK::PORT], tc->name);
-        FileSetting::SetValue(uc->file_id, INIGROUPMARKSTR, address,tc->ap.address);
-        FileSetting::SetValue(uc->file_id, INIGROUPMARKSTR, port, tc->ap.port);
+        FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, address,tc->ap.address);
+        FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, port, tc->ap.port);
     }
 
     template<typename FT,typename T>
@@ -185,10 +188,10 @@ namespace Su{
         GetGuiMark(appid, sizeof(appid), inimark_map[INIMARK::APPID], tc->name);
         GetGuiMark(secret, sizeof(secret), inimark_map[INIMARK::SECRET], tc->name);
         GetGuiMark(baseurl, sizeof(baseurl), inimark_map[INIMARK::BASEURL], tc->name);
-        if (POS_0 & tc->kasb.needpos)strcpy_s(tc->kasb.key,sizeof(tc->kasb.key), FileSetting::GetValue(uc->file_id, INIGROUPMARKSTR, key, INITSTR).c_str());
-        if (POS_1 & tc->kasb.needpos)strcpy_s(tc->kasb.appid, sizeof(tc->kasb.appid),FileSetting::GetValue(uc->file_id, INIGROUPMARKSTR, appid, INITSTR).c_str());
-        if (POS_2 & tc->kasb.needpos)strcpy_s(tc->kasb.secret, sizeof(tc->kasb.secret), FileSetting::GetValue(uc->file_id, INIGROUPMARKSTR, secret, INITSTR).c_str());
-        if (POS_3 & tc->kasb.needpos)strcpy_s(tc->kasb.baseurl, sizeof(tc->kasb.baseurl), FileSetting::GetValue(uc->file_id, INIGROUPMARKSTR, baseurl, INITSTR).c_str());
+        if (POS_0 & tc->kasb.needpos)strcpy_s(tc->kasb.key,sizeof(tc->kasb.key), FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, key, INITSTR).c_str());
+        if (POS_1 & tc->kasb.needpos)strcpy_s(tc->kasb.appid, sizeof(tc->kasb.appid),FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, appid, INITSTR).c_str());
+        if (POS_2 & tc->kasb.needpos)strcpy_s(tc->kasb.secret, sizeof(tc->kasb.secret), FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, secret, INITSTR).c_str());
+        if (POS_3 & tc->kasb.needpos)strcpy_s(tc->kasb.baseurl, sizeof(tc->kasb.baseurl), FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, baseurl, INITSTR).c_str());
     }
     template<typename FT, typename T>
     void InitAp(FT* uc, T* tc) {
@@ -196,8 +199,8 @@ namespace Su{
         static char port[DEFSIZE2];
         GetGuiMark(address, sizeof(address), inimark_map[INIMARK::ADDRESS], tc->name);
         GetGuiMark(port, sizeof(port), inimark_map[INIMARK::PORT], tc->name);
-        strcpy_s(tc->ap.address,sizeof(tc->ap.address), FileSetting::GetValue(uc->file_id, INIGROUPMARKSTR, address, INITSTR).c_str());
-        strcpy_s(tc->ap.port, sizeof(tc->ap.port),FileSetting::GetValue(uc->file_id, INIGROUPMARKSTR, port, INITSTR).c_str());
+        strcpy_s(tc->ap.address,sizeof(tc->ap.address), FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, address, INITSTR).c_str());
+        strcpy_s(tc->ap.port, sizeof(tc->ap.port),FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, port, INITSTR).c_str());
     }
 
 }

@@ -1,8 +1,10 @@
 ﻿#include "CubismWindowStyle.h"
 #include <dwmapi.h>
+#include "../global.h"
 
+WINSTYLE CubismWindowStyle::ws= WINSTYLE::WinTop;
 WINSTYLE CubismWindowStyle::winStyle= WINSTYLE::WinTop;
-bool CubismWindowStyle::canTrans;
+bool CubismWindowStyle::canTrans=true;
 
 void CubismWindowStyle::SetWindowTopApha(HWND hwnd, bool isTop, bool isApha)
 {
@@ -113,7 +115,7 @@ void CubismWindowStyle::WindowStyleUpdate(HWND hwnd)
 
 void CubismWindowStyle::Update(HWND hwnd)
 {
-    WINSTYLE ws = static_cast<WINSTYLE>(GlobalConfig::getInstance()->window_cubism_style_id);
+    ws = static_cast<WINSTYLE>(GlobalConfig::getInstance()->window_cubism_style_id);
     if (ws != winStyle) {
         winStyle = ws;
     }

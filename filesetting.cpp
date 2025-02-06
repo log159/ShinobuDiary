@@ -30,11 +30,37 @@ return RETURN_TYPE(ini.GET_FUNCTION(ss, k, n));
 //constexpr int SI_FILE = -3;     //!< File error (see errno for detail error)
 
 
-void FileSetting::SetValue(int id, const char* s, const char* k, const char* n){
+void FileSetting::SetValue(int id, const char* s, const char* k, const char* wn){
+    std::string str = wn;
+    std::string target = " ";
+    std::string replacement = "~SPACE~";
+
+    size_t pos = 0;
+    while ((pos = str.find(target, pos)) != std::string::npos) {
+        str.replace(pos, target.length(), replacement);
+        pos += replacement.length();
+    }
+
+    const char* n = str.c_str();
     SS(SetValue);
 }
 std::string FileSetting::GetValue(int id, const char* s, const char* k, const char* n){
-    SG(GetValue,std::string)
+    CSimpleIniA ini;
+    static char ss[DEFPATHSIZE];
+    memset(ss, sizeof(ss), 0);
+    snprintf(ss, sizeof(ss), s, id);
+    ini.SetUnicode(true);
+    if (ini.LoadFile(INITFILE) < 0)
+        return std::string(n);
+    std::string str = ini.GetValue(ss, k, n);
+    std::string target = "~SPACE~";
+    std::string replacement = " ";
+    size_t pos = 0;
+    while ((pos = str.find(target, pos)) != std::string::npos) {
+        str.replace(pos, target.length(), replacement);
+        pos += replacement.length();
+    }
+    return str;
 }
 void FileSetting::SetLongValue(int id, const char* s, const char* k, int n){
     SS(SetLongValue)
@@ -53,5 +79,15 @@ void FileSetting::SetBoolValue(int id, const char* s, const char* k, bool n){
 }
 bool FileSetting::GetBoolValue(int id, const char* s, const char* k, bool n){
     SG(GetBoolValue, bool)
+}
+
+void FileSetting::ClearFile()
+{
+    if (std::remove(INITFILE) == 0) {
+        std::printf("File %s deleted successfully.\n", INITFILE);
+    }
+    else {
+        perror("Error deleting file");
+    }
 }
 

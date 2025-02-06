@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "../global.h"
 #include <Windows.h>
 class CubismWindowStyle;
 
@@ -18,7 +17,8 @@ enum WINSTYLE: int
 
 
 class CubismWindowStyle {
-private:
+public:
+    static WINSTYLE ws;
     static WINSTYLE winStyle;
     static bool canTrans;
 public:

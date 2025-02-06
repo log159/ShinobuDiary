@@ -18,6 +18,8 @@
 #include "LAppSpriteShader.hpp"
 #include "LAppModel.hpp"
 
+#include "../global.h"
+
 using namespace std;
 using namespace LAppDefine;
 
@@ -346,10 +348,16 @@ void LAppView::OnTouchesEnded(float px, float py) const
 
         live2DManager->OnTap(x, y);
 
-        // 歯車にタップしたか
-        if (_gear->IsHit(px, py, width, height))
-        {
-            live2DManager->NextScene();
+        //// 歯車にタップしたか
+        //if (_gear->IsHit(px, py, width, height))
+        //{
+
+        //    //live2DManager->NextScene();
+        //    live2DManager->RefreshScene();
+        //}
+        if (GlobalTemp::RefreshCubismScene == true) {
+            live2DManager->RefreshScene();
+            GlobalTemp::RefreshCubismScene = false;
         }
 
         // 電源ボタンにタップしたか
@@ -408,9 +416,7 @@ void LAppView::PreModelDraw(LAppModel& refModel)
 
         // レンダリング開始
         useTarget->BeginDraw(LAppDelegate::GetInstance()->GetD3dContext());
-        //Shinobu Debug
-        //不需要背景
-        //useTarget->Clear(LAppDelegate::GetInstance()->GetD3dContext(), _clearColor[0], _clearColor[1], _clearColor[2], _clearColor[3]); // 背景クリアカラー
+        useTarget->Clear(LAppDelegate::GetInstance()->GetD3dContext(), _clearColor[0], _clearColor[1], _clearColor[2], _clearColor[3]); // 背景クリアカラー
     }
 }
 
