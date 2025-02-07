@@ -278,3 +278,5 @@
 #define TT_274 AT(u8"高性能模式",u8"Highperformance")
 #define TT_275 AT(u8"节能模式","Economize")
 #define TT_276 AT(u8"Windows 的窗体渲染功率",u8"Windows's rendering power")
+#define TT_277 AT(u8"添加用户",u8"Add User")
+#define TT_278 AT(u8"删除用户",u8"Delete User")

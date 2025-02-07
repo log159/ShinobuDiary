@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <map>
+#include <queue>
 #include "sizedef.h"
 #include "filesetting.h"
 #include "imgui.h"
@@ -24,8 +25,10 @@ public:
     static bool RefreshCubism;
     static bool CubismQuit;
     static bool RefreshCubismScene;
+    static bool RefreshCubismSceneSpecial;
     static const LPCSTR CubismDirectXClassName;
     static const LPCSTR CubismWindowClassName;
+    static std::queue<std::pair<bool,int>> RefreshCubismUsers;//true 代表添加 false代表移除
 
 };
 

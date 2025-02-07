@@ -14,6 +14,7 @@
 #include <Type/csmMap.hpp>
 #include <map>
 #include <string>
+#include <vector>
 
 struct ModelJsonConfig {
     Csm::csmString modelPath;
@@ -32,9 +33,13 @@ class LAppLive2DManager
 public:
     std::map<int, std::pair<int, std::string>> UserCubismMap;
 
+    //std::vector<std::string>
+
     ModelJsonConfig GetModelJsonConfig(int index);
 
     void RefreshScene();
+
+    void RefreshSceneSpecial();
 
 
     Csm::csmVector<Csm::csmString>& GetModelDir();; ///< モデルディレクトリ名のコンテナ

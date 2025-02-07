@@ -19,7 +19,7 @@
 #include "LAppModel.hpp"
 #include "LAppView.hpp"
 #include <iostream>
-
+#include "../global.h"
 
 using namespace Csm;
 using namespace LAppDefine;
@@ -318,12 +318,11 @@ void LAppLive2DManager::RefreshScene()
 {
     if (_modelDir.GetSize() <= 0)
         return;
-
     std::cout << u8"Cubism 刷新" << std::endl;
     ReleaseAllModel();
-    for (auto it = UserCubismMap.begin(); it != UserCubismMap.end();++it) {
+    for (auto it = UserCubismMap.begin(); it != UserCubismMap.end(); ++it) {
         int index = 0;
-        for (int i=0; i < _modelDir.GetSize(); ++i) {
+        for (int i = 0; i < _modelDir.GetSize(); ++i) {
             if (strcmp(it->second.second.c_str(), _modelDir[i].GetRawString()) == 0) {
                 index = i;
                 break;
@@ -334,9 +333,10 @@ void LAppLive2DManager::RefreshScene()
         LAppModel* lam = _models[_models.GetSize() - 1];
         lam->LoadAssets(mjc.modelPath.GetRawString(), mjc.modelJsonName.GetRawString());
         //Shinobu Debug
-        lam->GetModelMatrix()->TranslateX(-0.5f+it->second.first * 0.1f);
+        lam->GetModelMatrix()->TranslateX(-0.5f + it->second.first * 0.1f);
         std::cout << u8"用户 ID：" << it->first << u8" Cubism ID：" << it->second.first << u8" Cubism Model：" << it->second.second.c_str() << std::endl;
     }
+  
     /*
      * モデル半透明表示を行うサンプルを提示する。
      * ここでUSE_RENDER_TARGET、USE_MODEL_RENDER_TARGETが定義されている場合
@@ -364,6 +364,17 @@ void LAppLive2DManager::RefreshScene()
         float clearColor[3] = { 0.0f, 0.0f, 0.0f };
         LAppDelegate::GetInstance()->GetView()->SetRenderTargetClearColor(clearColor[0], clearColor[1], clearColor[2]);
     }
+}
+
+void LAppLive2DManager::RefreshSceneSpecial()
+{
+    if (_modelDir.GetSize() <= 0)
+        return;
+    std::cout << u8"Cubism Simple刷新" << std::endl;
+    
+    GlobalTemp::RefreshCubismUsers.front();
+
+
 }
 
 Csm::csmVector<Csm::csmString>& LAppLive2DManager::GetModelDir()

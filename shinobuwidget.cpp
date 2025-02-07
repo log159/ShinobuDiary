@@ -43,6 +43,24 @@ void ShowShinobuLunar()
     }
 }
 
+#define RTOL(L,R) if(L!=R){L=R;};
+#define ERTOL_A \
+case 0:RTOL(bo, uc.enable_widget) break;\
+case 1:RTOL(bo, uc.enable_cubism) break;\
+case 2:RTOL(bo, uc.enable_template) break;\
+case 3:RTOL(bo, uc.enable_tts) break;\
+case 4:RTOL(bo, uc.enable_mt) break;\
+case 5:RTOL(bo, uc.enable_original) break;\
+case 6:RTOL(bo, uc.enable_stt) break;
+
+#define ERTOL_B \
+case 0:RTOL(uc.enable_widget, bo) break;\
+case 1:RTOL(uc.enable_cubism, bo) break;\
+case 2:RTOL(uc.enable_template, bo) break;\
+case 3:RTOL(uc.enable_tts, bo) break;\
+case 4:RTOL(uc.enable_mt, bo) break;\
+case 5:RTOL(uc.enable_original, bo) break;\
+case 6:RTOL(uc.enable_stt, bo) break;
 
 void ShowShinobuStart()
 {
@@ -91,13 +109,7 @@ void ShowShinobuStart()
                     bool& bo = bools[row][col];
                     Su::UserConfig& uc = Su::UserConfig::getUserVector()[col - 1];
                     switch (row) {
-                    case 0:bo = uc.enable_widget; break;
-                    case 1:bo = uc.enable_cubism; break;
-                    case 2:bo = uc.enable_template; break;
-                    case 3:bo = uc.enable_tts; break;
-                    case 4:bo = uc.enable_mt; break;
-                    case 5:bo = uc.enable_original; break;
-                    case 6:bo = uc.enable_stt; break;
+                        ERTOL_A
                     }
                 }
             }
@@ -106,14 +118,18 @@ void ShowShinobuStart()
             for (int row = 0; row < rows_count; ++row) {
                 const bool& bo = bools[row][col];
                 Su::UserConfig& uc = Su::UserConfig::getUserVector()[col - 1];
+                if (row == 1) {
+                    if (uc.enable_cubism != bo) {
+                        if (bo) GlobalTemp::RefreshCubismUsers.push(std::make_pair(true,uc.user_id));
+                        else GlobalTemp::RefreshCubismUsers.push(std::make_pair(false, uc.user_id));
+                        GlobalTemp::RefreshCubismSceneSpecial = true;
+
+
+                    }
+                }
                 switch (row) {
-                case 0:uc.enable_widget = bo; break;
-                case 1:uc.enable_cubism = bo; break;
-                case 2:uc.enable_template = bo; break;
-                case 3:uc.enable_tts = bo; break;
-                case 4:uc.enable_mt = bo; break;
-                case 5:uc.enable_original = bo; break;
-                case 6:uc.enable_stt = bo; break;
+
+                    ERTOL_B
                 }
             }
         }
@@ -146,7 +162,6 @@ void ShowShinobuStart()
         }
 
         if (ImGui::Button(TT_117, ImVec2(150,0))) {
-            GlobalTemp::RefreshCubism = true;
             Su::AllConfigSave();
         }
         ImGui::SameLine();
@@ -158,13 +173,7 @@ void ShowShinobuStart()
                     bo = false;
                     Su::UserConfig& uc = Su::UserConfig::getUserVector()[col - 1];
                     switch (row) {
-                        case 0:uc.enable_widget = bo; break;
-                        case 1:uc.enable_cubism = bo; break;
-                        case 2:uc.enable_template = bo; break;
-                        case 3:uc.enable_tts = bo; break;
-                        case 4:uc.enable_mt = bo; break;
-                        case 5:uc.enable_original = bo; break;
-                        case 6:uc.enable_stt = bo; break;
+                        ERTOL_B
                     }
                 }
             }
@@ -206,18 +215,11 @@ void ShowShinobuCubism()
         if (GetCursorPos(&pt)) {
             std::cout << u8"鼠标当前位置: (" << pt.x << ", " << pt.y << ")\n";
         }
-
         LPARAM lParam = MAKELPARAM(pt.x, pt.y); // 传递客户区坐标
         WPARAM wParam = MK_LBUTTON;
-
-        // 发送鼠标按下事件
         PostMessage(hwnd, WM_LBUTTONDOWN, wParam, lParam);
-        // 发送鼠标松开事件
         PostMessage(hwnd, WM_LBUTTONUP, 0, lParam);
-
     }
-
-
 
 }
 void ShowShinobuCSM(Su::UserConfig* _uc)
@@ -356,9 +358,9 @@ void ShowShinobuGlobal()
         if (ImGui::TreeNode(TT_225)) {
             ImGui::SeparatorText(TT_230);
             static int e = ::GlobalConfig::getInstance()->window_cubism_style_id;
-            ImGui::RadioButton(TT_226, &e, 0); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth * 0.5);
+            ImGui::RadioButton(TT_226, &e, 0); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth * 0.5f);
             ImGui::RadioButton(TT_227, &e, 1); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth);
-            ImGui::RadioButton(TT_228, &e, 2); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth * 1.5);
+            ImGui::RadioButton(TT_228, &e, 2); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth * 1.5f);
             ImGui::RadioButton(TT_229, &e, 3);
             if (GlobalConfig::getInstance()->window_cubism_style_id != e) {
                 CubismLoom::addMessageList(::window_group_mark, ::window_style_mark, std::to_string(e).c_str());
@@ -375,9 +377,7 @@ void ShowShinobuGlobal()
             ImGui::TreePop();
         }
     }
-
 }
-
 void ShowShinobuUser()
 {
     if (ImGui::CollapsingHeader(TT_32))
@@ -389,7 +389,7 @@ void ShowShinobuUser()
         for (int i = 0; i < Su::UserConfig::getUserVector().size(); i++)
         {
             char label[128];
-            sprintf_s(label, sizeof(label), "MyObject %d", Su::UserConfig::getUserVector()[i].user_id);
+            sprintf_s(label, sizeof(label), TT_33, Su::UserConfig::getUserVector()[i].user_id);
             if (ImGui::Selectable(label, selected == i))
                 selected = i;
         }
@@ -400,7 +400,7 @@ void ShowShinobuUser()
         // Right
         ImGui::BeginChild("###BeginChild___ShowShinobuUser_B", ImVec2(0, 400), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX);//C2
         ImGui::BeginGroup();//G2
-        if (ImGui::Button("ADD", ImVec2(150,0))) {
+        if (ImGui::Button(TT_277, ImVec2(150,0))) {
             int pos = Su::UserConfig::getUserVector().size();
             cout << u8"添加新用户 ID:" << pos + 1 << endl;
             Su::UserConfig::getUserVector().push_back(Su::UserConfig(pos + 1));
@@ -409,7 +409,7 @@ void ShowShinobuUser()
             Su::AllConfigSave();
         }
         ImGui::SameLine();
-        if (ImGui::Button("DELETE", ImVec2(150, 0))) {
+        if (ImGui::Button(TT_278, ImVec2(150, 0))) {
             if (selected != -1) {
                 Su::UserConfig::getUserVector().erase(Su::UserConfig::getUserVector().begin() + selected);
                 for (int i = 0; i < (int)Su::UserConfig::getUserVector().size(); ++i) {
@@ -427,9 +427,9 @@ void ShowShinobuUser()
             ImGui::EndGroup();//G1
             return;
         }
-        ImGui::BeginChild("item view", ImVec2(0, 0));//C3
+        ImGui::BeginChild("###BeginChild___ShowShinobuUser", ImVec2(0, 0));//C3
         Su::UserConfig* _uc = &Su::UserConfig::getUserVector()[selected];
-        ImGui::Text("UserID: %d", _uc->user_id);
+        ImGui::Text(TT_33, _uc->user_id);
         ImGui::Separator();
         if (ImGui::BeginTabBar("###BeginTabBar___ShowShinobuUser", ImGuiTabBarFlags_None)) {
             if (ImGui::BeginTabItem(TT_267)) { ShowShinobuCSM(_uc); ImGui::EndTabItem(); }
@@ -443,82 +443,8 @@ void ShowShinobuUser()
         ImGui::EndGroup();//G2
         ImGui::EndChild();//C2
         ImGui::EndGroup();//G1
-
-
     }
-
-    return;
-    if (ImGui::CollapsingHeader(TT_32))
-    {
-        if (ImGui::BeginTabBar("###SettingBar", ImGuiTabBarFlags_None))
-        {
-            if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip))
-            {
-                int pos = Su::UserConfig::getUserVector().size();
-                cout << u8"添加新用户 ID:" << pos + 1 << endl;
-                Su::UserConfig::getUserVector().push_back(Su::UserConfig(pos + 1));
-
-                ::GlobalConfig::getInstance()->user_num = Su::UserConfig::getUserVector().size();
-                Su::AllConfigSave();
-            }
-            static char tabname[DEFSIZE];
-            memset(tabname, 0, sizeof(tabname));
-            int erase_pos = -1;
-            for (int i = 0; i < (int)Su::UserConfig::getUserVector().size(); ++i) {
-                strcpy_s(tabname, sizeof(tabname), TT_33);
-                snprintf(tabname, sizeof(tabname), tabname, Su::UserConfig::getUserVector()[i].user_id);
-                sprintf_s(tabname,sizeof(tabname), "%s###%d", tabname, Su::UserConfig::getUserVector()[i].user_id);
-
-                if (ImGui::BeginTabItem(tabname, &Su::UserConfig::getUserVector()[i].exist, ImGuiTabItemFlags_None))
-                {
-                    Su::UserConfig* _uc = &Su::UserConfig::getUserVector()[i];
-                    ShowShinobuCSM(_uc);
-                    ShowShinobuLLM(_uc);
-                    ShowShinibuTTS(_uc);
-                    ShowShinobuSTT(_uc);
-                    ShowShinobuMT(_uc);
-                    ImGui::EndTabItem();
-                }
-                if (Su::UserConfig::getUserVector()[i].exist == false) {
-                    ImGui::OpenPopup(TT_35);
-                    ImVec2 parent_pos = ImGui::GetWindowPos();
-                    ImVec2 parent_size = ImGui::GetWindowSize();
-                    ImVec2 popup_center = ImVec2(
-                        parent_pos.x + parent_size.x * 0.5f,
-                        parent_pos.y + parent_size.y * 0.5f
-                    );
-                    ImGui::SetNextWindowPos(popup_center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-                    if (ImGui::BeginPopupModal(TT_35, NULL, ImGuiWindowFlags_AlwaysAutoResize))
-                    {
-                        ImGui::Text(TT_34);
-                        ImGui::Separator();
-                        if (ImGui::Button(TT_36, ImVec2(120, 0))) {
-                            erase_pos = i;
-                            ImGui::CloseCurrentPopup();
-                        }
-                        ImGui::SetItemDefaultFocus();
-                        ImGui::SameLine();
-                        if (ImGui::Button(TT_37, ImVec2(120, 0))) {
-                            Su::UserConfig::getUserVector()[i].exist = true;
-                            ImGui::CloseCurrentPopup();
-                        }
-                        ImGui::EndPopup();
-                    }
-                }
-            }
-            if (erase_pos != -1) {
-                Su::UserConfig::getUserVector().erase(Su::UserConfig::getUserVector().begin() + erase_pos);
-                for (int i = 0; i < (int)Su::UserConfig::getUserVector().size(); ++i) {
-                    Su::UserConfig::getUserVector()[i].exist = true;
-                    Su::UserConfig::getUserVector()[i].user_id = i + 1;
-                }
-                erase_pos = -1;
-                ::GlobalConfig::getInstance()->user_num = Su::UserConfig::getUserVector().size();
-                Su::AllConfigSave();
-            }
-            ImGui::EndTabBar();
-        }
-    }
+   
 }
 
 void ShowShinobuLLM(Su::UserConfig* _uc) {

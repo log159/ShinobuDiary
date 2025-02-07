@@ -20,6 +20,10 @@ bool GlobalTemp::RefreshTable = true;
 bool GlobalTemp::RefreshCubism = true;
 bool GlobalTemp::CubismQuit = false;
 bool GlobalTemp::RefreshCubismScene = false;
+bool GlobalTemp::RefreshCubismSceneSpecial = false;
+std::queue<std::pair<bool, int>> GlobalTemp::RefreshCubismUsers;
+
+
 const LPCSTR GlobalTemp::CubismDirectXClassName = "Cubism DirectX11 Sample";
 const LPCSTR GlobalTemp::CubismWindowClassName = "ShinobuDiary Cubism";
 
