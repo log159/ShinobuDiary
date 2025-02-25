@@ -16,22 +16,22 @@ class FileSetting;
 
 class GlobalTemp {
 public:
-    static bool ShowStyleEditor;
-    static int CubismFrameCount;
-    static HWND WindowMainHandle;
-    static WNDCLASSEXW WindowMainWc;
-    static std::string LunarCalendar;
-    static bool RefreshTable;
-    static bool RefreshCubism;
-    static bool CubismQuit;
-    static bool RefreshCubismScene;
-    static bool RefreshCubismSceneSpecial;
-    static const LPCSTR CubismDirectXClassName;
-    static const LPCSTR CubismWindowClassName;
-    static std::queue<std::pair<bool,int>> RefreshCubismUsers;//true 代表添加 false代表移除
+    static bool                                     ShowStyleEditor;
+    static int                                      CubismFrameCount;
+    static HWND                                     WindowMainHandle;
+    static WNDCLASSEXW                              WindowMainWc;
+    static std::string                              LunarCalendar;
+    static bool                                     RefreshTable;
+    static bool                                     RefreshCubism;
+    static const LPCWSTR                            CubismDirectXClassName;
+    static const LPCWSTR                            CubismWindowClassName;
+    static std::queue<std::pair<int, std::string>>  CubismModelMessage;
+    static std::pair<bool,unsigned int>             CubismModelRefreshPos;
+    static bool                                     CubismIsRunning;
+    static bool                                     TableBools[DEFSIZE][DEFSIZEK16];
+    static float                                    GuiButtonWidth;
 
 };
-
 
 enum FREEMARK {
     LANGUAGESEL_ID,
@@ -63,13 +63,33 @@ enum FREEMARK {
     ENABLE_ORIGINAL,
     ENABLE_STT,
     CUBISM_CONFIG_MODEL_DIR,
-    WINDOW_MAIN_FAST_ID
+    WINDOW_MAIN_FAST_ID,
+
+    CUBISM_CG_CUBISM_TS_S,
+    CUBISM_CG_CUBISM_TX_T,
+    CUBISM_CG_CUBISM_TY_T,
+    CUBISM_CG_CUBISM_TS_X,
+    CUBISM_CG_CUBISM_TS_Y,
+    CUBISM_CG_CUBISM_TX_S,
+    CUBISM_CG_CUBISM_TY_S,
+    CUBISM_CG_CUBISM_TX_P,
+    CUBISM_CG_CUBISM_TY_P,
+
+    DEF_CUBISM_CG_CUBISM_TS_S,
+    DEF_CUBISM_CG_CUBISM_TX_T,
+    DEF_CUBISM_CG_CUBISM_TY_T,
+    DEF_CUBISM_CG_CUBISM_TS_X,
+    DEF_CUBISM_CG_CUBISM_TS_Y,
+    DEF_CUBISM_CG_CUBISM_TX_S,
+    DEF_CUBISM_CG_CUBISM_TY_S,
+    DEF_CUBISM_CG_CUBISM_TX_P,
+    DEF_CUBISM_CG_CUBISM_TY_P
 };
 static std::map<FREEMARK, const char*>inifreemark_map = {
     {FREEMARK::LANGUAGESEL_ID,                      "languagesel_id"},
     {FREEMARK::USER_NUM,                            "user_num"},
     {FREEMARK::THEMESEL_ID,                         "themesel_id"},
-    {FREEMARK::FONTSEL_NAME,                        "fontsel_id"},
+    {FREEMARK::FONTSEL_NAME,                        "fontsel_name"},
     {FREEMARK::WINDOW_MAIN_STYLE_ID,                "window_main_style_id"},
     {FREEMARK::WINDOW_MAIN_DOCK_ID,                 "window_main_dock_id"},
     {FREEMARK::WINDOW_MAIN_TRANSPARENT_ID,          "window_main_transparent_id"},
@@ -95,7 +115,28 @@ static std::map<FREEMARK, const char*>inifreemark_map = {
     {FREEMARK::ENABLE_MT,                           "enable_mt" },
     {FREEMARK::ENABLE_ORIGINAL,                     "enable_original" },
     {FREEMARK::ENABLE_STT,                          "enable_stt" },
-    {FREEMARK::CUBISM_CONFIG_MODEL_DIR,             "cubism_config_model_dir"}
+    {FREEMARK::CUBISM_CONFIG_MODEL_DIR,             "cubism_config_model_dir"},
+
+    {FREEMARK::CUBISM_CG_CUBISM_TS_S,               "cubism_cg_cubism_ts_s"},
+    {FREEMARK::CUBISM_CG_CUBISM_TX_T,               "cubism_cg_cubism_tx_t"},
+    {FREEMARK::CUBISM_CG_CUBISM_TY_T,               "cubism_cg_cubism_ty_t"},
+    {FREEMARK::CUBISM_CG_CUBISM_TS_X,               "cubism_cg_cubism_ts_x"},
+    {FREEMARK::CUBISM_CG_CUBISM_TS_Y,               "cubism_cg_cubism_ts_y"},
+    {FREEMARK::CUBISM_CG_CUBISM_TX_S,               "cubism_cg_cubism_tx_s"},
+    {FREEMARK::CUBISM_CG_CUBISM_TY_S,               "cubism_cg_cubism_ty_s"},
+    {FREEMARK::CUBISM_CG_CUBISM_TX_P,               "cubism_cg_cubism_tx_p"},
+    {FREEMARK::CUBISM_CG_CUBISM_TY_P,               "cubism_cg_cubism_ty_p"},
+
+    {FREEMARK::DEF_CUBISM_CG_CUBISM_TS_S,           "def_cubism_cg_cubism_ts_s"},
+    {FREEMARK::DEF_CUBISM_CG_CUBISM_TX_T,           "def_cubism_cg_cubism_tx_t"},
+    {FREEMARK::DEF_CUBISM_CG_CUBISM_TY_T,           "def_cubism_cg_cubism_ty_t"},
+    {FREEMARK::DEF_CUBISM_CG_CUBISM_TS_X,           "def_cubism_cg_cubism_ts_x"},
+    {FREEMARK::DEF_CUBISM_CG_CUBISM_TS_Y,           "def_cubism_cg_cubism_ts_y"},
+    {FREEMARK::DEF_CUBISM_CG_CUBISM_TX_S,           "def_cubism_cg_cubism_tx_s"},
+    {FREEMARK::DEF_CUBISM_CG_CUBISM_TY_S,           "def_cubism_cg_cubism_ty_s"},
+    {FREEMARK::DEF_CUBISM_CG_CUBISM_TX_P,           "def_cubism_cg_cubism_tx_p"},
+    {FREEMARK::DEF_CUBISM_CG_CUBISM_TY_P,           "def_cubism_cg_cubism_ty_p"}
+    
 };
 enum INIMARK { KEY, APPID, SECRET, BASEURL, ADDRESS, PORT };
 static std::map<INIMARK, const char*>inimark_map = {
@@ -129,9 +170,9 @@ public:
     int window_cubism_addtimefps    = 0;            /*0-100*/
 
     std::string select_font         = "";
+    int fonts_size                  = 0;
     const char** fonts_list         = NULL;
     const char** fonts_name_list    = NULL;
-    int fonts_size                  = 0;
     ImGuiStyle defaultStyle;
 public:
     static GlobalConfig* getInstance() {
@@ -143,9 +184,10 @@ public:
 
 private:
     GlobalConfig() {
+        //FileSetting 
+        FileSetting::RefreshRead();
         //GlobalConfigTemp
         GlobalTemp::LunarCalendar = Su::GetLunar();
-
         //GlobalConfig
         GlobalConfigInit(this);
     }

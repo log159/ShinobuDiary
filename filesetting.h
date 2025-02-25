@@ -16,6 +16,14 @@ using std::endl;
 
 class FileSetting {
 public:
+    static CSimpleIniA* delay_ini;
+    static CSimpleIniA read_ini;
+    static bool can_read;
+
+    static void BeginSave(CSimpleIniA& ini);
+    static void EndSave(CSimpleIniA& ini);
+    static void RefreshRead();
+
 
     static void SetValue(int id,const char* s, const char* k,const char* wn);
     static std::string GetValue(int id, const char* s, const char* k, const char* n);

@@ -33,6 +33,19 @@ namespace Su{
         std::string model_dir;
     };
 
+    struct CCG {
+        //cubism
+        float cubism_ts_s;
+        float cubism_tx_t;
+        float cubism_ty_t;
+        float cubism_ts_x;
+        float cubism_ts_y;
+        float cubism_tx_s;
+        float cubism_ty_s;
+        float cubism_tx_p;
+        float cubism_ty_p;
+    };
+
     class UserConfig {
     public:
         //temp
@@ -61,6 +74,10 @@ namespace Su{
         std::string                  myself_vits;
         CubismConfig                 cubism_config;
 
+        CCG cubism_cg;
+        CCG def_cubism_cg;
+
+
         //change
         std::vector<LLMConfig>       llms;
         std::vector<TTSConfig>       ttss;
@@ -71,8 +88,8 @@ namespace Su{
         void operator=(const UserConfig& uc);
         UserConfig(const UserConfig& uc);
 
-        static std::vector<UserConfig>& getUserVector() {
-            static std::vector<UserConfig>v;
+        static std::vector<Su::UserConfig>& getUserVector() {
+            static std::vector<Su::UserConfig>v;
             return v;
         }
         Su::LLMConfig* getLLMConfig(Su::LLM llm);

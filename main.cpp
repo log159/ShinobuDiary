@@ -54,19 +54,21 @@ int main(int, char**)
     //--------------------中间部分---------------------
     // 全局初始化
     ::GlobalConfig::getInstance();
+
     // 初始化配置
     Su::AllConfigInit();
 
     DWORD cubismThreadId, otherThreadId;
     threadVector.clear();
     threadVector.push_back(CreateThread(NULL, 0, CubismThread, NULL, 0, &cubismThreadId));
-    cout << u8"Cubism 进程ID" << cubismThreadId <<std::endl;
     threadVector.push_back(CreateThread(NULL, 0, OtherConfigThread, NULL, 0, &otherThreadId));
-    cout << u8"Other 进程ID" << otherThreadId << std::endl;
+    std::cout << u8"Cubism 进程ID" << cubismThreadId << std::endl;
+    std::cout << u8"Other 进程ID" << otherThreadId << std::endl;
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     MSG msg;
     static bool done = false;
+    std::cout << u8"主循环开始执行" << std::endl;
     do{
         if (GlobalConfig::getInstance()->window_main_fast_id==0) {
             MSG msg;
@@ -88,7 +90,6 @@ int main(int, char**)
                 cout << u8"全局退出消息" << endl;
             }
         }
-
         if (done == true)break;
         // Handle window being minimized or screen locked
         if (g_SwapChainOccluded && g_pSwapChain->Present(0, DXGI_PRESENT_TEST) == DXGI_STATUS_OCCLUDED)
@@ -111,23 +112,21 @@ int main(int, char**)
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
+        //WINDOWS--------------------------------------------------------------------------
 
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         static bool show_demo_window = true;
         if (show_demo_window)ImGui::ShowDemoWindow(&show_demo_window);
-
         static bool show_shinobu_window = true;
-        if (show_shinobu_window)ShowShinobuWindow(&show_shinobu_window);
-        else {
+
+        if (show_shinobu_window == false) {
             ::GlobalConfig::GlobalConfigSave();
             done = true;
         }
-        if (GlobalTemp::ShowStyleEditor) {
-            ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
-            ImGui::Begin(TT_39, &GlobalTemp::ShowStyleEditor);
-            ImGui::ShowStyleEditor();
-            ImGui::End();
-        }
+        ShowShinobuWindow(&show_shinobu_window);
+        ShowShinobuStyleEditor();
+        ShowShinobuInteractively();
+
+        //--------------------------------------------------------------------------
         // Rendering
         ImGui::Render();
 
@@ -155,7 +154,8 @@ int main(int, char**)
     //---------------------后部分--------------------------
     PosteriorPart();
     
-
+    LAppDelegate::GetInstance()->AppEnd();
+    OtherConfigThreadMark = true;
     std::cout << u8"全局终了" << std::endl;
 
     return 0;
@@ -174,7 +174,7 @@ DWORD WINAPI OtherConfigThread(LPVOID lpParam)
             std::cout << u8"更新时间" << std::endl;
             GlobalTemp::LunarCalendar = Su::GetLunar();
         }
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::seconds(1));//过一秒刷新一次
     }
     std::cout << u8"更新时间 终了" << std::endl;
 
@@ -184,13 +184,18 @@ DWORD WINAPI OtherConfigThread(LPVOID lpParam)
 //Cubism Thread
 DWORD WINAPI CubismThread(LPVOID lpParam)
 {
-    bool CubismInitMark = LAppDelegate::GetInstance()->Initialize();
-    if (!CubismInitMark) {
+    if (!LAppDelegate::GetInstance()->Initialize()) {
         LAppDelegate::GetInstance()->Release();
         LAppDelegate::ReleaseInstance();
     }
     else {
+        std::vector<Su::UserConfig>& vu = Su::UserConfig::getUserVector();
+        for (int i = 0; i < vu.size(); ++i) 
+            if (vu[i].enable_cubism) 
+                GlobalTemp::CubismModelMessage.push(std::make_pair(vu[i].user_id, vu[i].cubism_config.model_dir));
+
         cout << u8"Cubism 开始执行" << endl;
+        GlobalTemp::CubismIsRunning = true;
         LAppDelegate::GetInstance()->Run();
     }
     std::cout << u8"Cubism 终了" << std::endl;
@@ -239,7 +244,7 @@ void FrontPart() {
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
     // 设置平台、渲染后端
-    ImGui_ImplWin32_Init(GlobalTemp::WindowMainHandle);
+    ImGui_ImplWin32_Init(hwnd);
     ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 }
 void PosteriorPart() {

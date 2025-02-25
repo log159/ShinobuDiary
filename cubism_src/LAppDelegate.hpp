@@ -28,6 +28,8 @@ class LAppDelegate
 {
 public:
     HWND GetWindowHandle()const;
+    static void PosHandler(HWND _hw);
+
 
     /**
      * @brief   クラスのインスタンス（シングルトン）を返す。<br>

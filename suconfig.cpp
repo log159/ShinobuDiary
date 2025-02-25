@@ -42,6 +42,18 @@ namespace Su {
         enable_mt               = false;    //MT        [4]
         enable_original         = false;    //原文本对比[5]
         enable_stt              = false;    //STT       [6]
+        //Cubism
+        this->cubism_cg.cubism_ts_s = 1.0;
+        this->cubism_cg.cubism_tx_t = 0.0;
+        this->cubism_cg.cubism_ty_t = 1.0;
+        this->cubism_cg.cubism_ts_x = 1.0;
+        this->cubism_cg.cubism_ts_y = 0.0;
+        this->cubism_cg.cubism_tx_s = 0.0;
+        this->cubism_cg.cubism_ty_s = 0.0;
+        this->cubism_cg.cubism_tx_p = 0.0;
+        this->cubism_cg.cubism_ty_p = 0.0;
+
+        this->def_cubism_cg = this->cubism_cg;
 
     }
     void UserConfig::operator=(const UserConfig& uc) {
@@ -70,7 +82,10 @@ namespace Su {
         this->enable_mt = uc.enable_mt;                 
         this->enable_original = uc.enable_original;     
         this->enable_stt = uc.enable_stt;               
-    
+        //Cubism
+        this->cubism_cg = uc.cubism_cg;
+        this->def_cubism_cg = uc.def_cubism_cg;
+
     }
     UserConfig::UserConfig(const UserConfig& uc) {
         this->operator=(uc);
@@ -148,6 +163,7 @@ namespace Su {
         for (auto& val : UserConfig::getUserVector())
             UserConfigSave(&val);
         GlobalTemp::RefreshTable = true;
+
     }
 
     void UserConfigInit(UserConfig* uc)
@@ -179,10 +195,34 @@ namespace Su {
 
         uc->cubism_config.model_dir = FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::CUBISM_CONFIG_MODEL_DIR], INITSTR);
 
+        
+        uc->cubism_cg.cubism_ts_s=(float)FileSetting::GetDoubleValue(uc->user_id,INIGROUPMARKSTR,inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TS_S],1.0);
+        uc->cubism_cg.cubism_tx_t=(float)FileSetting::GetDoubleValue(uc->user_id,INIGROUPMARKSTR,inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TX_T],INITDOUBLE);
+        uc->cubism_cg.cubism_ty_t=(float)FileSetting::GetDoubleValue(uc->user_id,INIGROUPMARKSTR,inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TY_T],INITDOUBLE);
+        uc->cubism_cg.cubism_ts_x=(float)FileSetting::GetDoubleValue(uc->user_id,INIGROUPMARKSTR,inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TS_X],1.0);
+        uc->cubism_cg.cubism_ts_y=(float)FileSetting::GetDoubleValue(uc->user_id,INIGROUPMARKSTR,inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TS_Y],1.0);
+        uc->cubism_cg.cubism_tx_s=(float)FileSetting::GetDoubleValue(uc->user_id,INIGROUPMARKSTR,inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TX_S],INITDOUBLE);
+        uc->cubism_cg.cubism_ty_s=(float)FileSetting::GetDoubleValue(uc->user_id,INIGROUPMARKSTR,inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TY_S],INITDOUBLE);
+        uc->cubism_cg.cubism_tx_p=(float)FileSetting::GetDoubleValue(uc->user_id,INIGROUPMARKSTR,inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TX_P],INITDOUBLE);
+        uc->cubism_cg.cubism_ty_p=(float)FileSetting::GetDoubleValue(uc->user_id,INIGROUPMARKSTR,inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TY_P],INITDOUBLE);
+
+        uc->def_cubism_cg.cubism_ts_s = (float)FileSetting::GetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TS_S], 1.0);
+        uc->def_cubism_cg.cubism_tx_t = (float)FileSetting::GetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TX_T], INITDOUBLE);
+        uc->def_cubism_cg.cubism_ty_t = (float)FileSetting::GetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TY_T], INITDOUBLE);
+        uc->def_cubism_cg.cubism_ts_x = (float)FileSetting::GetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TS_X], 1.0);
+        uc->def_cubism_cg.cubism_ts_y = (float)FileSetting::GetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TS_Y], 1.0);
+        uc->def_cubism_cg.cubism_tx_s = (float)FileSetting::GetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TX_S], INITDOUBLE);
+        uc->def_cubism_cg.cubism_ty_s = (float)FileSetting::GetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TY_S], INITDOUBLE);
+        uc->def_cubism_cg.cubism_tx_p = (float)FileSetting::GetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TX_P], INITDOUBLE);
+        uc->def_cubism_cg.cubism_ty_p = (float)FileSetting::GetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TY_P], INITDOUBLE);
+
+
+
     }
     void UserConfigSave(UserConfig* uc) {
         std::cout << uc->user_id <<u8" 用户配置保存" << std::endl;
-
+        CSimpleIniA ini;
+        FileSetting::BeginSave(ini);
         for (auto& val : uc->llms) SaveKasb(uc, &val);
         for (auto& val : uc->ttss) SaveAp(uc, &val);
         for (auto& val : uc->stts) SaveKasb(uc, &val);
@@ -207,6 +247,29 @@ namespace Su {
         FileSetting::SetBoolValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::ENABLE_STT], uc->enable_stt);
 
         FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::CUBISM_CONFIG_MODEL_DIR], uc->cubism_config.model_dir.c_str());
+
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TS_S], uc->cubism_cg.cubism_ts_s);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TX_T], uc->cubism_cg.cubism_tx_t);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TY_T], uc->cubism_cg.cubism_ty_t);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TS_X], uc->cubism_cg.cubism_ts_x);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TS_Y], uc->cubism_cg.cubism_ts_y);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TX_S], uc->cubism_cg.cubism_tx_s);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TY_S], uc->cubism_cg.cubism_ty_s);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TX_P], uc->cubism_cg.cubism_tx_p);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TY_P], uc->cubism_cg.cubism_ty_p);
+
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TS_S], uc->def_cubism_cg.cubism_ts_s);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TX_T], uc->def_cubism_cg.cubism_tx_t);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TY_T], uc->def_cubism_cg.cubism_ty_t);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TS_X], uc->def_cubism_cg.cubism_ts_x);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TS_Y], uc->def_cubism_cg.cubism_ts_y);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TX_S], uc->def_cubism_cg.cubism_tx_s);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TY_S], uc->def_cubism_cg.cubism_ty_s);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TX_P], uc->def_cubism_cg.cubism_tx_p);
+        FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::DEF_CUBISM_CG_CUBISM_TY_P], uc->def_cubism_cg.cubism_ty_p);
+
+
+        FileSetting::EndSave(ini);
 
     }
 

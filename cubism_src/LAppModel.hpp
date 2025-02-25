@@ -25,6 +25,12 @@ class LAppModel : public Csm::CubismUserModel
 {
 public:
 
+    bool canLookMouse = false;
+
+    Csm::ICubismModelSetting* GetModelSetting() const;
+
+    Csm::CubismTargetPoint* GetModelDragManager()const;
+
 
     /**
      * @brief コンストラクタ
@@ -140,7 +146,6 @@ protected:
      *
      */
     void DoDraw();
-
 private:
     /**
      * @brief model3.jsonからモデルを生成する。<br>

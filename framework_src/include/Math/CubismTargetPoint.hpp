@@ -17,6 +17,9 @@ namespace Live2D { namespace Cubism { namespace Framework {
 class CubismTargetPoint
 {
 public:
+
+    csmFloat32 TimeToMaxSpeed = 0.15f;
+
     /**
      * Constructor
      */

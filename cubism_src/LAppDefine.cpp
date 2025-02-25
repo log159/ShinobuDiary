@@ -33,9 +33,9 @@ namespace LAppDefine {
     // モデルの後ろにある背景の画像ファイル
     //const csmChar* BackImageName = "back_class_normal.png";
     // 歯車
-    const csmChar* GearImageName = "icon_gear.png";
+    //const csmChar* GearImageName = "icon_gear.png";
     // 終了ボタン
-    const csmChar* PowerImageName = "close.png";
+    //const csmChar* PowerImageName = "close.png";
 
     // シェーダー相対パス
     const csmChar* ShaderPath = "SampleShaders/";
@@ -44,6 +44,7 @@ namespace LAppDefine {
 
     // モデル定義------------------------------------------
     // 外部定義ファイル(json)と合わせる
+
     const csmChar* MotionGroupIdle = "Idle"; // アイドリング
     const csmChar* MotionGroupTapBody = "TapBody"; // 体をタップしたとき
 

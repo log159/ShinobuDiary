@@ -18,11 +18,11 @@
 #include "LAppDelegate.hpp"
 #include "LAppModel.hpp"
 #include "LAppView.hpp"
-#include <iostream>
-#include "../global.h"
+
 
 using namespace Csm;
 using namespace LAppDefine;
+
 
 namespace {
     LAppLive2DManager* s_instance = NULL;
@@ -66,13 +66,9 @@ void LAppLive2DManager::ReleaseInstance()
 
 LAppLive2DManager::LAppLive2DManager()
     : _viewMatrix(NULL)
-    //, _sceneIndex(0)
 {
     _viewMatrix = new CubismMatrix44();
     SetUpModel();
-
-    //ChangeScene(_sceneIndex);
-    //ChangeScene(0);
 }
 
 LAppLive2DManager::~LAppLive2DManager()
@@ -95,21 +91,29 @@ LAppLive2DManager::~LAppLive2DManager()
 
 void LAppLive2DManager::ReleaseAllModel()
 {
-    for (csmUint32 i = 0; i < _models.GetSize(); i++)
-    {
-        //delete _models[i]; ここでは消さない
-
-        // 削除予定の印
-        _models[i]->DeleteMark();
-
-        // 2フレーム後削除
+    for (auto& pair : _models) {
+        pair.second->DeleteMark();
         ReleaseModel rel;
-        rel._model = _models[i];
+        rel._model = pair.second;
         rel._counter = 2;
         _releaseModel.PushBack(rel);
     }
+    _models.clear();
+}
 
-    _models.Clear();
+void LAppLive2DManager::ReleaseOneModel(int userid)
+{
+    for (auto& pair : _models) {
+        if (pair.first == userid) {
+            pair.second->DeleteMark();
+            ReleaseModel rel;
+            rel._model = pair.second;
+            rel._counter = 2;
+            _releaseModel.PushBack(rel);
+            break;
+        }
+    }
+    _models.erase(userid);
 }
 
 void LAppLive2DManager::SetUpModel()
@@ -128,19 +132,17 @@ void LAppLive2DManager::SetUpModel()
     struct _wfinddata_t fdata;
     intptr_t fh = _wfindfirst(wideStr, &fdata);
     if (fh == -1)
-    {
         return;
-    }
 
     _modelDir.Clear();
-
+    _modelDir.PushBack("");
     while (_wfindnext(fh, &fdata) == 0)
     {
         if ((fdata.attrib & _A_SUBDIR) && wcscmp(fdata.name, L"..") != 0)
         {
             LAppPal::ConvertWideToMultiByte(fdata.name, name, MAX_PATH);
 
-            // フォルダと同名の.model3.jsonがあるか探索する
+            // .model3.json 探索
             csmString model3jsonPath(ResourcesPath);
             model3jsonPath += name;
             model3jsonPath.Append(1, '/');
@@ -190,23 +192,18 @@ csmInt32 LAppLive2DManager::GetModelDirSize() const
     return _modelDir.GetSize();
 }
 
-LAppModel* LAppLive2DManager::GetModel(csmUint32 no) const
+std::unordered_map<Csm::csmUint32, LAppModel*, Uint32Hash>& LAppLive2DManager::GetModel()
 {
-    if (no < _models.GetSize())
-    {
-        return _models[no];
-    }
-
-    return NULL;
+    return _models;
 }
 
 void LAppLive2DManager::OnDrag(csmFloat32 x, csmFloat32 y) const
 {
-    for (csmUint32 i = 0; i < _models.GetSize(); i++)
-    {
-        LAppModel* model = GetModel(i);
-
-        model->SetDragging(x, y);
+    for (auto& pair : _models) {
+        if (pair.second->canLookMouse)
+            pair.second->SetDragging(x - pair.second->GetModelMatrix()->GetTranslateX(), y - pair.second->GetModelMatrix()->GetTranslateY());
+        else
+            pair.second->SetDragging(0.0f, 0.0f);
     }
 }
 
@@ -216,25 +213,48 @@ void LAppLive2DManager::OnTap(csmFloat32 x, csmFloat32 y)
     {
         LAppPal::PrintLogLn("[APP]tap point: {x:%.2f y:%.2f}", x, y);
     }
+   
+    for (auto& pair : _models) {
+        //Shinobu Debug
+        Csm::ICubismModelSetting* lms = pair.second->GetModelSetting();
+        for (int i = 0; i < lms->GetHitAreasCount(); ++i) {
+            if (pair.second->HitTest(lms->GetHitAreaName(i), x, y)) {
+                printf(lms->GetHitAreaName(i));
+                printf("\n");
 
-    for (csmUint32 i = 0; i < _models.GetSize(); i++)
-    {
-        if (_models[i]->HitTest(HitAreaNameHead, x, y))
-        {
-            if (DebugLogEnable)
-            {
-                LAppPal::PrintLogLn("[APP]hit area: [%s]", HitAreaNameHead);
+                pair.second->StartRandomMotion("Idle", /*PriorityNormal*/PriorityForce, FinishedMotion, BeganMotion);
+
             }
-            _models[i]->SetRandomExpression();
         }
-        else if (_models[i]->HitTest(HitAreaNameBody, x, y))
-        {
-            if (DebugLogEnable)
-            {
-                LAppPal::PrintLogLn("[APP]hit area: [%s]", HitAreaNameBody);
-            }
-            _models[i]->StartRandomMotion(MotionGroupTapBody, PriorityNormal, FinishedMotion, BeganMotion);
-        }
+        //const csmInt32 count = pair.second->GetModelSetting()->GetHitAreasCount();
+        //for (csmInt32 i = 0; i < count; i++)
+        //{
+        //    //if (pair.second->HitTest(pair.second->GetModelSetting()->GetHitAreaName(i), x, y)) {
+        //        std::cout << pair.second->GetModelSetting()->GetHitAreaName(i) << std::endl;
+        //    //}
+        //}
+
+        //if (pair.second->HitTest(HitAreaNameHead, x, y))
+        //{
+        //    printf(HitAreaNameHead);
+        //    printf("\n");
+
+        //    if (DebugLogEnable)
+        //    {
+        //        LAppPal::PrintLogLn("[APP]hit area: [%s]", HitAreaNameHead);
+        //    }
+        //    pair.second->SetRandomExpression();
+        //}
+        //else if (pair.second->HitTest(HitAreaNameBody, x, y))
+        //{
+        //    printf(HitAreaNameBody);
+        //    printf("\n");
+        //    if (DebugLogEnable)
+        //    {
+        //        LAppPal::PrintLogLn("[APP]hit area: [%s]", HitAreaNameBody);
+        //    }
+        //    pair.second->StartRandomMotion(/*MotionGroupTapBody*/"", PriorityNormal, FinishedMotion, BeganMotion);
+        //}
     }
 }
 
@@ -247,12 +267,11 @@ void LAppLive2DManager::OnUpdate() const
     // 各フレームでの、Cubism SDK の処理前にコール
     Rendering::CubismRenderer_D3D11::StartFrame(LAppDelegate::GetInstance()->GetD3dDevice(), LAppDelegate::GetInstance()->GetD3dContext(), windowWidth, windowHeight);
 
-    const csmUint32 modelCount = _models.GetSize();
-    for (csmUint32 i = 0; i < modelCount; ++i)
+    for (auto& pair : _models)
     {
         // 投影用マトリックス
         CubismMatrix44 projection;
-        LAppModel* model = GetModel(i);
+        LAppModel* model = pair.second;
 
         if (model->GetModel() == NULL)
         {
@@ -292,12 +311,12 @@ void LAppLive2DManager::OnUpdate() const
     Rendering::CubismRenderer_D3D11::EndFrame(LAppDelegate::GetInstance()->GetD3dDevice());
 }
 
-
-ModelJsonConfig LAppLive2DManager::GetModelJsonConfig(int index) {
-    const csmChar* modelptr = _modelDir[index].GetRawString();
+ModelJsonConfig LAppLive2DManager::GetModelJsonConfigFromName(std::string modelname)
+{
+    const csmChar* modelptr = modelname.c_str();
     const csmChar* lastSlash = strrchr(modelptr, '/');
-    static csmChar modelPath[512] = { 0 };
-    static csmChar modelJsonName[512] = { 0 };
+    static csmChar modelPath[DEFSIZEK] = { 0 };
+    static csmChar modelJsonName[DEFSIZEK] = { 0 };
     memset(modelPath, 0, sizeof(modelPath));
     memset(modelJsonName, 0, sizeof(modelJsonName));
     size_t pathLength = lastSlash - modelptr + 1;
@@ -314,69 +333,133 @@ ModelJsonConfig LAppLive2DManager::GetModelJsonConfig(int index) {
 }
 //#define USE_RENDER_TARGET
 //#define USE_MODEL_RENDER_TARGET
-void LAppLive2DManager::RefreshScene()
-{
-    if (_modelDir.GetSize() <= 0)
-        return;
-    std::cout << u8"Cubism 刷新" << std::endl;
-    ReleaseAllModel();
-    for (auto it = UserCubismMap.begin(); it != UserCubismMap.end(); ++it) {
-        int index = 0;
-        for (int i = 0; i < _modelDir.GetSize(); ++i) {
-            if (strcmp(it->second.second.c_str(), _modelDir[i].GetRawString()) == 0) {
-                index = i;
-                break;
-            }
-        }
-        ModelJsonConfig mjc = GetModelJsonConfig(index);
-        _models.PushBack(new LAppModel());
-        LAppModel* lam = _models[_models.GetSize() - 1];
-        lam->LoadAssets(mjc.modelPath.GetRawString(), mjc.modelJsonName.GetRawString());
-        //Shinobu Debug
-        lam->GetModelMatrix()->TranslateX(-0.5f + it->second.first * 0.1f);
-        std::cout << u8"用户 ID：" << it->first << u8" Cubism ID：" << it->second.first << u8" Cubism Model：" << it->second.second.c_str() << std::endl;
-    }
-  
-    /*
-     * モデル半透明表示を行うサンプルを提示する。
-     * ここでUSE_RENDER_TARGET、USE_MODEL_RENDER_TARGETが定義されている場合
-     * 別のレンダリングターゲットにモデルを描画し、描画結果をテクスチャとして別のスプライトに張り付ける。
-     */
-    {
+
+void RefreshTarget() {
+/*
+    * モデル半透明表示を行うサンプルを提示する。
+    * ここでUSE_RENDER_TARGET、USE_MODEL_RENDER_TARGETが定義されている場合
+    * 別のレンダリングターゲットにモデルを描画し、描画結果をテクスチャとして別のスプライトに張り付ける。
+    */
 #if defined(USE_RENDER_TARGET)
-        // LAppViewの持つターゲットに描画を行う場合、こちらを選択
-        LAppView::SelectTarget useRenderTarget = LAppView::SelectTarget_ViewFrameBuffer;
+    // LAppViewの持つターゲットに描画を行う場合、こちらを選択
+    LAppView::SelectTarget useRenderTarget = LAppView::SelectTarget_ViewFrameBuffer;
 #elif defined(USE_MODEL_RENDER_TARGET)
-        // 各LAppModelの持つターゲットに描画を行う場合、こちらを選択
-        LAppView::SelectTarget useRenderTarget = LAppView::SelectTarget_ModelFrameBuffer;
+    // 各LAppModelの持つターゲットに描画を行う場合、こちらを選択
+    LAppView::SelectTarget useRenderTarget = LAppView::SelectTarget_ModelFrameBuffer;
 #else
-        // デフォルトのメインフレームバッファへレンダリングする(通常)
-        LAppView::SelectTarget useRenderTarget = LAppView::SelectTarget_None;
+    // デフォルトのメインフレームバッファへレンダリングする(通常)
+    LAppView::SelectTarget useRenderTarget = LAppView::SelectTarget_None;
 #endif
 
 #if defined(USE_RENDER_TARGET) || defined(USE_MODEL_RENDER_TARGET)
-        // モデル個別にαを付けるサンプルとして、もう1体モデルを作成し、少し位置をずらす
+    // モデル個別にαを付けるサンプルとして、もう1体モデルを作成し、少し位置をずらす
 
 #endif
-        LAppDelegate::GetInstance()->GetView()->SwitchRenderingTarget(useRenderTarget);
+    LAppDelegate::GetInstance()->GetView()->SwitchRenderingTarget(useRenderTarget);
 
-        // 別レンダリング先を選択した際の背景クリア色
-        float clearColor[3] = { 0.0f, 0.0f, 0.0f };
-        LAppDelegate::GetInstance()->GetView()->SetRenderTargetClearColor(clearColor[0], clearColor[1], clearColor[2]);
-    }
+    // 別レンダリング先を選択した際の背景クリア色
+    float clearColor[3] = { 0.0f, 0.0f, 0.0f };
+    LAppDelegate::GetInstance()->GetView()->SetRenderTargetClearColor(clearColor[0], clearColor[1], clearColor[2]);
 }
 
-void LAppLive2DManager::RefreshSceneSpecial()
+void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
 {
     if (_modelDir.GetSize() <= 0)
         return;
-    std::cout << u8"Cubism Simple刷新" << std::endl;
-    
-    GlobalTemp::RefreshCubismUsers.front();
+    static const std::string defdir = "./Resources/";
+    if (modelname.size() <= defdir.size()) {
+        if (_models.find(userid) != _models.end()) {
+            ReleaseOneModel(userid);
+            std::cout << u8"Cubism 尝试删除Model" << std::endl;
+        }
+        else {
+            std::cout << u8"Cubism 删除为空：" << modelname.c_str() << std::endl;
 
+        }
+        return;
+    }
+    std::cout << u8"Cubism 尝试加载：" << modelname.c_str() << std::endl;
 
+    bool havedir = false;
+    for (int i = 0; i < _modelDir.GetSize(); ++i) {
+        if(strcmp(_modelDir[i].GetRawString(), modelname.c_str())==0) {
+            havedir = true;
+            break;
+        }
+    }
+    if (havedir == false) {
+        std::cout << u8"Cubism 加载失败，没有找到该模型：" << modelname.c_str() << std::endl;
+        return;
+    }
+
+    ModelJsonConfig mjc = GetModelJsonConfigFromName(modelname);
+    LAppModel* lam = new LAppModel();
+    if (_models.find(userid) != _models.end())
+        ReleaseOneModel(userid);
+    _models[userid] = lam;
+
+    lam->LoadAssets(mjc.modelPath.GetRawString(), mjc.modelJsonName.GetRawString());
+
+    for (int i = 0; i < Su::UserConfig::getUserVector().size(); ++i) {
+        Su::UserConfig& su = Su::UserConfig::getUserVector()[i];
+        if (su.user_id == userid) {
+
+            su.cubism_cg.cubism_ts_s = su.cubism_cg.cubism_ts_s == 0.0f ? 1.0f : su.cubism_cg.cubism_ts_s;
+            su.cubism_cg.cubism_ts_x = su.cubism_cg.cubism_ts_x == 0.0f ? 1.0f : su.cubism_cg.cubism_ts_x;
+            su.cubism_cg.cubism_ts_y = su.cubism_cg.cubism_ts_y == 0.0f ? 1.0f : su.cubism_cg.cubism_ts_y;
+            lam->GetModelMatrix()->GetArray()[12] =su.cubism_cg.cubism_tx_t;
+            lam->GetModelMatrix()->GetArray()[13] =su.cubism_cg.cubism_ty_t;
+            lam->GetModelMatrix()->GetArray()[0] = su.cubism_cg.cubism_ts_x * su.cubism_cg.cubism_ts_s;
+            lam->GetModelMatrix()->GetArray()[5] = su.cubism_cg.cubism_ts_y * su.cubism_cg.cubism_ts_s;
+            lam->GetModelMatrix()->GetArray()[4] = su.cubism_cg.cubism_tx_s;
+            lam->GetModelMatrix()->GetArray()[1] = su.cubism_cg.cubism_ty_s;
+            lam->GetModelMatrix()->GetArray()[7] = su.cubism_cg.cubism_tx_p;
+            lam->GetModelMatrix()->GetArray()[3] = su.cubism_cg.cubism_ty_p;
+            break;
+        }
+    }
+
+    std::cout << u8"Cubism 加载成功：" << modelname.c_str() << std::endl;
+    std::cout << u8"用户 ID：" << userid << u8" Cubism Model：" << modelname.c_str() << std::endl;
+    RefreshTarget();
 }
 
+void LAppLive2DManager::RefreshSceneAndUserId(Csm::csmUint32 pos)
+{
+    if (_modelDir.GetSize() <= 0)
+        return;
+    std::cout << u8"Cubism 归置" << std::endl;
+
+    if (_models.find(pos) != _models.end()) {
+        ReleaseOneModel(pos);
+    }
+    else {
+    }
+    static std::vector<int>vid;
+    vid.clear();
+    vid.reserve(_models.size());
+    for (auto& pair : _models)
+        vid.push_back(pair.first);
+    std::sort(vid.begin(), vid.end());
+    bool can_pop = false;
+    for (int i = 0; i < vid.size(); ++i) {
+        if (vid[i] > pos) {
+            can_pop = true;
+            _models[vid[i] - 1] = _models[vid[i]];
+            std::cout << u8"Cubism 归置变化 i - 1 : " << vid[i] - 1 << " -> " << vid[i] << std::endl;
+        }
+    }
+    if (can_pop)
+        _models.erase(vid.back());
+
+    std::cout << u8"更新后models" << std::endl;
+    for (auto& pair : _models) {
+        std::cout << pair.first << " " << pair.second->GetModel() << endl;
+    }
+
+
+  
+}
 Csm::csmVector<Csm::csmString>& LAppLive2DManager::GetModelDir()
 {
     return  _modelDir;
@@ -385,7 +468,7 @@ Csm::csmVector<Csm::csmString>& LAppLive2DManager::GetModelDir()
 
 csmUint32 LAppLive2DManager::GetModelNum() const
 {
-    return _models.GetSize();
+    return _models.size();
 }
 
 void LAppLive2DManager::EndFrame()
@@ -411,11 +494,8 @@ void LAppLive2DManager::EndFrame()
 
 void LAppLive2DManager::ResizedWindow()
 {
-    const csmUint32 modelCount = _models.GetSize();
-    for (csmUint32 i = 0; i < modelCount; ++i)
-    {
-        _models[i]->GetRenderBuffer().DestroyOffscreenSurface();
-    }
+    for (auto& pair : _models) 
+        pair.second->GetRenderBuffer().DestroyOffscreenSurface();
 }
 
 void LAppLive2DManager::SetViewMatrix(CubismMatrix44* m)

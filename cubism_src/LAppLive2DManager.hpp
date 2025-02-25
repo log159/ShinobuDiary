@@ -12,15 +12,25 @@
 #include <Math/CubismMatrix44.hpp>
 #include <Type/csmVector.hpp>
 #include <Type/csmMap.hpp>
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <vector>
+#include <iostream>
+#include "../global.h"
+#include "../suconfig.h"
 
 struct ModelJsonConfig {
     Csm::csmString modelPath;
     Csm::csmString modelJsonName;
 };
 class LAppModel;
+
+
+struct Uint32Hash {
+    std::size_t operator()(const Csm::csmUint32& i) const {
+        return size_t(i);
+    }
+};
 
 /**
 * @brief サンプルアプリケーションにおいてCubismModelを管理するクラス<br>
@@ -31,16 +41,12 @@ class LAppLive2DManager
 {
 
 public:
-    std::map<int, std::pair<int, std::string>> UserCubismMap;
 
-    //std::vector<std::string>
+    ModelJsonConfig GetModelJsonConfigFromName(std::string modelname);
 
-    ModelJsonConfig GetModelJsonConfig(int index);
+    void RefreshScene(int userid,std::string modelname);
 
-    void RefreshScene();
-
-    void RefreshSceneSpecial();
-
+    void RefreshSceneAndUserId(Csm::csmUint32 pos);
 
     Csm::csmVector<Csm::csmString>& GetModelDir();; ///< モデルディレクトリ名のコンテナ
 
@@ -91,19 +97,15 @@ public:
     */
     Csm::csmInt32 GetModelDirSize() const;
 
-    /**
-    * @brief   現在のシーンで保持しているモデルを返す
-    *
-    * @param[in]   no  モデルリストのインデックス値
-    * @return      モデルのインスタンスを返す。インデックス値が範囲外の場合はNULLを返す。
-    */
-    LAppModel* GetModel(Csm::csmUint32 no) const;
-
+    //直接返回_models
+    std::unordered_map<Csm::csmUint32, LAppModel*, Uint32Hash>& GetModel();
     /**
     * @brief   現在のシーンで保持しているすべてのモデルを解放する
     *
     */
     void ReleaseAllModel();
+
+    void ReleaseOneModel(int userid);
 
     /**
     * @brief   画面をドラッグしたときの処理
@@ -160,7 +162,7 @@ private:
     virtual ~LAppLive2DManager();
 
     Csm::CubismMatrix44* _viewMatrix; ///< モデル描画に用いるView行列
-    Csm::csmVector<LAppModel*> _models; ///< モデルインスタンスのコンテナ
+    std::unordered_map<Csm::csmUint32,LAppModel*, Uint32Hash> _models; ///< モデルインスタンスのコンテナ
     //Csm::csmInt32 _sceneIndex; ///< 表示するシーンのインデックス値
 
     Csm::csmVector<Csm::csmString> _modelDir; ///< モデルディレクトリ名のコンテナ

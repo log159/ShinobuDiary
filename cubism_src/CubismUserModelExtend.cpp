@@ -323,8 +323,9 @@ void CubismUserModelExtend::ModelParamUpdate()
 
     if (_motionManager->IsFinished())
     {
+        //Shinobu Debug
         // モーションの再生がない場合、始めに登録されているモーションを再生する
-        StartMotion(LAppDefine::MotionGroupIdle, 0, LAppDefine::PriorityIdle);
+        StartMotion(/*LAppDefine::MotionGroupIdle*/"", 0, LAppDefine::PriorityIdle);
     }
     else
     {

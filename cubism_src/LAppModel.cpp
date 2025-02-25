@@ -47,6 +47,16 @@ namespace {
 
 
 
+Csm::ICubismModelSetting* LAppModel::GetModelSetting()const
+{
+    return _modelSetting;
+}
+
+Csm::CubismTargetPoint* LAppModel::GetModelDragManager() const
+{
+    return _dragManager;
+}
+
 LAppModel::LAppModel()
     : CubismUserModel()
     , _modelSetting(NULL)
@@ -359,8 +369,10 @@ void LAppModel::Update()
     _model->LoadParameters(); // 前回セーブされた状態をロード
     if (_motionManager->IsFinished())
     {
+        //Shinobu Debug
         // モーションの再生がない場合、待機モーションの中からランダムで再生する
-        StartRandomMotion(MotionGroupIdle, PriorityIdle);
+        StartRandomMotion(/*MotionGroupIdle*/"", PriorityIdle);
+
     }
     else
     {
@@ -453,13 +465,15 @@ CubismMotionQueueEntryHandle LAppModel::StartMotion(const csmChar* group, csmInt
         }
         return InvalidMotionQueueEntryHandleValue;
     }
-
     const csmString fileName = _modelSetting->GetMotionFileName(group, no);
+
 
     //ex) idle_0
     csmString name = Utils::CubismString::GetFormatedString("%s_%d", group, no);
     CubismMotion* motion = static_cast<CubismMotion*>(_motions[name.GetRawString()]);
     csmBool autoDelete = false;
+    //Shinobu Debug
+    //printf(u8"\n开始播放动画: ");printf(fileName.GetRawString());printf(u8"\n");
 
     if (motion == NULL)
     {
@@ -549,6 +563,8 @@ csmBool LAppModel::HitTest(const csmChar* hitAreaName, csmFloat32 x, csmFloat32 
         if (strcmp(_modelSetting->GetHitAreaName(i), hitAreaName) == 0)
         {
             const CubismIdHandle drawID = _modelSetting->GetHitAreaId(i);
+            //Shinobu Debug
+            printf(drawID->GetString().GetRawString());
             return IsHit(drawID, x, y);
         }
     }
@@ -575,7 +591,6 @@ void LAppModel::SetExpression(const csmChar* expressionID)
         }
     }
 }
-
 void LAppModel::SetRandomExpression()
 {
     if (_expressions.GetSize() == 0)

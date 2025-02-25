@@ -1,0 +1,309 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="imgui_src">
+      <UniqueIdentifier>{9dae1311-e87c-42cc-819c-6e4cc067907c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="simpleini-4.22_src">
+      <UniqueIdentifier>{cb5054e9-bee6-4b26-adb2-3990ae65beb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sparkdesk_src">
+      <UniqueIdentifier>{7cf8a24d-5f4d-4246-91bf-5046dff3f4e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cubism_src">
+      <UniqueIdentifier>{67abd2ec-79a0-4b3a-aea9-d1137e9b7a5e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="imgui_impl_dx11.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_win32.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_src\imgui.cpp">
+      <Filter>imgui_src</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_src\imgui_demo.cpp">
+      <Filter>imgui_src</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_src\imgui_draw.cpp">
+      <Filter>imgui_src</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_src\imgui_tables.cpp">
+      <Filter>imgui_src</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_src\imgui_widgets.cpp">
+      <Filter>imgui_src</Filter>
+    </ClCompile>
+    <ClCompile Include="filesetting.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="suconfig.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="shinobuwidget.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="sparkdesk.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="llmhome.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="global.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="simpleini-4.22_src\ConvertUTF.cpp">
+      <Filter>simpleini-4.22_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\CubismDirectXRenderer.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\CubismDirectXView.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\CubismSampleViewMatrix.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\CubismSprite.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\CubismSpriteShader.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\CubismTextureManager.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\CubismUserModelExtend.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\LAppAllocator.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\LAppDefine.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\LAppDelegate.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\LAppLive2DManager.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\LAppModel.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\LAppPal.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\LAppSprite.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\LAppSpriteShader.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\LAppTextureManager.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\LAppView.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\LAppWavFileHandler.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\MouseActionManager.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\TouchManager.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\CubismWindowStyle.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="cubism_src\CubismLoom.cpp">
+      <Filter>cubism_src</Filter>
+    </ClCompile>
+    <ClCompile Include="timeconfig.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="sufunction.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="imgui_src\imconfig.h">
+      <Filter>imgui_src</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_src\imgui.h">
+      <Filter>imgui_src</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_src\imgui_internal.h">
+      <Filter>imgui_src</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_src\imstb_rectpack.h">
+      <Filter>imgui_src</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_src\imstb_textedit.h">
+      <Filter>imgui_src</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_src\imstb_truetype.h">
+      <Filter>imgui_src</Filter>
+    </ClInclude>
+    <ClInclude Include="compoundgui.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="filesetting.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_dx11.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_win32.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="llmhome.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="shinobuwidget.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sparkdesk.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="suconfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="translator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="global.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleini-4.22_src\ConvertUTF.h">
+      <Filter>simpleini-4.22_src</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleini-4.22_src\SimpleIni.h">
+      <Filter>simpleini-4.22_src</Filter>
+    </ClInclude>
+    <ClInclude Include="sparkdesk_src\include\sc_agent.h">
+      <Filter>sparkdesk_src</Filter>
+    </ClInclude>
+    <ClInclude Include="sparkdesk_src\include\sc_error.h">
+      <Filter>sparkdesk_src</Filter>
+    </ClInclude>
+    <ClInclude Include="sparkdesk_src\include\sc_knowledge.h">
+      <Filter>sparkdesk_src</Filter>
+    </ClInclude>
+    <ClInclude Include="sparkdesk_src\include\sc_llm.h">
+      <Filter>sparkdesk_src</Filter>
+    </ClInclude>
+    <ClInclude Include="sparkdesk_src\include\sc_memory.h">
+      <Filter>sparkdesk_src</Filter>
+    </ClInclude>
+    <ClInclude Include="sparkdesk_src\include\sc_plugins.h">
+      <Filter>sparkdesk_src</Filter>
+    </ClInclude>
+    <ClInclude Include="sparkdesk_src\include\sc_prompt.h">
+      <Filter>sparkdesk_src</Filter>
+    </ClInclude>
+    <ClInclude Include="sparkdesk_src\include\sc_qachain.h">
+      <Filter>sparkdesk_src</Filter>
+    </ClInclude>
+    <ClInclude Include="sparkdesk_src\include\sc_type.h">
+      <Filter>sparkdesk_src</Filter>
+    </ClInclude>
+    <ClInclude Include="sparkdesk_src\include\sparkchain.h">
+      <Filter>sparkdesk_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\CubismDirectXRenderer.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\CubismDirectXView.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\CubismSampleViewMatrix.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\CubismSprite.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\CubismSpriteShader.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\CubismTextureManager.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\CubismUserModelExtend.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\LAppAllocator.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\LAppDefine.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\LAppDelegate.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\LAppLive2DManager.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\LAppModel.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\LAppPal.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\LAppSprite.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\LAppSpriteShader.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\LAppTextureManager.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\LAppView.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\LAppWavFileHandler.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\MouseActionManager.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\TouchManager.hpp">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\CubismWindowStyle.h">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="cubism_src\CubismLoom.h">
+      <Filter>cubism_src</Filter>
+    </ClInclude>
+    <ClInclude Include="timeconfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sufunction.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sizedef.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

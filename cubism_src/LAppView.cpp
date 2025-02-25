@@ -23,6 +23,11 @@
 using namespace std;
 using namespace LAppDefine;
 
+Csm::CubismMatrix44* LAppView::GetDeviceToScreen() const
+{
+    return _deviceToScreen;
+}
+
 LAppView::LAppView():
     _back(NULL),
     _gear(NULL),
@@ -153,10 +158,12 @@ void LAppView::Render()
     // 各モデルが持つ描画ターゲットをテクスチャとする場合
     if (_renderTarget == SelectTarget_ModelFrameBuffer && _renderSprite)
     {
-        for(csmUint32 i=0; i<live2DManager->GetModelNum(); i++)
-        {
-            LAppModel* model = live2DManager->GetModel(i);
+        //Shinobu Debug
+        int i = 0;
+        for (auto& pair : live2DManager->GetModel()) {
+            LAppModel* model = pair.second;
             float alpha = i < 1 ? 1.0f : model->GetOpacity(); // サンプルとしてαに適当な差をつける
+            ++i;
             _renderSprite->SetColor(1.0f, 1.0f, 1.0f, alpha);
 
             if (model)
@@ -164,6 +171,7 @@ void LAppView::Render()
                 _renderSprite->RenderImmidiate(width, height, model->GetRenderBuffer().GetTextureView(), renderContext);
             }
         }
+
     }
 }
 
@@ -183,7 +191,6 @@ void LAppView::InitializeSprite()
     float fWidth = 0.0f;
     float fHeight = 0.0f;
 
-    //Shinobu Debug
     string imageName = ""/*resourcesPath + BackImageName*/;
     //LAppTextureManager::TextureInfo* backgroundTexture = textureManager->CreateTextureFromPngFile(imageName, false);
     //x = width * 0.5f;
@@ -192,21 +199,21 @@ void LAppView::InitializeSprite()
     //fHeight = static_cast<float>(height) * 0.95f;
     //_back = new LAppSprite(x, y, fWidth, fHeight, backgroundTexture->id, _shader, device);
 
-    imageName = resourcesPath + GearImageName;
-    LAppTextureManager::TextureInfo* gearTexture = textureManager->CreateTextureFromPngFile(imageName, false);
-    x = static_cast<float>(width - gearTexture->width * 0.5f);
-    y = static_cast<float>(height - gearTexture->height * 0.5f);
-    fWidth = static_cast<float>(gearTexture->width);
-    fHeight = static_cast<float>(gearTexture->height);
-    _gear = new LAppSprite(x, y, fWidth, fHeight, gearTexture->id, _shader, device);
+    //imageName = resourcesPath + GearImageName;
+    //LAppTextureManager::TextureInfo* gearTexture = textureManager->CreateTextureFromPngFile(imageName, false);
+    //x = static_cast<float>(width - gearTexture->width * 0.5f);
+    //y = static_cast<float>(height - gearTexture->height * 0.5f);
+    //fWidth = static_cast<float>(gearTexture->width);
+    //fHeight = static_cast<float>(gearTexture->height);
+    //_gear = new LAppSprite(x, y, fWidth, fHeight, gearTexture->id, _shader, device);
 
-    imageName = resourcesPath + PowerImageName;
-    LAppTextureManager::TextureInfo* powerTexture = textureManager->CreateTextureFromPngFile(imageName, false);
-    x = static_cast<float>(width - powerTexture->width * 0.5f);
-    y = static_cast<float>(powerTexture->height * 0.5f);
-    fWidth = static_cast<float>(powerTexture->width);
-    fHeight = static_cast<float>(powerTexture->height);
-    _power = new LAppSprite(x, y, fWidth, fHeight, powerTexture->id, _shader, device);
+    //imageName = resourcesPath + PowerImageName;
+    //LAppTextureManager::TextureInfo* powerTexture = textureManager->CreateTextureFromPngFile(imageName, false);
+    //x = static_cast<float>(width - powerTexture->width * 0.5f);
+    //y = static_cast<float>(powerTexture->height * 0.5f);
+    //fWidth = static_cast<float>(powerTexture->width);
+    //fHeight = static_cast<float>(powerTexture->height);
+    //_power = new LAppSprite(x, y, fWidth, fHeight, powerTexture->id, _shader, device);
 
     x = width * 0.5f;
     y = height * 0.5f;
@@ -322,7 +329,6 @@ void LAppView::OnTouchesMoved(float px, float py) const
 {
     float viewX = this->TransformViewX(_touchManager->GetX());
     float viewY = this->TransformViewY(_touchManager->GetY());
-
     _touchManager->TouchesMoved(px, py);
 
     LAppLive2DManager* live2DManager = LAppLive2DManager::GetInstance();
@@ -351,20 +357,25 @@ void LAppView::OnTouchesEnded(float px, float py) const
         //// 歯車にタップしたか
         //if (_gear->IsHit(px, py, width, height))
         //{
-
         //    //live2DManager->NextScene();
         //    live2DManager->RefreshScene();
         //}
-        if (GlobalTemp::RefreshCubismScene == true) {
-            live2DManager->RefreshScene();
-            GlobalTemp::RefreshCubismScene = false;
+        // 電源ボタンにタップしたか
+        //if (_power->IsHit(px, py, width, height))
+        //{
+        //    LAppDelegate::GetInstance()->AppEnd();
+        //}
+        
+        if (GlobalTemp::CubismModelRefreshPos.first) {
+            live2DManager->RefreshSceneAndUserId(GlobalTemp::CubismModelRefreshPos.second);
+            GlobalTemp::CubismModelRefreshPos.first = false;
+        }
+        std::queue<std::pair<int, std::string>>& qp = GlobalTemp::CubismModelMessage;
+        while (!qp.empty()) {
+            live2DManager->RefreshScene(qp.front().first, qp.front().second);
+            qp.pop();
         }
 
-        // 電源ボタンにタップしたか
-        if (_power->IsHit(px, py, width, height))
-        {
-            LAppDelegate::GetInstance()->AppEnd();
-        }
     }
 }
 

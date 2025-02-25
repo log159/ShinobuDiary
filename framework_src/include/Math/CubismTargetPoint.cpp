@@ -47,7 +47,7 @@ void CubismTargetPoint::Update(csmFloat32 deltaTimeSeconds)
     _lastTimeSeconds = _userTimeSeconds;
 
     // 最高速度になるまでの時間を
-    const csmFloat32 TimeToMaxSpeed = 0.15f;
+    //const csmFloat32 TimeToMaxSpeed = 0.15f;
     const csmFloat32 FrameToMaxSpeed = TimeToMaxSpeed * static_cast<csmFloat32>(FrameRate);     // sec * frame/sec
     const csmFloat32 MaxA = deltaTimeWeight * MaxV / FrameToMaxSpeed;                           // 1frameあたりの加速度
 

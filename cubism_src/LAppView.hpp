@@ -26,6 +26,8 @@ class LAppView
 {
 public:
 
+    Csm::CubismMatrix44* GetDeviceToScreen() const;
+
     /**
      * @brief LAppModelのレンダリング先
      */

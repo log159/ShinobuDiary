@@ -3446,7 +3446,6 @@ void ImGui::TableDrawDefaultContextMenu(ImGuiTable* table, ImGuiTableFlags flags
     {
         if (column != NULL)
         {
-            //Shinobu Debug
             const bool can_resize = !(column->Flags & ImGuiTableColumnFlags_NoResize) && column->IsEnabled;
             if (MenuItem(/*LocalizeGetMsg(ImGuiLocKey_TableSizeOne)*/TT_270, NULL, false, can_resize)) // "###SizeOne"
                 TableSetColumnWidthAutoSingle(table, column_n);

@@ -7936,23 +7936,33 @@ namespace ImGui { IMGUI_API void ShowFontAtlas(ImFontAtlas* atlas); }
 
 // Demo helper function to select among loaded fonts.
 // Here we use the regular BeginCombo()/EndCombo() api which is the more flexible one.
+//void ImGui::ShowFontSelector(const char* label)
+//{
+//    ImGuiIO& io = ImGui::GetIO();
+//    ImFont* font_current = ImGui::GetFont();
+//    if (ImGui::BeginCombo(label, font_current->GetDebugName()))
+//    {
+//        for (ImFont* font : io.Fonts->Fonts)
+//        {
+//            ImGui::PushID((void*)font);
+//            if (ImGui::Selectable(font->GetDebugName(), font == font_current))
+//                io.FontDefault = font;
+//            ImGui::PopID();
+//        }
+//        ImGui::EndCombo();
+//    }
+//    ImGui::SameLine();
+//    HelpMarker(
+//        "- Load additional fonts with io.Fonts->AddFontFromFileTTF().\n"
+//        "- The font atlas is built when calling io.Fonts->GetTexDataAsXXXX() or io.Fonts->Build().\n"
+//        "- Read FAQ and docs/FONTS.md for more details.\n"
+//        "- If you need to add/remove fonts at runtime (e.g. for DPI change), do it before calling NewFrame().");
+//}
+
 void ImGui::ShowFontSelector(const char* label)
 {
     ImGuiIO& io = ImGui::GetIO();
     ImFont* font_current = ImGui::GetFont();
-    /*
-    if (ImGui::BeginCombo(label, font_current->GetDebugName()))
-    {
-        for (ImFont* font : io.Fonts->Fonts)
-        {
-            ImGui::PushID((void*)font);
-            if (ImGui::Selectable(font->GetDebugName(), font == font_current))
-                io.FontDefault = font;
-            ImGui::PopID();
-        }
-        ImGui::EndCombo();
-    }
-    */
     if (ImGui::BeginCombo(label,::GlobalConfig::getInstance()->select_font.c_str()))
     {
         for (ImFont* font : io.Fonts->Fonts)
@@ -8025,13 +8035,13 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
     { bool border = (style.PopupBorderSize > 0.0f);  if (ImGui::Checkbox(TT_48,  &border)) { style.PopupBorderSize  = border ? 1.0f : 0.0f; } }
 
     // Save/Revert button
-    if (ImGui::Button(TT_49)) {
+    if (ImGui::Button(TT_49, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         //*ref = ref_saved_style = style;
         ::GlobalConfig::GlobalConfigSave();
     }
 
     ImGui::SameLine();
-    if (ImGui::Button(TT_50)) {
+    if (ImGui::Button(TT_50, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         //style = *ref;
         style = ::GlobalConfig::getInstance()->defaultStyle;
         ::GlobalConfig::getInstance()->select_theme_id = 0;
@@ -8123,27 +8133,28 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
 
         if (ImGui::BeginTabItem(TT_107))
         {
-            static int output_dest = 0;
-            static bool output_only_modified = true;
-            if (ImGui::Button(TT_108))
-            {
-                if (output_dest == 0)
-                    ImGui::LogToClipboard();
-                else
-                    ImGui::LogToTTY();
-                ImGui::LogText("ImVec4* colors = ImGui::GetStyle().Colors;" IM_NEWLINE);
-                for (int i = 0; i < ImGuiCol_COUNT; i++)
-                {
-                    const ImVec4& col = style.Colors[i];
-                    const char* name = ImGui::GetStyleColorName(i);
-                    if (!output_only_modified || memcmp(&col, &ref->Colors[i], sizeof(ImVec4)) != 0)
-                        ImGui::LogText("colors[ImGuiCol_%s]%*s= ImVec4(%.2ff, %.2ff, %.2ff, %.2ff);" IM_NEWLINE,
-                            name, 23 - (int)strlen(name), "", col.x, col.y, col.z, col.w);
-                }
-                ImGui::LogFinish();
-            }
-            ImGui::SameLine(); ImGui::SetNextItemWidth(120); ImGui::Combo("##output_type", &output_dest, TT_109);
-            ImGui::SameLine(); ImGui::Checkbox(TT_110, &output_only_modified);
+            //DELETE
+            //static int output_dest = 0;
+            //static bool output_only_modified = true;
+            //if (ImGui::Button(TT_108))
+            //{
+            //    if (output_dest == 0)
+            //        ImGui::LogToClipboard();
+            //    else
+            //        ImGui::LogToTTY();
+            //    ImGui::LogText("ImVec4* colors = ImGui::GetStyle().Colors;" IM_NEWLINE);
+            //    for (int i = 0; i < ImGuiCol_COUNT; i++)
+            //    {
+            //        const ImVec4& col = style.Colors[i];
+            //        const char* name = ImGui::GetStyleColorName(i);
+            //        if (!output_only_modified || memcmp(&col, &ref->Colors[i], sizeof(ImVec4)) != 0)
+            //            ImGui::LogText("colors[ImGuiCol_%s]%*s= ImVec4(%.2ff, %.2ff, %.2ff, %.2ff);" IM_NEWLINE,
+            //                name, 23 - (int)strlen(name), "", col.x, col.y, col.z, col.w);
+            //    }
+            //    ImGui::LogFinish();
+            //}
+            //ImGui::SameLine(); ImGui::SetNextItemWidth(120); ImGui::Combo("##output_type", &output_dest, TT_109);
+            //ImGui::SameLine(); ImGui::Checkbox(TT_110, &output_only_modified);
 
             static ImGuiTextFilter filter;
             filter.Draw(TT_111, ImGui::GetFontSize() * 16);

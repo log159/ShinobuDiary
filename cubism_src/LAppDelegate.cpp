@@ -36,61 +36,22 @@ namespace {
     const csmInt32 BackBufferNum = 1; // バックバッファ枚数
 }
 
-//
-//void LAppDelegate::PosHandler()
-//{
-//    if (_canMove)
-//    {
-//        POINT pt;
-//        ::GetCursorPos(&pt);
-//        ::SetWindowPos(_hw, NULL, pt.x - _deviationPoint.x, pt.y - _deviationPoint.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-//    }
-//    if (s_instance != NULL)
-//    {
-//        if (s_instance->_view == NULL)
-//        {
-//            return;
-//        }
-//        //鼠标坐标
-//        POINT pos = { 0 };
-//        GetCursorPos(&pos);
-//        //模型坐标
-//        RECT rect;
-//        ::GetWindowRect(_hw, &rect);
-//
-//        long rectX = rect.left + RenderTargetWidth * 0.5;
-//        long rectY = rect.top + RenderTargetHeight * 0.5;
-//
-//        if (pos.x <= rectX)
-//        {
-//            pos.x = LONG(((float)pos.x / (float)rectX) * ((float)RenderTargetWidth * 0.5));
-//        }
-//        else {
-//            pos.x -= rectX;
-//            pos.x = LONG(((float)pos.x / (float)(RenderTargetWidth - rectX)) * ((float)RenderTargetWidth * 0.5));
-//            pos.x += LONG((float)RenderTargetWidth * 0.5);
-//        }
-//        if (pos.y <= rectY)
-//        {
-//            pos.y = LONG(((float)pos.y / (float)rectY) * ((float)RenderTargetHeight * 0.5));
-//        }
-//        else {
-//            pos.y -= rectY;
-//            pos.y = LONG(((float)pos.y / (float)(RenderTargetHeight - rectY)) * ((float)RenderTargetHeight * 0.5));
-//            pos.y += LONG((float)RenderTargetHeight * 0.5);
-//        }
-//
-//        s_instance->_mouseX = pos.x;
-//        s_instance->_mouseY = pos.y;
-//        s_instance->_captured = true;
-//        //LAppPal::PrintLog("[APP]tap point in pos : {x:%.2f y:%.2f}", s_instance->_mouseX, s_instance->_mouseY);
-//        s_instance->_view->OnTouchesMoved(s_instance->_mouseX, s_instance->_mouseY);
-//    }
-//}
-
 HWND LAppDelegate::GetWindowHandle() const
 {
     return _windowHandle;
+}
+
+void LAppDelegate::PosHandler(HWND _hw)
+{
+    if (s_instance != NULL && s_instance->_view != NULL)
+    {
+        static POINT pos = { 0 };
+        GetCursorPos(&pos);
+        s_instance->_mouseX = float(pos.x);
+        s_instance->_mouseY = float(pos.y);
+        s_instance->_captured = true;
+        s_instance->_view->OnTouchesMoved(s_instance->_mouseX, s_instance->_mouseY);
+    }
 }
 
 LAppDelegate* LAppDelegate::GetInstance()
@@ -353,7 +314,12 @@ void LAppDelegate::Run()
         }
         else
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(GlobalConfig::getInstance()->window_cubism_addtimefps));
+            //限制帧率
+            if (GlobalConfig::getInstance()->window_cubism_addtimefps != 0) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(GlobalConfig::getInstance()->window_cubism_addtimefps));
+            }
+            //
+            PosHandler(_windowHandle);
 
             // 窗口更新
             CubismWindowStyle::Update(_windowHandle);
@@ -383,7 +349,7 @@ void LAppDelegate::Run()
             // アプリケーション終了メッセージでウィンドウを破棄する
             if (GetIsEnd() && _windowHandle != NULL)
             {
-                GlobalTemp::CubismQuit = true;
+                GlobalTemp::CubismIsRunning = false;
                 DestroyWindow(_windowHandle);
                 _windowHandle = NULL;
             }
@@ -590,7 +556,7 @@ LRESULT WINAPI LAppDelegate::MsgProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM l
 
     switch (msg)
     {
-    case WM_DESTROY:    // 终了
+    case WM_DESTROY:// 终了
         PostQuitMessage(0);
         return 0;
 
@@ -646,22 +612,21 @@ LRESULT WINAPI LAppDelegate::MsgProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM l
         return 0;
 
     case WM_MOUSEMOVE:
-        if(s_instance!=NULL)
-        {
-            s_instance->_mouseX = static_cast<float>(LOWORD(lParam));
-            s_instance->_mouseY = static_cast<float>(HIWORD(lParam));
+        //if(s_instance!=NULL)
+        //{
+        //    s_instance->_mouseX = static_cast<float>(LOWORD(lParam));
+        //    s_instance->_mouseY = static_cast<float>(HIWORD(lParam));
+        //    if (!s_instance->_captured)
+        //    {
+        //        return 0;
+        //    }
+        //    if (s_instance->_view == NULL)
+        //    {
+        //        return 0;
+        //    }
 
-            if (!s_instance->_captured)
-            {
-                return 0;
-            }
-            if (s_instance->_view == NULL)
-            {
-                return 0;
-            }
-
-            s_instance->_view->OnTouchesMoved(s_instance->_mouseX, s_instance->_mouseY);
-        }
+        //    s_instance->_view->OnTouchesMoved(s_instance->_mouseX, s_instance->_mouseY);
+        //}
         return 0;
 
     default:

@@ -17,6 +17,9 @@ namespace Live2D { namespace Cubism { namespace Framework {
 class CubismMatrix44
 {
 public:
+    float devX = 0.0f;
+    float devY = 0.0f;
+
     /**
      * Constructor
      */
@@ -171,6 +174,7 @@ public:
      * @param m Matrix to multiply with the current matrix
      */
     void            MultiplyByMatrix(CubismMatrix44* m);
+
 
 protected:
     csmFloat32  _tr[16];
