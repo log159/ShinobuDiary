@@ -1,14 +1,13 @@
-## ⚠️ 许可声明
+⚠️ 许可声明  
+Live2D Cubism SDK 许可   
+- 如果您的企业在最近一个会计年度的销售额达到或超过 **1000万日元**，  
+您必须获得 **Cubism SDK 的出版授权许可**（出版许可协议）。  
+  [Cubism SDK 发行许可证](https://www.live2d.com/zh-CHS/download/cubism-sdk/release-license/)  
 
-### 📌 **Live2D Cubism SDK 许可**
-- 如果您的企业在最近一个会计年度的销售额达到或超过 **1000万日元**，您必须获得 **Cubism SDK 的出版授权许可**（出版许可协议）。  
-  🔗 [Cubism SDK 发行许可证](https://www.live2d.com/zh-CHS/download/cubism-sdk/release-license/)
-
-- **Live2D 官方的相关许可说明：**
+- Live2D 官方的相关许可说明：  
   - **Live2D Cubism Core**：受 **Live2D 专有软件许可** 约束。  
   - **Live2D Cubism Samples**：受 **Live2D 开放软件许可** 约束。  
   - **Live2D Cubism Framework**：受 **Live2D 开放软件许可** 约束。  
 
-  🔗 [Live2D 开放软件使用授权协议](https://www.live2d.com/eula/live2d-open-software-license-agreement_cn.html)  
-  🔗 [Live2D 专有软件使用授权协议](https://www.live2d.com/eula/live2d-proprietary-software-license-agreement_cn.html)  
-
+[Live2D 专有软件使用授权协议](https://www.live2d.com/eula/live2d-proprietary-software-license-agreement_cn.html)  
+[Live2D 开放软件使用授权协议](https://www.live2d.com/eula/live2d-open-software-license-agreement_cn.html)  
