@@ -1,13 +1,41 @@
-⚠️ 许可声明  
-Live2D Cubism SDK 许可   
-- 如果您的企业在最近一个会计年度的销售额达到或超过 **1000万日元**，  
-您必须获得 **Cubism SDK 的出版授权许可**（出版许可协议）。  
-  [Cubism SDK 发行许可证](https://www.live2d.com/zh-CHS/download/cubism-sdk/release-license/)  
+# 许可声明  
 
-- Live2D 官方的相关许可说明：  
-  - **Live2D Cubism Core**：受 **Live2D 专有软件许可** 约束。  
-  - **Live2D Cubism Samples**：受 **Live2D 开放软件许可** 约束。  
-  - **Live2D Cubism Framework**：受 **Live2D 开放软件许可** 约束。  
+## Live2D Cubism SDK 许可  
 
-[Live2D 专有软件使用授权协议](https://www.live2d.com/eula/live2d-proprietary-software-license-agreement_cn.html)  
-[Live2D 开放软件使用授权协议](https://www.live2d.com/eula/live2d-open-software-license-agreement_cn.html)  
+### 1. 商业使用要求  
+- **如果企业在最近一个会计年度的销售额达到或超过 1000 万日元**，必须获得 **Cubism SDK 的出版授权许可**（出版许可协议）。  
+  - 详情参见：[Cubism SDK 发行许可证](https://www.live2d.com/zh-CHS/download/cubism-sdk/release-license/)  
+
+### 2. 组件许可  
+Live2D 官方的相关许可说明如下：  
+
+- **Live2D Cubism Core**：受 **Live2D 专有软件许可** 约束。  
+- **Live2D Cubism Samples**：受 **Live2D 开放软件许可** 约束。  
+- **Live2D Cubism Framework**：受 **Live2D 开放软件许可** 约束。  
+
+### 3. 相关协议  
+- [Live2D 专有软件使用授权协议](https://www.live2d.com/eula/live2d-proprietary-software-license-agreement_cn.html)  
+- [Live2D 开放软件使用授权协议](https://www.live2d.com/eula/live2d-open-software-license-agreement_cn.html)  
+
+## 其余部分许可  
+
+除 **Live2D Cubism SDK** 相关组件外，其余部分采用 **MIT 许可证**。  
+
+> **MIT 许可证**  
+>  
+> 版权所有 (c) [年份] [版权所有者]  
+>  
+> 特此免费授予任何获得本软件副本及相关文档文件（“软件”）的人，在软件中自由使用，包括但不限于使用、复制、修改、合并、发布、分发、再许可和/或出售软件的副本的权利，但须满足以下条件：  
+>  
+> - 在软件的所有副本或重要部分中包含上述版权声明和本许可声明。  
+>  
+> 本软件按“原样”提供，不提供任何明示或暗示的担保，包括但不限于适销性、特定用途的适用性及不侵权的担保。在任何情况下，作者或版权持有人均不对因使用本软件或其他交易中产生的任何索赔、损害或其他责任负责，无论是因合同、侵权或其他原因。  
+
+## 依赖项  
+
+本项目依赖于 **C++ 标准库（STL）**，其本身受相应许可证约束：  
+
+- **Microsoft C++ Standard Library**（适用于 MSVC）：**Apache License 2.0 with LLVM Exception**  
+- **GNU libstdc++**（适用于 GCC）：**GPL with GCC Runtime Library Exception**  
+
+详细信息请参见相应标准库的官方许可文档。  
