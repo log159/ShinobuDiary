@@ -18,11 +18,13 @@
 #include "LAppDelegate.hpp"
 #include "LAppModel.hpp"
 #include "LAppView.hpp"
-
+#include <CubismDefaultParameterId.hpp>
+#include <./Id/CubismIdManager.hpp>
 
 using namespace Csm;
 using namespace LAppDefine;
-
+namespace Csmd = Live2D::Cubism::Framework::DefaultParameterId;
+using namespace Csmd;
 
 namespace {
     LAppLive2DManager* s_instance = NULL;
@@ -110,10 +112,10 @@ void LAppLive2DManager::ReleaseOneModel(int userid)
             rel._model = pair.second;
             rel._counter = 2;
             _releaseModel.PushBack(rel);
+            _models.erase(userid);
             break;
         }
     }
-    _models.erase(userid);
 }
 
 void LAppLive2DManager::SetUpModel()
@@ -174,7 +176,7 @@ void LAppLive2DManager::SetUpModel()
         }
     }
     for (csmUint32 i = 0; i < _modelDir.GetSize(); ++i) {
-        printf("%hs\n", _modelDir[i].GetRawString());
+        std::cout << _modelDir[i].GetRawString() << std::endl;
     }
     std::cout << u8"Cubism find end " << u8"共加载 " << _modelDir.GetSize() << u8" 个模型" << std::endl;
     
@@ -192,7 +194,7 @@ csmInt32 LAppLive2DManager::GetModelDirSize() const
     return _modelDir.GetSize();
 }
 
-std::unordered_map<Csm::csmUint32, LAppModel*, Uint32Hash>& LAppLive2DManager::GetModel()
+std::unordered_map<int, LAppModel*>& LAppLive2DManager::GetModel()
 {
     return _models;
 }
@@ -213,48 +215,33 @@ void LAppLive2DManager::OnTap(csmFloat32 x, csmFloat32 y)
     {
         LAppPal::PrintLogLn("[APP]tap point: {x:%.2f y:%.2f}", x, y);
     }
-   
     for (auto& pair : _models) {
-        //Shinobu Debug
+        LAppModel* lam = pair.second;
         Csm::ICubismModelSetting* lms = pair.second->GetModelSetting();
         for (int i = 0; i < lms->GetHitAreasCount(); ++i) {
             if (pair.second->HitTest(lms->GetHitAreaName(i), x, y)) {
-                printf(lms->GetHitAreaName(i));
-                printf("\n");
+                lam->hit_name = lms->GetHitAreaName(i);
 
-                pair.second->StartRandomMotion("Idle", /*PriorityNormal*/PriorityForce, FinishedMotion, BeganMotion);
-
+                ImVector<ImGuiID>& ivm = lam->hit_areas_motion_map[lam->GetModelSetting()->GetHitAreaId(i)->GetString().GetRawString()].Items[1];
+                ImVector<ImGuiID>& ive = lam->hit_areas_expression_map[lam->GetModelSetting()->GetHitAreaId(i)->GetString().GetRawString()].Items[1];
+                int p1=-1, p2=-1;
+                std::cout << u8"触发动作----------------------------------------" << std::endl;
+                if (ivm.Size > 0) {
+                    std::pair<int, int>& pr=lam->motion_map[ivm[rand() % ivm.Size]];
+                    const Csm::csmChar* gid = lam->GetModelSetting()->GetMotionGroupName(pr.first);
+                    lam->StartMotion(gid, pr.second, LAppDefine::PriorityForce);
+                    lam->hit_motion_name = lam->GetModelSetting()->GetMotionFileName(gid, pr.second);
+                    std::cout << gid << u8" " << lam->hit_motion_name << std::endl;
+                }
+                if (ive.Size > 0) {
+                    int ep = lam->expression_map[ive[rand() % ive.Size]];
+                    lam->SetExpression(lam->GetModelSetting()->GetExpressionName(ep));
+                    lam->hit_expression_name = lam->GetModelSetting()->GetExpressionName(ep);
+                    std::cout << lam->hit_expression_name << std::endl;
+                }
+                std::cout << u8"ID " << lam->GetModelSetting()->GetHitAreaId(i)->GetString().GetRawString() << " " << lam->hit_name << std::endl;
             }
         }
-        //const csmInt32 count = pair.second->GetModelSetting()->GetHitAreasCount();
-        //for (csmInt32 i = 0; i < count; i++)
-        //{
-        //    //if (pair.second->HitTest(pair.second->GetModelSetting()->GetHitAreaName(i), x, y)) {
-        //        std::cout << pair.second->GetModelSetting()->GetHitAreaName(i) << std::endl;
-        //    //}
-        //}
-
-        //if (pair.second->HitTest(HitAreaNameHead, x, y))
-        //{
-        //    printf(HitAreaNameHead);
-        //    printf("\n");
-
-        //    if (DebugLogEnable)
-        //    {
-        //        LAppPal::PrintLogLn("[APP]hit area: [%s]", HitAreaNameHead);
-        //    }
-        //    pair.second->SetRandomExpression();
-        //}
-        //else if (pair.second->HitTest(HitAreaNameBody, x, y))
-        //{
-        //    printf(HitAreaNameBody);
-        //    printf("\n");
-        //    if (DebugLogEnable)
-        //    {
-        //        LAppPal::PrintLogLn("[APP]hit area: [%s]", HitAreaNameBody);
-        //    }
-        //    pair.second->StartRandomMotion(/*MotionGroupTapBody*/"", PriorityNormal, FinishedMotion, BeganMotion);
-        //}
     }
 }
 
@@ -262,7 +249,7 @@ void LAppLive2DManager::OnUpdate() const
 {
     int windowWidth, windowHeight;
     LAppDelegate::GetInstance()->GetClientSize(windowWidth, windowHeight);
-
+    ID3D11DeviceContext* renderContext = LAppDelegate::GetD3dContext();
     // D3D11 フレーム先頭処理
     // 各フレームでの、Cubism SDK の処理前にコール
     Rendering::CubismRenderer_D3D11::StartFrame(LAppDelegate::GetInstance()->GetD3dDevice(), LAppDelegate::GetInstance()->GetD3dContext(), windowWidth, windowHeight);
@@ -300,10 +287,11 @@ void LAppLive2DManager::OnUpdate() const
 
         // Cubismモデルの描画
         model->Update();
-        model->Draw(projection);///< 参照渡しなのでprojectionは変質する
 
+        model->Draw(projection);///< 参照渡しなのでprojectionは変質する
         // モデル1体描画後コール
         LAppDelegate::GetInstance()->GetView()->PostModelDraw(*model);
+
     }
 
     // D3D11 フレーム終了処理
@@ -325,7 +313,7 @@ ModelJsonConfig LAppLive2DManager::GetModelJsonConfigFromName(std::string modeln
     // 斜杠之后部分拷贝到modelJsonName
     strncpy_s(modelJsonName, lastSlash + 1, sizeof(modelJsonName) - 1);
     modelJsonName[sizeof(modelJsonName) - 1] = '\0';
-    printf("Change Cubism |%hs| -> |%hs|\n", modelPath, modelJsonName);
+    std::cout << "Change Cubism " << modelPath << " " << modelJsonName << std::endl;
     ModelJsonConfig mjc;
     mjc.modelPath = modelPath;
     mjc.modelJsonName = modelJsonName;
@@ -374,57 +362,237 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
         }
         else {
             std::cout << u8"Cubism 删除为空：" << modelname.c_str() << std::endl;
-
         }
         return;
     }
     std::cout << u8"Cubism 尝试加载：" << modelname.c_str() << std::endl;
-
     bool havedir = false;
-    for (int i = 0; i < _modelDir.GetSize(); ++i) {
+    for (int i = 0; i < int(_modelDir.GetSize()); ++i) {
         if(strcmp(_modelDir[i].GetRawString(), modelname.c_str())==0) {
-            havedir = true;
-            break;
+            havedir = true;break;
         }
     }
     if (havedir == false) {
         std::cout << u8"Cubism 加载失败，没有找到该模型：" << modelname.c_str() << std::endl;
         return;
     }
-
     ModelJsonConfig mjc = GetModelJsonConfigFromName(modelname);
     LAppModel* lam = new LAppModel();
     if (_models.find(userid) != _models.end())
         ReleaseOneModel(userid);
-    _models[userid] = lam;
-
     lam->LoadAssets(mjc.modelPath.GetRawString(), mjc.modelJsonName.GetRawString());
 
-    for (int i = 0; i < Su::UserConfig::getUserVector().size(); ++i) {
-        Su::UserConfig& su = Su::UserConfig::getUserVector()[i];
-        if (su.user_id == userid) {
-
-            su.cubism_cg.cubism_ts_s = su.cubism_cg.cubism_ts_s == 0.0f ? 1.0f : su.cubism_cg.cubism_ts_s;
-            su.cubism_cg.cubism_ts_x = su.cubism_cg.cubism_ts_x == 0.0f ? 1.0f : su.cubism_cg.cubism_ts_x;
-            su.cubism_cg.cubism_ts_y = su.cubism_cg.cubism_ts_y == 0.0f ? 1.0f : su.cubism_cg.cubism_ts_y;
-            lam->GetModelMatrix()->GetArray()[12] =su.cubism_cg.cubism_tx_t;
-            lam->GetModelMatrix()->GetArray()[13] =su.cubism_cg.cubism_ty_t;
-            lam->GetModelMatrix()->GetArray()[0] = su.cubism_cg.cubism_ts_x * su.cubism_cg.cubism_ts_s;
-            lam->GetModelMatrix()->GetArray()[5] = su.cubism_cg.cubism_ts_y * su.cubism_cg.cubism_ts_s;
-            lam->GetModelMatrix()->GetArray()[4] = su.cubism_cg.cubism_tx_s;
-            lam->GetModelMatrix()->GetArray()[1] = su.cubism_cg.cubism_ty_s;
-            lam->GetModelMatrix()->GetArray()[7] = su.cubism_cg.cubism_tx_p;
-            lam->GetModelMatrix()->GetArray()[3] = su.cubism_cg.cubism_ty_p;
+    //----------------------------------------------------------------------------------------INIT配置
+    Su::UserConfig* uc = nullptr;
+    for (int i = 0; i < int(Su::UserConfig::getUserVector().size()); ++i) {
+        if (Su::UserConfig::getUserVector()[i].user_id == userid) {
+            uc = &(Su::UserConfig::getUserVector()[i]);
             break;
         }
     }
+    if (uc == nullptr) {
+        std::cout << u8"UserConfig为空 无法初始化Cubism参数" << std::endl;
+        return;
+    }
 
+    if (uc->need_init_cubism) std::cout << u8"完全初始化" << std::endl;
+    else std::cout << u8"预期初始化" << std::endl;
+    //完全初始化--------------------------------------------------------------------------------
+    //几何
+    lam->def_cubism_cg.cubism_ts_s = 1.0f;
+    lam->def_cubism_cg.cubism_tx_t = lam->GetModelMatrix()->GetArray()[12];
+    lam->def_cubism_cg.cubism_ty_t = lam->GetModelMatrix()->GetArray()[13];
+    lam->def_cubism_cg.cubism_ts_x = lam->GetModelMatrix()->GetArray()[0] * lam->def_cubism_cg.cubism_ts_s;
+    lam->def_cubism_cg.cubism_ts_y = lam->GetModelMatrix()->GetArray()[5] * lam->def_cubism_cg.cubism_ts_s;
+    lam->def_cubism_cg.cubism_tx_s = lam->GetModelMatrix()->GetArray()[4];
+    lam->def_cubism_cg.cubism_ty_s = lam->GetModelMatrix()->GetArray()[1];
+    lam->def_cubism_cg.cubism_tx_p = lam->GetModelMatrix()->GetArray()[7];
+    lam->def_cubism_cg.cubism_ty_p = lam->GetModelMatrix()->GetArray()[3];
+
+    uc->cubism_config.cubism_cg = lam->def_cubism_cg;
+
+    //目标看向
+    uc->cubism_config.enable_look_mouse = true;
+    uc->cubism_config.damping = 0.15f;
+    uc->cubism_config.look_target_params.clear();
+    lam->canLookMouse = uc->cubism_config.enable_look_mouse;
+    lam->GetLookTargetDamping() = uc->cubism_config.damping;
+    lam->GetLookTargetParams().clear();
+    //呼吸
+    uc->cubism_config.enable_breath = true;
+    uc->cubism_config.breath_params.clear();
+    lam->GetCanBreath() = uc->cubism_config.enable_breath;
+    lam->GetBreathParameters().Clear();
+    for (int paramid = 0; paramid < lam->GetModel()->GetParameterCount(); paramid++) {
+        const char* pid = lam->GetModel()->GetParameterId(paramid)->GetString().GetRawString();
+        const Csm::CubismId* cid = CubismFramework::GetIdManager()->GetId(pid);
+        std::string cid_str = std::string(cid->GetString().GetRawString());
+        //目标看向ITEM
+        do {
+            LookParam lp;
+            lp.cid = cid;
+            if (PARAM_DEF.find(cid_str) != PARAM_DEF.end()) {
+                lp.enable = true;
+                lp.param = PARAM_DEF.at(cid_str).first;
+                lp.xyzpos = PARAM_DEF.at(cid_str).second;
+            }
+            uc->cubism_config.look_target_params.push_back(lp);
+        } while (0);
+        //呼吸ITEM
+        do {
+            CubismBreath::BreathParameterData bp;
+            bp.ParameterId = cid;
+            if (BREATH_DEF.find(cid_str) != BREATH_DEF.end()) {
+                BreathParam bit=BREATH_DEF.at(cid_str);
+                bp.Enable = true;
+                bp.Offset = bit.Offset;bp.Peak = bit.Peak;bp.Cycle = bit.Cycle;bp.Weight = bit.Weight;
+            }
+            else {
+                bp.Enable = false;bp.Offset = 0.0f;bp.Peak = 0.0f;bp.Cycle = 3.0f;bp.Weight = 0.5f;
+            }
+            uc->cubism_config.breath_params.push_back(bp);
+        } while (0);
+    }
+    lam->def_look_target_params = uc->cubism_config.look_target_params;
+    lam->def_breath_params = uc->cubism_config.breath_params;
+    lam->GetLookTargetParams() = uc->cubism_config.look_target_params;
+    for (const Csm::CubismBreath::BreathParameterData& bpd : uc->cubism_config.breath_params)
+        lam->GetBreathParameters().PushBack(bpd);
+
+    //自动眨眼
+    uc->cubism_config.enable_blink = true;
+    uc->cubism_config.blink_sel_list.Items[0].clear();
+    uc->cubism_config.blink_sel_list.Items[1].clear();
+    lam->canEyeBlink = uc->cubism_config.enable_blink;
+    lam->GetEyeBlinkIds().Clear();
+    for (int paramid = 0; paramid < lam->GetModel()->GetParameterCount(); paramid++) {
+        std::string param_str = lam->GetModel()->GetParameterId(paramid)->GetString().GetRawString();
+        if (EYEBLINK_DEF.find(param_str) != EYEBLINK_DEF.end()) {
+            CubismIdHandle handle = CubismFramework::GetIdManager()->GetId(param_str.c_str());
+            uc->cubism_config.blink_sel_list.Items[1].push_back((ImGuiID)paramid);
+        }
+        else {
+            uc->cubism_config.blink_sel_list.Items[0].push_back((ImGuiID)paramid);
+        }
+    }
+    for (const ImGuiID& pid : uc->cubism_config.blink_sel_list.Items[1]) {
+        std::string param_str = lam->GetModel()->GetParameterId(pid)->GetString().GetRawString();
+        lam->GetEyeBlinkIds().PushBack(CubismFramework::GetIdManager()->GetId(param_str.c_str()));
+    }
+    for (const ImGuiID& pid : uc->cubism_config.blink_sel_list.Items[1]) {
+        lam->def_blink_list_ids.push_back(pid);
+    }
+
+    //动画
+    //没有动画自动播放
+    uc->cubism_config.enable_anim_autoplay = false;
+    lam->animationAutoPlay = uc->cubism_config.enable_anim_autoplay;
+
+    //点击触发初始化
+    //启用预览
+    lam->previewHitareas = false;
+    Csm::ICubismModelSetting* lcms = lam->GetModelSetting();
+    CubismModel* lamcm = lam->GetModel();
+    LAppTextureManager* textureManager = LAppDelegate::GetInstance()->GetTextureManager();
+    ID3D11Device* device = LAppDelegate::GetInstance()->GetD3dDevice();
+    LAppSpriteShader* shader = LAppDelegate::GetInstance()->GetView()->GetShader();
+    for (int i = 0; i < lcms->GetHitAreasCount(); ++i) {
+        const CubismIdHandle drawID = lcms->GetHitAreaId(i);
+        const csmChar* hitName = lcms->GetHitAreaName(i);
+        const csmInt32 drawIndex = lamcm->GetDrawableIndex(drawID);
+        const csmInt32 count = lamcm->GetDrawableVertexCount(drawIndex);
+        const csmFloat32* vertices = lamcm->GetDrawableVertices(drawIndex);
+        csmFloat32 left = vertices[0];
+        csmFloat32 right = vertices[0];
+        csmFloat32 top = vertices[1];
+        csmFloat32 bottom = vertices[1];
+        for (csmInt32 j = 1; j < count; ++j)
+        {
+            csmFloat32 x = vertices[Constant::VertexOffset + j * Constant::VertexStep];
+            csmFloat32 y = vertices[Constant::VertexOffset + j * Constant::VertexStep + 1];
+            if (x < left) { left = x; }
+            if (x > right) { right = x; }
+            if (y < top) { top = y; }
+            if (y > bottom) { bottom = y; }
+        }
+        Csm::CubismMatrix44* viewcm4 = LAppDelegate::GetInstance()->GetView()->GetDeviceToScreen();
+        Csm::CubismMatrix44* lamcm4 = lam->GetModelMatrix();
+        const csmFloat32 gx_l = viewcm4->InvertTransformX(lamcm4->TransformX(left));
+        const csmFloat32 gx_r = viewcm4->InvertTransformX(lamcm4->TransformX(right));
+        const csmFloat32 gy_t = LAppDefine::RenderTargetHeight - viewcm4->InvertTransformY(lamcm4->TransformY(bottom));
+        const csmFloat32 gy_b = LAppDefine::RenderTargetHeight - viewcm4->InvertTransformY(lamcm4->TransformY(top));
+        std::vector<LAppSprite*> vls;
+        float rectWidth = gx_r - gx_l;
+        float rectHeight = gy_t - gy_b;
+        float lineThickness = 3.0; // 线条厚度
+        LAppTextureManager::TextureInfo* topTexture = textureManager->CreateTextureFromRGBA(1.0, 0.0, 0.0, 1.0, UINT(rectWidth), UINT(lineThickness));
+        vls.push_back(new LAppSprite(gx_l + rectWidth * 0.5f, gy_t - lineThickness * 0.5f, rectWidth, lineThickness, topTexture->id, shader, device));
+        LAppTextureManager::TextureInfo* bottomTexture = textureManager->CreateTextureFromRGBA(1.0, 0.0, 0.0, 1.0, UINT(rectWidth), UINT(lineThickness));
+        vls.push_back(new LAppSprite(gx_l + rectWidth * 0.5f, gy_b + lineThickness * 0.5f, rectWidth, lineThickness, bottomTexture->id, shader, device));
+        LAppTextureManager::TextureInfo* leftTexture = textureManager->CreateTextureFromRGBA(1.0, 0.0, 0.0, 1.0, UINT(lineThickness), UINT(rectHeight));
+        vls.push_back(new LAppSprite(gx_l + lineThickness * 0.5f, gy_b + rectHeight * 0.5f, lineThickness, rectHeight, leftTexture->id, shader, device));
+        LAppTextureManager::TextureInfo* rightTexture = textureManager->CreateTextureFromRGBA(1.0, 0.0, 0.0, 1.0, UINT(lineThickness), UINT(rectHeight));
+        vls.push_back(new LAppSprite(gx_r - lineThickness * 0.5f, gy_b + rectHeight * 0.5f, lineThickness, rectHeight, rightTexture->id, shader, device));
+        lam->hitareas[std::string(drawID->GetString().GetRawString())] = vls;
+    }
+
+    for (int i = 0; i<lcms->GetHitAreasCount();i++)
+    {
+        Su::ShinobuExList& m_sel = uc->cubism_config.hit_areas_motion_map[lcms->GetHitAreaId(i)->GetString().GetRawString()];
+        m_sel.Items[0].clear();m_sel.Items[1].clear();
+        Su::ShinobuExList& cm_sel=lam->hit_areas_motion_map[lcms->GetHitAreaId(i)->GetString().GetRawString()];
+        cm_sel.Items[0].clear(); cm_sel.Items[1].clear();
+        int m_pos = 0;
+        for (int i = 0; i < lam->GetModelSetting()->GetMotionGroupCount(); ++i) {
+            for (int j = 0; j < lcms->GetMotionCount(lam->GetModelSetting()->GetMotionGroupName(i)); ++j) {
+                lam->motion_map[m_pos] = std::pair<int, int>(i, j);
+                m_sel.Items[1].push_back((ImGuiID)m_pos);
+                cm_sel.Items[1].push_back((ImGuiID)m_pos);
+                m_pos++;
+            }
+        }
+        Su::ShinobuExList& e_sel = uc->cubism_config.hit_areas_expression_map[lcms->GetHitAreaId(i)->GetString().GetRawString()];
+        e_sel.Items[0].clear(); e_sel.Items[1].clear();
+        Su::ShinobuExList& ce_sel = lam->hit_areas_expression_map[lcms->GetHitAreaId(i)->GetString().GetRawString()];
+        ce_sel.Items[0].clear(); ce_sel.Items[1].clear();
+        for (int i = 0; i < lam->GetModelSetting()->GetExpressionCount(); ++i) {
+            lam->expression_map[i] = i;
+            e_sel.Items[1].push_back((ImGuiID)i);
+            ce_sel.Items[1].push_back((ImGuiID)i);
+        }
+    }
+    
+    //正片叠底
+    lam->InitMultiplyColor();
+    //屏幕色
+    lam->InitScreenColor();
+    //正片叠底组
+    lam->InitPartMultiplyColor();
+    //屏幕色组
+    lam->InitPartScreenColor();
+
+    ////预期初始化
+    //if (!uc->need_init_cubism) {
+    //    lam->GetModelMatrix()->GetArray()[12] = uc->cubism_config.cubism_cg.cubism_tx_t;
+    //    lam->GetModelMatrix()->GetArray()[13] = uc->cubism_config.cubism_cg.cubism_ty_t;
+    //    lam->GetModelMatrix()->GetArray()[0] = uc->cubism_config.cubism_cg.cubism_ts_x * uc->cubism_config.cubism_cg.cubism_ts_s;
+    //    lam->GetModelMatrix()->GetArray()[5] = uc->cubism_config.cubism_cg.cubism_ts_y * uc->cubism_config.cubism_cg.cubism_ts_s;
+    //    lam->GetModelMatrix()->GetArray()[4] = uc->cubism_config.cubism_cg.cubism_tx_s;
+    //    lam->GetModelMatrix()->GetArray()[1] = uc->cubism_config.cubism_cg.cubism_ty_s;
+    //    lam->GetModelMatrix()->GetArray()[7] = uc->cubism_config.cubism_cg.cubism_tx_p;
+    //    lam->GetModelMatrix()->GetArray()[3] = uc->cubism_config.cubism_cg.cubism_ty_p;
+    //}
+
+    uc->need_init_cubism = false;
+    _models[userid] = lam;
+    Su::UserConfigSave(uc);
+    //----------------------------------------------------------------------------------------INIT结束
     std::cout << u8"Cubism 加载成功：" << modelname.c_str() << std::endl;
     std::cout << u8"用户 ID：" << userid << u8" Cubism Model：" << modelname.c_str() << std::endl;
     RefreshTarget();
 }
 
-void LAppLive2DManager::RefreshSceneAndUserId(Csm::csmUint32 pos)
+void LAppLive2DManager::RefreshSceneAndUserId(int pos)
 {
     if (_modelDir.GetSize() <= 0)
         return;
@@ -433,32 +601,14 @@ void LAppLive2DManager::RefreshSceneAndUserId(Csm::csmUint32 pos)
     if (_models.find(pos) != _models.end()) {
         ReleaseOneModel(pos);
     }
-    else {
+    std::unordered_map<int, LAppModel*> new_models;
+    for (auto it = _models.begin(); it != _models.end(); ++it) {
+        int index = it->first;
+        if (index > pos)index--;
+        new_models[index] = it->second;
     }
-    static std::vector<int>vid;
-    vid.clear();
-    vid.reserve(_models.size());
-    for (auto& pair : _models)
-        vid.push_back(pair.first);
-    std::sort(vid.begin(), vid.end());
-    bool can_pop = false;
-    for (int i = 0; i < vid.size(); ++i) {
-        if (vid[i] > pos) {
-            can_pop = true;
-            _models[vid[i] - 1] = _models[vid[i]];
-            std::cout << u8"Cubism 归置变化 i - 1 : " << vid[i] - 1 << " -> " << vid[i] << std::endl;
-        }
-    }
-    if (can_pop)
-        _models.erase(vid.back());
-
-    std::cout << u8"更新后models" << std::endl;
-    for (auto& pair : _models) {
-        std::cout << pair.first << " " << pair.second->GetModel() << endl;
-    }
-
-
-  
+    _models.clear();
+    _models = new_models;
 }
 Csm::csmVector<Csm::csmString>& LAppLive2DManager::GetModelDir()
 {

@@ -12,26 +12,158 @@
 #include <ICubismModelSetting.hpp>
 #include <Type/csmRectF.hpp>
 #include <Rendering/D3D11/CubismOffscreenSurface_D3D11.hpp>
-
+#include <./Effect/CubismBreath.hpp>
+#include <./Id/CubismId.hpp>
+#include <unordered_map>
+#include <unordered_set>
+#include "../native_src/include/Live2DCubismCore.h"
 #include "LAppWavFileHandler.hpp"
+#include "../global.h"
+#include "./LAppSprite.hpp"
+#include "./LAppTextureManager.hpp"
 
-
+namespace Csc = Live2D::Cubism::Core;
 /**
  * @brief ユーザーが実際に使用するモデルの実装クラス<br>
  *         モデル生成、機能コンポーネント生成、更新処理とレンダリングの呼び出しを行う。
  *
  */
+
+class LookParam{
+public:
+    const Csm::CubismId*    cid;
+    bool                    enable;
+    float                   param;
+    int                     xyzpos;
+    LookParam() :
+        cid(nullptr),
+        enable(false),
+        param(0.0f),
+        xyzpos(0)
+    {}
+};
+
+static const char* XYZAXIS[3] = { "X","Y","Z" };
+static const std::unordered_map<std::string, std::pair<float,int>>PARAM_DEF = {
+    {"ParamAngleX",{30.f,0}},
+    {"PARAM_ANGLE_X",{30.f,0}},
+    {"ParamAngleY",{30.f,1}},
+    {"PARAM_ANGLE_Y",{30.f,1}},
+    {"ParamAngleZ",{1.f,2}},
+    {"PARAM_ANGLE_Z",{1.f,2}},
+    {"ParamBodyAngleX",{10.f,0}},
+    {"PARAM_BODY_ANGLE_X",{10.f,0}},
+    {"ParamEyeBallX",{1.f,0}},
+    {"PARAM_EYE_BALL_X",{1.f,0}},
+    {"ParamEyeBallY",{1.f,1}},
+    {"PARAM_EYE_BALL_Y",{1.f,1}},
+};
+class BreathParam {
+public:
+    float Offset;
+    float Peak;
+    float Cycle;
+    float Weight;
+    BreathParam(float o, float p, float c, float w):
+    Offset(o),
+    Peak(p),
+    Cycle(c),
+    Weight(w)
+    {}
+};
+static const std::unordered_map<std::string, BreathParam>BREATH_DEF = {
+    {"ParamAngleX",BreathParam(0.0f, 15.0f, 6.5345f, 0.5f)},
+    {"PARAM_ANGLE_X",BreathParam(0.0f, 15.0f, 6.5345f, 0.5f)},
+    {"ParamAngleY",BreathParam(0.0f, 8.0f, 3.5345f, 0.5f)},
+    {"PARAM_ANGLE_Y",BreathParam(0.0f, 8.0f, 3.5345f, 0.5f)},
+    {"ParamAngleZ",BreathParam(0.0f, 10.0f, 5.5345f, 0.5f)},
+    {"PARAM_ANGLE_Z",BreathParam(0.0f, 10.0f, 5.5345f, 0.5f)},
+    {"ParamBodyAngleX",BreathParam(0.0f, 4.0f, 15.5345f, 0.5f)},
+    {"PARAM_BODY_ANGLE_X",BreathParam(0.0f, 4.0f, 15.5345f, 0.5f)},
+    {"ParamBreath",BreathParam(0.5f, 0.5f, 3.2345f, 0.5f)},
+    {"PARAM_BREATH",BreathParam(0.5f, 0.5f, 3.2345f, 0.5f)},
+};
+
+static const std::unordered_set<std::string> EYEBLINK_DEF = {
+    {"ParamEyeROpen"},
+    {"ParamEyeLOpen" },
+    {"PARAM_EYE_L_OPEN"},
+    {"PARAM_EYE_R_OPEN"},
+};
+struct CCG {
+    //cubism geometry
+    float cubism_ts_s;
+    float cubism_tx_t;
+    float cubism_ty_t;
+    float cubism_ts_x;
+    float cubism_ts_y;
+    float cubism_tx_s;
+    float cubism_ty_s;
+    float cubism_tx_p;
+    float cubism_ty_p;
+};
+
 class LAppModel : public Csm::CubismUserModel
 {
+private:
+    bool                                            canFlash            = false;
+    float*                                          flashColor[4]       = { nullptr };
+    float                                           flashTime           = 0.0f;
+    float                                           flashing            = false;
+    float                                           rgb_backup[4]       = { 0.0f };
 public:
+    long long                                       hit_num             = 0;
+    std::string                                     hit_name;
+    std::string                                     hit_id;
+    int                                             hit_ui_selected     = -1;
+    int                                             function_selected   = 0;
+    std::unordered_map<int, std::pair<int, int>>    motion_map;
+    std::unordered_map<int, int>                    expression_map;
+    std::string                                     hit_motion_name;
+    std::string                                     hit_expression_name;
+    float                                           multiply_group_color[4] = { 1.0f,1.0f, 1.0f, 1.0f };
+    float                                           screen_group_color[4]   = { 0.0f,0.0f, 0.0f, 1.0f };
+    bool                                            set_all_mp_mark = false;
+    bool                                            set_all_sp_mark = false;
+public:
+    CCG                                                 def_cubism_cg;
+    std::vector<LookParam>                              def_look_target_params;
+    std::vector<Csm::CubismBreath::BreathParameterData> def_breath_params;
+    std::vector<ImGuiID>                                def_blink_list_ids;
 
-    bool canLookMouse = false;
+public:
+    bool                canLookMouse                                = false;    //是否看向
+    bool                canEyeBlink                                 = false;    //是否自动眨眼
+    bool                previewHitareas                             = false;    //预览触发区域
+    bool                animationAutoPlay                           = false;    //启用动画自动播放
+    float               drawable_multiply_color[DEFSIZEK16][4]      = { 0.f };  //正片叠底参数
+    float               drawable_screen_color[DEFSIZEK16][4]        = { 0.f};   //屏幕色参数
+    float               drawable_part_multiply_color[DEFSIZEK16][4] = { 0.f };  //正片叠底组参数
+    float               drawable_part_screen_color[DEFSIZEK16][4]   = { 0.f };  //屏幕色组参数
+    std::unordered_map<std::string, std::vector<LAppSprite*>>       hitareas;   //点击触发预览区域 对应 N * 4 个矩形
+    std::unordered_map<std::string, Su::ShinobuExList>              hit_areas_motion_map;
+    std::unordered_map<std::string, Su::ShinobuExList>              hit_areas_expression_map;
 
-    Csm::ICubismModelSetting* GetModelSetting() const;
+    void InitMultiplyColor();
+    void InitScreenColor();
+    void InitPartMultiplyColor();
+    void InitPartScreenColor();
 
-    Csm::CubismTargetPoint* GetModelDragManager()const;
+    void StartFlashColor(int mark,int index);
+    void UpdateFlashColor();
+    void UpdateAllColor();
 
-
+    Csm::ICubismModelSetting*   GetModelSetting() const;
+    Csm::CubismTargetPoint*     GetModelDragManager()const;
+    float&                      GetLookTargetDamping();                             //看向目标阻尼
+    bool&                       GetCanBreath();                                     //是否呼吸
+    Csm::csmFloat32&            GetBlinkingIntervalSeconds();                       //眨眼的时间间隔
+    Csm::csmFloat32&            GetClosingSeconds();                                //闭眼所需的时间
+    Csm::csmFloat32&            GetClosedSeconds();                                 //完全闭合状态的持续时间
+    Csm::csmFloat32&            GetOpeningSeconds();                                //闭合到完全睁开的过渡时间
+    std::vector<LookParam>&                 GetLookTargetParams();                  //看向参数
+    Csm::csmVector<Csm::CubismIdHandle>&    GetEyeBlinkIds();                       //眨眼参数
+    Csm::csmVector<Csm::CubismBreath::BreathParameterData>& GetBreathParameters();  //呼吸参数
     /**
      * @brief コンストラクタ
      */
@@ -195,24 +327,22 @@ private:
     Csm::ICubismModelSetting* _modelSetting; ///< モデルセッティング情報
     Csm::csmString _modelHomeDir; ///< モデルセッティングが置かれたディレクトリ
     Csm::csmFloat32 _userTimeSeconds; ///< デルタ時間の積算値[秒]
-    Csm::csmVector<Csm::CubismIdHandle> _eyeBlinkIds; ///< モデルに設定されたまばたき機能用パラメータID
     Csm::csmVector<Csm::CubismIdHandle> _lipSyncIds; ///< モデルに設定されたリップシンク機能用パラメータID
+    std::vector<LookParam> _lookTargetParams;
     Csm::csmMap<Csm::csmString, Csm::ACubismMotion*>   _motions; ///< 読み込まれているモーションのリスト
     Csm::csmMap<Csm::csmString, Csm::ACubismMotion*>   _expressions; ///< 読み込まれている表情のリスト
     Csm::csmVector<Csm::csmRectF> _hitArea;
     Csm::csmVector<Csm::csmRectF> _userArea;
-    const Csm::CubismId* _idParamAngleX; ///< パラメータID: ParamAngleX
-    const Csm::CubismId* _idParamAngleY; ///< パラメータID: ParamAngleX
-    const Csm::CubismId* _idParamAngleZ; ///< パラメータID: ParamAngleX
-    const Csm::CubismId* _idParamBodyAngleX; ///< パラメータID: ParamBodyAngleX
-    const Csm::CubismId* _idParamEyeBallX; ///< パラメータID: ParamEyeBallX
-    const Csm::CubismId* _idParamEyeBallY; ///< パラメータID: ParamEyeBallXY
-
+    //delete
+    //const Csm::CubismId* _idParamAngleX; ///< パラメータID: ParamAngleX
+    //const Csm::CubismId* _idParamAngleY; ///< パラメータID: ParamAngleX
+    //const Csm::CubismId* _idParamAngleZ; ///< パラメータID: ParamAngleX
+    //const Csm::CubismId* _idParamBodyAngleX; ///< パラメータID: ParamBodyAngleX
+    //const Csm::CubismId* _idParamEyeBallX; ///< パラメータID: ParamEyeBallX
+    //const Csm::CubismId* _idParamEyeBallY; ///< パラメータID: ParamEyeBallXY
+    Csm::csmVector<Csm::CubismIdHandle> _eyeBlinkIdsDef;
     Csm::csmVector<Csm::csmUint64> _bindTextureId; ///< テクスチャID
-
     LAppWavFileHandler _wavFileHandler; ///< wavファイルハンドラ
-
     bool _deleteModel;  ///< 実体消滅予定フラグ Drawを呼ばない
-
     Csm::Rendering::CubismOffscreenSurface_D3D11 _renderBuffer;   ///< フレームバッファ以外の描画先
 };

@@ -5,11 +5,11 @@
  * that can be found at https://www.live2d.com/eula/live2d-open-software-license-agreement_en.html.
  */
 
-#include "CubismFramework.hpp"
-#include "Utils/CubismDebug.hpp"
-#include "Utils/CubismJson.hpp"
-#include "Id/CubismIdManager.hpp"
-#include "Rendering/CubismRenderer.hpp"
+#include "./CubismFramework.hpp"
+#include "./Utils/CubismDebug.hpp"
+#include "./Utils/CubismJson.hpp"
+#include "./Id/CubismIdManager.hpp"
+#include "./Rendering/CubismRenderer.hpp"
 
 #ifdef CSM_DEBUG_MEMORY_LEAKING
 

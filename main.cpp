@@ -6,91 +6,80 @@
 // - Documentation        https://dearimgui.com/docs (same as your local docs/ folder).
 // - Introduction, links and more at the top of imgui.cpp
 
+#include <d3d11.h>
+#include <tchar.h>
+#include <Windows.h>
+#include <iostream>
+#include <thread>
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
-#include <d3d11.h>
-#include <tchar.h>
-
 #include "shinobuwidget.h"
-#include <Windows.h>
 #include "./cubism_src/LAppDelegate.hpp"
-#include <iostream>
-#include <thread>
 
-// Data
-static ID3D11Device* g_pd3dDevice = nullptr;
-static ID3D11DeviceContext* g_pd3dDeviceContext = nullptr;
-static IDXGISwapChain* g_pSwapChain = nullptr;
-static bool                     g_SwapChainOccluded = false;
-static UINT                     g_ResizeWidth = 0, g_ResizeHeight = 0;
-static ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
+static ID3D11Device*            g_pd3dDevice            = nullptr;
+static ID3D11DeviceContext*     g_pd3dDeviceContext     = nullptr;
+static IDXGISwapChain*          g_pSwapChain            = nullptr;
+static bool                     g_SwapChainOccluded     = false;
+static UINT                     g_ResizeWidth           = 0;
+static UINT                     g_ResizeHeight          = 0;
+static ID3D11RenderTargetView*  g_mainRenderTargetView  = nullptr;
+static bool                     while_done              = false;
 
-bool CreateDeviceD3D(HWND hWnd);
-void CleanupDeviceD3D();
-void CreateRenderTarget();
-void CleanupRenderTarget();
-LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+bool            CreateDeviceD3D(HWND hWnd);
+void            CleanupDeviceD3D();
+void            CreateRenderTarget();
+void            CleanupRenderTarget();
+void            FrontPart();
+void            PosteriorPart();
+void            QuitHandle();
+LRESULT WINAPI  WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+DWORD WINAPI    CubismThread(LPVOID lpParam);
 
-static bool OtherConfigThreadMark = false;
-void FrontPart();
-void PosteriorPart();
-// Shinobu Function
-std::vector<HANDLE>threadVector;
-DWORD WINAPI CubismThread(LPVOID lpParam);
-DWORD WINAPI OtherConfigThread(LPVOID lpParam);
-
-
-// Main code
-int main(int, char**)
-//int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-//                     _In_opt_ HINSTANCE hPrevInstance,
-//                     _In_ LPWSTR    lpCmdLine,
-//                     _In_ int       nCmdShow)
-//int WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int)
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+                     _In_opt_ HINSTANCE hPrevInstance,
+                     _In_ LPWSTR    lpCmdLine,
+                     _In_ int       nCmdShow)
 {
-    //---------------------前部分--------------------
+    //---------------------------------------------------开始的处理
+    // cout 输出重定向
+    std::cout.rdbuf(GlobalTemp::DebugOss.rdbuf());
+    // 初始化时间种子
+    srand((unsigned)time(NULL));
+    //---------------------------------------------------前部分
     FrontPart();
-    //--------------------中间部分---------------------
+    //---------------------------------------------------中间部分
     // 全局初始化
     ::GlobalConfig::getInstance();
-
-    // 初始化配置
+    // 初始化用户配置
     Su::AllConfigInit();
 
-    DWORD cubismThreadId, otherThreadId;
-    threadVector.clear();
-    threadVector.push_back(CreateThread(NULL, 0, CubismThread, NULL, 0, &cubismThreadId));
-    threadVector.push_back(CreateThread(NULL, 0, OtherConfigThread, NULL, 0, &otherThreadId));
+    DWORD cubismThreadId;
+    CreateThread(NULL, 0, CubismThread, NULL, 0, &cubismThreadId);
     std::cout << u8"Cubism 进程ID" << cubismThreadId << std::endl;
-    std::cout << u8"Other 进程ID" << otherThreadId << std::endl;
-
+    // Cubism 运行后可继续
+    while (!GlobalTemp::CubismIsRunning);
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     MSG msg;
-    static bool done = false;
-    std::cout << u8"主循环开始执行" << std::endl;
+    std::cout << u8"全局开始执行" << std::endl;
     do{
+        if (while_done == true)break;
+        //高性能绘制
         if (GlobalConfig::getInstance()->window_main_fast_id==0) {
-            MSG msg;
-            while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
-            {
+            while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE)){
                 ::TranslateMessage(&msg);
                 ::DispatchMessage(&msg);
-                if (msg.message == WM_QUIT) {
-                    done = true;
-                    cout << u8"全局退出消息" << endl;
-                }
+                if (msg.message == WM_QUIT)
+                    QuitHandle();
             }
         }
+        //节能绘制
         else {
             ::TranslateMessage(&msg);
             ::DispatchMessage(&msg);
-            if (msg.message == WM_QUIT) {
-                done = true;
-                cout << u8"全局退出消息" << endl;
-            }
+            if (msg.message == WM_QUIT) 
+                QuitHandle();
         }
-        if (done == true)break;
         // Handle window being minimized or screen locked
         if (g_SwapChainOccluded && g_pSwapChain->Present(0, DXGI_PRESENT_TEST) == DXGI_STATUS_OCCLUDED)
         {
@@ -98,7 +87,6 @@ int main(int, char**)
             continue;
         }
         g_SwapChainOccluded = false;
-
         // Handle window resize (we don't resize directly in the WM_SIZE handler)
         if (g_ResizeWidth != 0 && g_ResizeHeight != 0)
         {
@@ -107,33 +95,27 @@ int main(int, char**)
             g_ResizeWidth = g_ResizeHeight = 0;
             CreateRenderTarget();
         }
-
         // Start the Dear ImGui frame
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
-        //WINDOWS--------------------------------------------------------------------------
-
-        static bool show_demo_window = true;
-        if (show_demo_window)ImGui::ShowDemoWindow(&show_demo_window);
+        //WINDOWS BEGIN--------------------------------------------------------------------------
+        //Demo Window
+        //static bool show_demo_window = true;
+        //if (show_demo_window)ImGui::ShowDemoWindow(&show_demo_window);
         static bool show_shinobu_window = true;
-
-        if (show_shinobu_window == false) {
-            ::GlobalConfig::GlobalConfigSave();
-            done = true;
-        }
         ShowShinobuWindow(&show_shinobu_window);
         ShowShinobuStyleEditor();
         ShowShinobuInteractively();
-
-        //--------------------------------------------------------------------------
-        // Rendering
-        ImGui::Render();
-
+        ShowShinobuErrorWindow();//Error Window
+        ShowShinobuDebugWindow();//Debug Window
+        //WINDOWS END--------------------------------------------------------------------------
+        if (show_shinobu_window == false)QuitHandle();
         //限制帧率
         if (ImGui::GetIO().Framerate > GlobalConfig::getInstance()->window_main_forecastfps)
             std::this_thread::sleep_for(std::chrono::milliseconds(GlobalConfig::getInstance()->window_main_addtimefps));
-
+        // Rendering
+        ImGui::Render();
         static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
         static const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
         g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, nullptr);
@@ -151,50 +133,36 @@ int main(int, char**)
         g_SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
     }while (GlobalConfig::getInstance()->window_main_fast_id==0 ||GetMessage(&msg, NULL, 0, 0));
 
-    //---------------------后部分--------------------------
+    //---------------------------------------------------后部分
     PosteriorPart();
-    
-    LAppDelegate::GetInstance()->AppEnd();
-    OtherConfigThreadMark = true;
+
     std::cout << u8"全局终了" << std::endl;
-
     return 0;
 }
-
-DWORD WINAPI OtherConfigThread(LPVOID lpParam)
-{
-    std::cout << u8"Other 信息更新开始执行" << std::endl;
-
-    while (!OtherConfigThreadMark) {
-
-        static std::string lastMinutes = "";
-        std::string thisMinutes = ::getCurrentMinutes();
-        if (lastMinutes.compare(thisMinutes)!=0) {
-            lastMinutes = thisMinutes;
-            std::cout << u8"更新时间" << std::endl;
-            GlobalTemp::LunarCalendar = Su::GetLunar();
-        }
-        std::this_thread::sleep_for(std::chrono::seconds(1));//过一秒刷新一次
-    }
-    std::cout << u8"更新时间 终了" << std::endl;
-
-    return 0;
+void QuitHandle() {
+    while_done = true;
+    std::cout << u8"全局退出预备" << std::endl;
+    LAppDelegate::GetInstance()->AppEnd();
+    std::cout << u8"Cubism 退出" << std::endl;
+    ::GlobalConfig::GlobalConfigSave();
+    std::cout << u8"退出时自动保存全局配置" << std::endl;
 }
-
-//Cubism Thread
+// Cubism Thread
 DWORD WINAPI CubismThread(LPVOID lpParam)
 {
+    // 初始化Cubism进程
     if (!LAppDelegate::GetInstance()->Initialize()) {
+        //初始Cubism进程失败
         LAppDelegate::GetInstance()->Release();
         LAppDelegate::ReleaseInstance();
     }
     else {
+        // 初始化Cubism模型
         std::vector<Su::UserConfig>& vu = Su::UserConfig::getUserVector();
-        for (int i = 0; i < vu.size(); ++i) 
+        for (int i = 0; i < int(vu.size()); ++i) 
             if (vu[i].enable_cubism) 
                 GlobalTemp::CubismModelMessage.push(std::make_pair(vu[i].user_id, vu[i].cubism_config.model_dir));
-
-        cout << u8"Cubism 开始执行" << endl;
+        std::cout << u8"Cubism 开始执行" << std::endl;
         GlobalTemp::CubismIsRunning = true;
         LAppDelegate::GetInstance()->Run();
     }
@@ -202,13 +170,12 @@ DWORD WINAPI CubismThread(LPVOID lpParam)
     return 0;
 }
 void FrontPart() {
-    //全局UTF-8
+    // 全局UTF-8
     SetConsoleOutputCP(CP_UTF8);
-    //调用这个函数解决字体发虚的问题
+    // 调用这个函数解决字体发虚的问题
     ImGui_ImplWin32_EnableDpiAwareness();
-    // DPI 感知启用
-    SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-
+    // DPI 感知启用,防止Cubism界面模糊
+    SetProcessDPIAware();
 
     WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"Shinobu Example", nullptr };
     ::RegisterClassExW(&wc);
@@ -236,7 +203,6 @@ void FrontPart() {
     io.ConfigViewportsNoTaskBarIcon = true;
     io.ConfigDockingTransparentPayload = true;                // 停靠时透明
 
-    // 这一段是默认这样做的
     ImGuiStyle& style = ImGui::GetStyle();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
@@ -302,10 +268,12 @@ void CleanupDeviceD3D()
 
 void CreateRenderTarget()
 {
-    ID3D11Texture2D* pBackBuffer;
+    ID3D11Texture2D* pBackBuffer = nullptr;
     g_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
-    g_pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &g_mainRenderTargetView);
-    pBackBuffer->Release();
+    if (pBackBuffer != nullptr) {
+        g_pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &g_mainRenderTargetView);
+        pBackBuffer->Release();
+    }
 }
 
 void CleanupRenderTarget()
@@ -348,8 +316,6 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_DPICHANGED:
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DpiEnableScaleViewports)
         {
-            //const int dpi = HIWORD(wParam);
-            //printf("WM_DPICHANGED to %d (%.0f%%)\n", dpi, (float)dpi / 96.0f * 100.0f);
             const RECT* suggested_rect = (RECT*)lParam;
             ::SetWindowPos(hWnd, nullptr, suggested_rect->left, suggested_rect->top, suggested_rect->right - suggested_rect->left, suggested_rect->bottom - suggested_rect->top, SWP_NOZORDER | SWP_NOACTIVATE);
         }

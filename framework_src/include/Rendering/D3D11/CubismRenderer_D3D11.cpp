@@ -586,7 +586,7 @@ void CubismRenderer_D3D11::DoDrawModel()
         const csmInt32 order = renderOrder[i];
         _sortedDrawableIndexList[order] = i;
     }
-
+    
     // 描画
     for (csmInt32 i = 0; i < drawableCount; ++i)
     {
@@ -664,7 +664,6 @@ void CubismRenderer_D3D11::DoDrawModel()
 
         DrawMeshDX11(*GetModel(), drawableIndex);
     }
-
     // ダブルバッファ・トリプルバッファを回す
     PostDraw();
 }
@@ -779,6 +778,7 @@ void CubismRenderer_D3D11::ExecuteDrawForDraw(const CubismModel& model, const cs
 
     // 描画
     DrawDrawableIndexed(model, index);
+
 }
 
 void CubismRenderer_D3D11::DrawDrawableIndexed(const CubismModel& model, const csmInt32 index)

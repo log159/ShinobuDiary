@@ -12,6 +12,7 @@
 #include "LAppTextureManager.hpp"
 #include "LAppSpriteShader.hpp"
 #include "Rendering/D3D11/CubismType_D3D11.hpp"
+#include <cmath>
 
 using namespace LAppDefine;
 using namespace DirectX;
@@ -28,6 +29,7 @@ LAppSprite::LAppSprite()
 
 LAppSprite::LAppSprite(float x, float y, float width, float height, Csm::csmUint64 textureId, LAppSpriteShader* shader, ID3D11Device* device)
     : _rect(),
+    _rect_def(),
     _vertexBuffer(NULL),
     _indexBuffer(NULL),
     _constantBuffer(NULL),
@@ -39,6 +41,7 @@ LAppSprite::LAppSprite(float x, float y, float width, float height, Csm::csmUint
     _rect.right = (x + width * 0.5f);
     _rect.up = (y + height * 0.5f);
     _rect.down = (y - height * 0.5f);
+    _rect_def = _rect;
     _textureId = textureId;
 
     if (!device)
@@ -219,6 +222,7 @@ void LAppSprite::RenderImmidiate(int width, int height, ID3D11ShaderResourceView
     }
 }
 
+
 bool LAppSprite::IsHit(float pointX, float pointY, int clientWidth, int clientHeight) const
 {
     if(clientWidth==0 || clientHeight==0)
@@ -242,6 +246,28 @@ void LAppSprite::ResetRect(float x, float y, float width, float height)
     _rect.right = (x + width * 0.5f);
     _rect.up = (y + height * 0.5f);
     _rect.down = (y - height * 0.5f);
+
+    if (_rect.left > _rect.right)
+        std::swap(_rect.left,_rect.right);
+    if(_rect.down > _rect.up)
+        std::swap(_rect.up, _rect.down);
+    if (_rect.right - _rect.left < 3.f) 
+        _rect.right = _rect.left + 3.f;
+    if (_rect.up - _rect.down < 3.f) 
+        _rect.down= _rect.up - 3.f;
+
+}
+void LAppSprite::ResetOffsetRect(float ox, float oy, float ow, float oh)
+{
+    float dx = (_rect_def.left + _rect_def.right) * 0.5f;
+    float dy = (_rect_def.up + _rect_def.down) * 0.5f;
+    float dw = _rect_def.right - _rect_def.left;
+    float dh = _rect_def.up - _rect_def.down;
+    float cdx = LAppDefine::RenderTargetWidth * 0.5f;
+    float cdy = LAppDefine::RenderTargetHeight * 0.5f;
+    float dox = dx - cdx;
+    float doy = dy - cdy;
+    ResetRect(cdx + ox + dox * ow, cdy + oy + doy * oh, dw * ow, dh * oh);
 }
 
 void LAppSprite::SetColor(float r, float g, float b, float a)

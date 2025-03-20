@@ -2,11 +2,17 @@
 #include <iostream>
 #include <vector>
 #include <map>
-
+#include <unordered_map>
 #include "filesetting.h"
 #include "translator.h"
 #include "imgui.h"
 #include "sufunction.h"
+#include "cubism_src/LAppModel.hpp"
+
+#define POS_0 uint32_t(0x1)
+#define POS_1 uint32_t(0x2)
+#define POS_2 uint32_t(0x4)
+#define POS_3 uint32_t(0x8)
 
 using std::cout;
 using std::endl;
@@ -22,39 +28,36 @@ namespace Su{
     class STTConfig;
     class MTConfig;
     class UserConfig;
+    class CubismConfig;
+    struct  Su::ShinobuExList;
     enum LLM { CHATGPT, SPARKDESK, DEEPSEEK };
     enum TTS { VITS_SIMPLE_API, GPT_SOVITS, MYSELF_VITS };
     enum STT { BAIDUZHINENGYUN };
     enum MT { BAIDUFANYI };
 
-
     class CubismConfig {
     public:
-        std::string model_dir;
-    };
-
-    struct CCG {
-        //cubism
-        float cubism_ts_s;
-        float cubism_tx_t;
-        float cubism_ty_t;
-        float cubism_ts_x;
-        float cubism_ts_y;
-        float cubism_tx_s;
-        float cubism_ty_s;
-        float cubism_tx_p;
-        float cubism_ty_p;
+        std::string                                             model_dir;
+        CCG                                                     cubism_cg;
+        //New Member
+        bool                                                    enable_look_mouse;      //true
+        float                                                   damping;                //0.15
+        bool                                                    enable_breath;          //true
+        bool                                                    enable_blink;           //true
+        bool                                                    enable_anim_autoplay;   //false
+        std::vector<LookParam>                                  look_target_params;
+        std::vector<Csm::CubismBreath::BreathParameterData>     breath_params;
+        Su::ShinobuExList                                       blink_sel_list;
+        std::unordered_map<std::string,Su::ShinobuExList>       hit_areas_motion_map;
+        std::unordered_map<std::string,Su::ShinobuExList>       hit_areas_expression_map;
     };
 
     class UserConfig {
     public:
-        //temp
-        bool                         exist      = true; //存在标识
-        //normal
+        //temp 直接初始化参数以区分
+        bool                         need_init_cubism = false;
+        //normal 构造中初始化
         int                          user_id;           //文件标识
-        std::string                  user_name;         //
-        std::string                  user_explain;      //
-        std::string                  user_template;     //
         bool                         enable_widget;     //交互面板  [0]
         bool                         enable_cubism;     //虚拟形象  [1]
         bool                         enable_template;   //设定角色  [2]
@@ -62,7 +65,6 @@ namespace Su{
         bool                         enable_mt;         //MT        [4]
         bool                         enable_original;   //原文本对比[5]
         bool                         enable_stt;        //STT       [6]
-
         Su::LLM                      select_llm;
         Su::TTS                      select_tts;
         Su::STT                      select_stt;
@@ -73,12 +75,6 @@ namespace Su{
         int                          gpt_sovits_target_language_id;
         std::string                  myself_vits;
         CubismConfig                 cubism_config;
-
-        CCG cubism_cg;
-        CCG def_cubism_cg;
-
-
-        //change
         std::vector<LLMConfig>       llms;
         std::vector<TTSConfig>       ttss;
         std::vector<STTConfig>       stts;
@@ -89,8 +85,12 @@ namespace Su{
         UserConfig(const UserConfig& uc);
 
         static std::vector<Su::UserConfig>& getUserVector() {
-            static std::vector<Su::UserConfig>v;
-            return v;
+            static std::vector<Su::UserConfig>* v = nullptr;
+            static std::once_flag flag;
+            std::call_once(flag, []() {
+                v = new std::vector<Su::UserConfig>();
+            });
+            return *v;
         }
         Su::LLMConfig* getLLMConfig(Su::LLM llm);
         Su::TTSConfig* getTTSConfig(Su::TTS tts);

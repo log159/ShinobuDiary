@@ -20917,6 +20917,7 @@ void ImGui::DebugFlashStyleColor(ImGuiCol idx)
     g.DebugFlashStyleColorTime = 0.5f;
     g.DebugFlashStyleColorIdx = idx;
     g.DebugFlashStyleColorBackup = g.Style.Colors[idx];
+
 }
 
 void ImGui::UpdateDebugToolFlashStyleColor()

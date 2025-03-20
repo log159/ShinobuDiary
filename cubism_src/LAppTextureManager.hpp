@@ -77,7 +77,7 @@ public:
      * @return 画像情報。読み込み失敗時はNULLを返す
      */
     TextureInfo* CreateTextureFromPngFile(std::string fileName, bool isPreMult, UINT maxSize = 0);
-
+    LAppTextureManager::TextureInfo* CreateTextureFromRGBA(float r, float g, float b, float a, UINT width, UINT height);
     /**
     * @brief 画像の解放
     *

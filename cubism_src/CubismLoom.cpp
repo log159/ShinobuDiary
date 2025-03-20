@@ -10,7 +10,6 @@ void CubismLoom::addMessageList(const char* gm, const char* hm, const char* pm)
 	cm.parameter = std::string(pm);
 	messageList.push_back(cm);
 
-	//然后处理完毕
 	while (!messageList.empty()) {
 		handleMessageUpdate();
 	}

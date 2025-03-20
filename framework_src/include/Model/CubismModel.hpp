@@ -119,6 +119,12 @@ public:
         Rendering::CubismRenderer::CubismTextureColor Color;        ///< Color
     };
 
+
+    Csm::csmVector<Csm::CubismModel::PartColorData>& GetPartScreenColorsRef();
+
+    Csm::csmVector<Csm::CubismModel::PartColorData>& GetPartMultiplyColorsRef();
+
+
     /**
      * Calculates and updates the model state based on the set parameters.
      */
@@ -646,6 +652,8 @@ public:
      */
     void SetMultiplyColor(csmInt32 drawableIndex, csmFloat32 r, csmFloat32 g, csmFloat32 b, csmFloat32 a = 1.0f);
 
+    Csm::csmVector<Csm::CubismModel::DrawableColorData>& GetMultiplyColorRef();
+
     /**
      * Sets the screen color of the drawable.
      *
@@ -665,6 +673,8 @@ public:
      */
     void SetScreenColor(csmInt32 drawableIndex, csmFloat32 r, csmFloat32 g, csmFloat32 b, csmFloat32 a = 1.0f);
 
+
+    Csm::csmVector<Csm::CubismModel::DrawableColorData>& GetScreenColorRef();
     /**
      * Returns the multiply color of the part.
      */
@@ -702,12 +712,17 @@ public:
      */
     csmBool GetOverwriteFlagForModelMultiplyColors() const;
 
+    csmBool& GetOverwriteFlagForModelMultiplyColorsRef();
+
     /**
      * Returns the flag indicating whether the color set at runtime is used as the screen color for the entire model during rendering.
      *
      * @return true if the color set at runtime is used; otherwise false.
      */
     csmBool GetOverwriteFlagForModelScreenColors() const;
+
+    csmBool& GetOverwriteFlagForModelScreenColorsRef();
+
 
     /**
      * Sets the flag indicating whether the color set at runtime is used as the multiply color for the entire model during rendering.
@@ -804,6 +819,8 @@ public:
      */
     csmBool GetOverwriteFlagForModelCullings() const;
 
+    csmBool& GetOverwriteFlagForModelCullingsRef();
+
     /**
      * Sets whether the culling settings for the entire model are overridden by the SDK.
      * Use true to use the culling settings from the SDK, or false to use the culling settings from the model.
@@ -838,6 +855,8 @@ public:
     void SetModelOpacity(csmFloat32 value);
 
     Core::csmModel*     GetModel() const;
+
+
 
 private:
     CubismModel(Core::csmModel* model);

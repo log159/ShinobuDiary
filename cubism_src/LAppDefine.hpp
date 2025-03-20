@@ -40,8 +40,8 @@ namespace LAppDefine {
 
     // モデル定義--------------------------------------------
                                                     // 外部定義ファイル(json)と合わせる
-    extern const csmChar* MotionGroupIdle;          ///< アイドリング時に再生するモーションのリスト
-    extern const csmChar* MotionGroupTapBody;       ///< 体をタップした時に再生するモーションのリスト
+    //extern const csmChar* MotionGroupIdle;          ///< アイドリング時に再生するモーションのリスト
+    //extern const csmChar* MotionGroupTapBody;       ///< 体をタップした時に再生するモーションのリスト
 
                                                     // 外部定義ファイル(json)と合わせる
     extern const csmChar* HitAreaNameHead;          ///< 当たり判定の[Head]タグ

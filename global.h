@@ -7,26 +7,25 @@
 #include "imgui.h"
 #include "sufunction.h"
 #define STYLEWAY "./Saves/style.data"
-#define POS_0 uint32_t(0x1)
-#define POS_1 uint32_t(0x2)
-#define POS_2 uint32_t(0x4)
-#define POS_3 uint32_t(0x8)
 
 class FileSetting;
 
 class GlobalTemp {
 public:
+    static std::ostringstream                       DebugOss;
     static bool                                     ShowStyleEditor;
     static int                                      CubismFrameCount;
     static HWND                                     WindowMainHandle;
     static WNDCLASSEXW                              WindowMainWc;
-    static std::string                              LunarCalendar;
     static bool                                     RefreshTable;
     static bool                                     RefreshCubism;
     static const LPCWSTR                            CubismDirectXClassName;
     static const LPCWSTR                            CubismWindowClassName;
     static std::queue<std::pair<int, std::string>>  CubismModelMessage;
-    static std::pair<bool,unsigned int>             CubismModelRefreshPos;
+    static std::queue<std::pair<int, std::pair<int, int>>>  CubismMotionMessage;
+    static std::queue<std::pair<int, int>>                  CubismExpressionMessage;
+
+
     static bool                                     CubismIsRunning;
     static bool                                     TableBools[DEFSIZE][DEFSIZEK16];
     static float                                    GuiButtonWidth;
@@ -73,17 +72,7 @@ enum FREEMARK {
     CUBISM_CG_CUBISM_TX_S,
     CUBISM_CG_CUBISM_TY_S,
     CUBISM_CG_CUBISM_TX_P,
-    CUBISM_CG_CUBISM_TY_P,
-
-    DEF_CUBISM_CG_CUBISM_TS_S,
-    DEF_CUBISM_CG_CUBISM_TX_T,
-    DEF_CUBISM_CG_CUBISM_TY_T,
-    DEF_CUBISM_CG_CUBISM_TS_X,
-    DEF_CUBISM_CG_CUBISM_TS_Y,
-    DEF_CUBISM_CG_CUBISM_TX_S,
-    DEF_CUBISM_CG_CUBISM_TY_S,
-    DEF_CUBISM_CG_CUBISM_TX_P,
-    DEF_CUBISM_CG_CUBISM_TY_P
+    CUBISM_CG_CUBISM_TY_P
 };
 static std::map<FREEMARK, const char*>inifreemark_map = {
     {FREEMARK::LANGUAGESEL_ID,                      "languagesel_id"},
@@ -125,17 +114,7 @@ static std::map<FREEMARK, const char*>inifreemark_map = {
     {FREEMARK::CUBISM_CG_CUBISM_TX_S,               "cubism_cg_cubism_tx_s"},
     {FREEMARK::CUBISM_CG_CUBISM_TY_S,               "cubism_cg_cubism_ty_s"},
     {FREEMARK::CUBISM_CG_CUBISM_TX_P,               "cubism_cg_cubism_tx_p"},
-    {FREEMARK::CUBISM_CG_CUBISM_TY_P,               "cubism_cg_cubism_ty_p"},
-
-    {FREEMARK::DEF_CUBISM_CG_CUBISM_TS_S,           "def_cubism_cg_cubism_ts_s"},
-    {FREEMARK::DEF_CUBISM_CG_CUBISM_TX_T,           "def_cubism_cg_cubism_tx_t"},
-    {FREEMARK::DEF_CUBISM_CG_CUBISM_TY_T,           "def_cubism_cg_cubism_ty_t"},
-    {FREEMARK::DEF_CUBISM_CG_CUBISM_TS_X,           "def_cubism_cg_cubism_ts_x"},
-    {FREEMARK::DEF_CUBISM_CG_CUBISM_TS_Y,           "def_cubism_cg_cubism_ts_y"},
-    {FREEMARK::DEF_CUBISM_CG_CUBISM_TX_S,           "def_cubism_cg_cubism_tx_s"},
-    {FREEMARK::DEF_CUBISM_CG_CUBISM_TY_S,           "def_cubism_cg_cubism_ty_s"},
-    {FREEMARK::DEF_CUBISM_CG_CUBISM_TX_P,           "def_cubism_cg_cubism_tx_p"},
-    {FREEMARK::DEF_CUBISM_CG_CUBISM_TY_P,           "def_cubism_cg_cubism_ty_p"}
+    {FREEMARK::CUBISM_CG_CUBISM_TY_P,               "cubism_cg_cubism_ty_p"}
     
 };
 enum INIMARK { KEY, APPID, SECRET, BASEURL, ADDRESS, PORT };
@@ -186,8 +165,6 @@ private:
     GlobalConfig() {
         //FileSetting 
         FileSetting::RefreshRead();
-        //GlobalConfigTemp
-        GlobalTemp::LunarCalendar = Su::GetLunar();
         //GlobalConfig
         GlobalConfigInit(this);
     }

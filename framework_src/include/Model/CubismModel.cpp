@@ -710,6 +710,11 @@ void CubismModel::SetMultiplyColor(csmInt32 drawableIndex, csmFloat32 r, csmFloa
     _userMultiplyColors[drawableIndex].Color.A = a;
 }
 
+Csm::csmVector<Csm::CubismModel::DrawableColorData>& CubismModel::GetMultiplyColorRef()
+{
+    return _userMultiplyColors;
+}
+
 void CubismModel::SetScreenColor(csmInt32 drawableIndex, const Rendering::CubismRenderer::CubismTextureColor& color)
 {
     SetScreenColor(drawableIndex, color.R, color.G, color.B, color.A);
@@ -721,6 +726,11 @@ void CubismModel::SetScreenColor(csmInt32 drawableIndex, csmFloat32 r, csmFloat3
     _userScreenColors[drawableIndex].Color.G = g;
     _userScreenColors[drawableIndex].Color.B = b;
     _userScreenColors[drawableIndex].Color.A = a;
+}
+
+Csm::csmVector<Csm::CubismModel::DrawableColorData>& CubismModel::GetScreenColorRef()
+{
+    return _userScreenColors;
 }
 
 Rendering::CubismRenderer::CubismTextureColor CubismModel::GetPartMultiplyColor(csmInt32 partIndex) const
@@ -782,7 +792,17 @@ csmBool CubismModel::GetOverwriteFlagForModelMultiplyColors() const
     return _isOverwrittenModelMultiplyColors;
 }
 
+csmBool& CubismModel::GetOverwriteFlagForModelMultiplyColorsRef()
+{
+    return _isOverwrittenModelMultiplyColors;
+}
+
 csmBool CubismModel::GetOverwriteFlagForModelScreenColors() const
+{
+    return _isOverwrittenModelScreenColors;
+}
+
+csmBool& CubismModel::GetOverwriteFlagForModelScreenColorsRef()
 {
     return _isOverwrittenModelScreenColors;
 }
@@ -882,6 +902,11 @@ csmBool CubismModel::GetOverwriteFlagForModelCullings() const
     return _isOverwrittenCullings;
 }
 
+csmBool& CubismModel::GetOverwriteFlagForModelCullingsRef()
+{
+    return _isOverwrittenCullings;
+}
+
 void CubismModel::SetOverwriteFlagForModelCullings(csmBool value)
 {
     _isOverwrittenCullings = value;
@@ -910,6 +935,16 @@ void CubismModel::SetModelOpacity(csmFloat32 value)
 Core::csmModel* CubismModel::GetModel() const
 {
     return _model;
+}
+
+Csm::csmVector<Csm::CubismModel::PartColorData>& CubismModel::GetPartScreenColorsRef()
+{
+    return _userPartScreenColors;
+}
+
+Csm::csmVector<Csm::CubismModel::PartColorData>& CubismModel::GetPartMultiplyColorsRef()
+{
+    return _userPartMultiplyColors;
 }
 
 csmBool CubismModel::IsUsingMasking() const

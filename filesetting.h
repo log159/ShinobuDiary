@@ -13,6 +13,8 @@ using std::endl;
 #define INITDOUBLE 0.0
 #define INITBOOL false
 #define INITFILE "./Saves/userconfig.ini"
+#define ZEROFLOAT (float(1e-6))
+#define ZERODOUBLE (double(1e-15))
 
 class FileSetting {
 public:
@@ -23,7 +25,6 @@ public:
     static void BeginSave(CSimpleIniA& ini);
     static void EndSave(CSimpleIniA& ini);
     static void RefreshRead();
-
 
     static void SetValue(int id,const char* s, const char* k,const char* wn);
     static std::string GetValue(int id, const char* s, const char* k, const char* n);
@@ -38,7 +39,7 @@ public:
 private:
     FileSetting();
     ~FileSetting();
-    FileSetting(const FileSetting& single) = delete;
-    const FileSetting& operator=(const FileSetting& single) = delete;
+    FileSetting(const FileSetting& single);
+    const FileSetting& operator=(const FileSetting& single);
   
 };

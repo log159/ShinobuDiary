@@ -122,13 +122,10 @@ void CubismWindowStyle::Update(HWND hwnd)
     POINT Mouse_X_Y;	//存放鼠标坐标结构体
     //获取鼠标坐标
     if (FALSE == GetCursorPos(&Mouse_X_Y)) {
-        //printf("error：无法获取鼠标指针位于屏幕的坐标值");
     }
     else {
-        //printf("鼠标的X坐标：%d,鼠标的Y坐标：%d\n", Mouse_X_Y.x, Mouse_X_Y.y);
         BYTE r, g, b, a;
         CubismWindowStyle::GetPixelRGBA(hwnd, Mouse_X_Y.x, Mouse_X_Y.y, r, g, b, a);
-        //printf("%d %d %d %d\n", r, g, b, a);
         if (r == 0 && g == 0 && b == 0 && a == 0)CubismWindowStyle::canTrans = true;
         else CubismWindowStyle::canTrans = false;
     }

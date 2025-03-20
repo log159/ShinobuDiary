@@ -20,6 +20,7 @@
 #include "LAppPal.hpp"
 #include "LAppTextureManager.hpp"
 #include "LAppDelegate.hpp"
+#include "../sufunction.h"
 
 using namespace Live2D::Cubism::Framework;
 using namespace Live2D::Cubism::Framework::DefaultParameterId;
@@ -47,6 +48,136 @@ namespace {
 
 
 
+void LAppModel::InitMultiplyColor()
+{
+    for (int i = 0; i < int(this->GetModel()->GetDrawableCount()); i++)
+    {
+        this->drawable_multiply_color[i][0] = this->GetModel()->GetDrawableMultiplyColor(i).X;
+        this->drawable_multiply_color[i][1] = this->GetModel()->GetDrawableMultiplyColor(i).Y;
+        this->drawable_multiply_color[i][2] = this->GetModel()->GetDrawableMultiplyColor(i).Z;
+        this->drawable_multiply_color[i][3] = this->GetModel()->GetDrawableMultiplyColor(i).W;
+    }
+}
+
+void LAppModel::InitScreenColor()
+{
+    for (int i = 0; i < int(this->GetModel()->GetDrawableCount()); i++)
+    {
+        this->drawable_screen_color[i][0] = this->GetModel()->GetDrawableScreenColor(i).X;
+        this->drawable_screen_color[i][1] = this->GetModel()->GetDrawableScreenColor(i).Y;
+        this->drawable_screen_color[i][2] = this->GetModel()->GetDrawableScreenColor(i).Z;
+        this->drawable_screen_color[i][3] = this->GetModel()->GetDrawableScreenColor(i).W;
+    }
+}
+
+void LAppModel::InitPartMultiplyColor()
+{
+    for (int i = 0; i < this->GetModel()->GetPartCount(); i++)
+    {
+        this->drawable_part_multiply_color[i][0] = 1.0;
+        this->drawable_part_multiply_color[i][1] = 1.0;
+        this->drawable_part_multiply_color[i][2] = 1.0;
+        this->drawable_part_multiply_color[i][3] = 1.0;
+    }
+}
+
+void LAppModel::InitPartScreenColor()
+{
+    for (int i = 0; i < this->GetModel()->GetPartCount(); i++)
+    {
+        this->drawable_part_screen_color[i][0] = 0.0;
+        this->drawable_part_screen_color[i][1] = 0.0;
+        this->drawable_part_screen_color[i][2] = 0.0;
+        this->drawable_part_screen_color[i][3] = 1.0;
+    }
+}
+
+void LAppModel::StartFlashColor(int mark, int index) {
+    if (index <= -1)
+        return;
+    if (flashColor[0] != nullptr && flashColor[1] != nullptr && flashColor[2] != nullptr && flashColor[3] != nullptr ) {
+        *flashColor[0] = rgb_backup[0];
+        *flashColor[1] = rgb_backup[1];
+        *flashColor[2] = rgb_backup[2];
+        *flashColor[3] = rgb_backup[3];
+    }
+    float* tmpf = { nullptr };
+    if (mark == 0)tmpf = drawable_multiply_color[index];
+    else if (mark == 1)tmpf = drawable_screen_color[index];
+    else if (mark == 2)tmpf = drawable_part_multiply_color[index];
+    else if (mark == 3)tmpf = drawable_part_screen_color[index];
+    else return;
+    if (tmpf == nullptr)return;
+    flashColor[0] = &(tmpf[0]);
+    flashColor[1] = &(tmpf[1]);
+    flashColor[2] = &(tmpf[2]);
+    flashColor[3] = &(tmpf[3]);
+    rgb_backup[0] = *(&tmpf[0]);
+    rgb_backup[1] = *(&tmpf[1]);
+    rgb_backup[2] = *(&tmpf[2]);
+    rgb_backup[3] = *(&tmpf[3]);
+    std::cout << "Save Color: " << rgb_backup[0] << " " << rgb_backup[1] << " " << rgb_backup[2] << std::endl;
+    canFlash = true;
+}
+
+void LAppModel::UpdateFlashColor()
+{
+    if (canFlash) {
+        canFlash = false;
+
+        flashTime = 1.0f;
+        flashing = true;
+    }
+    if (flashing) {
+        if (flashTime <= 0.0f) {
+            flashTime = 0.0f;
+            flashing = false;
+            return;
+        }
+        Su::ColorConvertHSVtoRGB(cosf(flashTime * 6.0f) * 0.5f + 0.5f, 0.5f, 0.5f, *flashColor[0], *flashColor[1], *flashColor[2]);
+        *flashColor[3] = 1.0f;
+        if ((flashTime -= (1.f/float(GlobalTemp::CubismFrameCount)) ) <= 0.0f) {
+            std::cout << "Goback Color: " << rgb_backup[0] << " " << rgb_backup[1] << " " << rgb_backup[2] << std::endl;
+            *flashColor[0] = rgb_backup[0];
+            *flashColor[1] = rgb_backup[1];
+            *flashColor[2] = rgb_backup[2];
+            *flashColor[3] = rgb_backup[3];
+        }
+    }
+}
+
+void LAppModel::UpdateAllColor()
+{
+    UpdateFlashColor();
+    for (int i = 0; i < this->GetModel()->GetDrawableCount(); ++i) {
+        this->GetModel()->GetMultiplyColorRef()[i].Color.R = this->drawable_multiply_color[i][0];
+        this->GetModel()->GetMultiplyColorRef()[i].Color.G = this->drawable_multiply_color[i][1];
+        this->GetModel()->GetMultiplyColorRef()[i].Color.B = this->drawable_multiply_color[i][2];
+        this->GetModel()->GetMultiplyColorRef()[i].Color.A = this->drawable_multiply_color[i][3];
+
+        this->GetModel()->GetScreenColorRef()[i].Color.R = this->drawable_screen_color[i][0];
+        this->GetModel()->GetScreenColorRef()[i].Color.G = this->drawable_screen_color[i][1];
+        this->GetModel()->GetScreenColorRef()[i].Color.B = this->drawable_screen_color[i][2];
+        this->GetModel()->GetScreenColorRef()[i].Color.A = this->drawable_screen_color[i][3];
+    }
+
+    for (int i = 0; i < this->GetModel()->GetPartCount(); i++)
+    {
+        float pm_r = this->drawable_part_multiply_color[i][0];
+        float pm_g = this->drawable_part_multiply_color[i][1];
+        float pm_b = this->drawable_part_multiply_color[i][2];
+        float pm_a = this->drawable_part_multiply_color[i][3];
+        this->GetModel()->SetPartMultiplyColor(i, pm_r, pm_g, pm_b, pm_a);
+        
+        float ps_r = this->drawable_part_screen_color[i][0];
+        float ps_g = this->drawable_part_screen_color[i][1];
+        float ps_b = this->drawable_part_screen_color[i][2];
+        float ps_a = this->drawable_part_screen_color[i][3];
+        this->GetModel()->SetPartScreenColor(i, ps_r, ps_g, ps_b, ps_a);
+    }
+
+}
+
 Csm::ICubismModelSetting* LAppModel::GetModelSetting()const
 {
     return _modelSetting;
@@ -55,6 +186,51 @@ Csm::ICubismModelSetting* LAppModel::GetModelSetting()const
 Csm::CubismTargetPoint* LAppModel::GetModelDragManager() const
 {
     return _dragManager;
+}
+
+float& LAppModel::GetLookTargetDamping()
+{
+    return _dragManager->TimeToMaxSpeed;
+}
+
+std::vector<LookParam>& LAppModel::GetLookTargetParams()
+{
+    return _lookTargetParams;
+}
+
+Csm::csmVector<Csm::CubismBreath::BreathParameterData>& LAppModel::GetBreathParameters()
+{
+    return _breath->GetParameters();
+}
+
+Csm::csmVector<Csm::CubismIdHandle>& LAppModel::GetEyeBlinkIds()
+{
+    return _eyeBlink->GetParameterIds();
+}
+
+Csm::csmFloat32& LAppModel::GetBlinkingIntervalSeconds()
+{
+    return _eyeBlink->GetBlinkingIntervalSeconds();
+}
+
+Csm::csmFloat32& LAppModel::GetClosingSeconds()
+{
+    return _eyeBlink->GetClosingSeconds();
+}
+
+Csm::csmFloat32& LAppModel::GetClosedSeconds()
+{
+    return _eyeBlink->GetClosedSeconds();
+}
+
+Csm::csmFloat32& LAppModel::GetOpeningSeconds()
+{
+    return _eyeBlink->GetOpeningSeconds();
+}
+
+bool& LAppModel::GetCanBreath()
+{
+    return _breath->canBreath;
 }
 
 LAppModel::LAppModel()
@@ -72,13 +248,15 @@ LAppModel::LAppModel()
     {
         _debugMode = true;
     }
+    //delete
+    //_idParamAngleX = CubismFramework::GetIdManager()->GetId(ParamAngleX);
+    //_idParamAngleY = CubismFramework::GetIdManager()->GetId(ParamAngleY);
+    //_idParamAngleZ = CubismFramework::GetIdManager()->GetId(ParamAngleZ);
+    //_idParamBodyAngleX = CubismFramework::GetIdManager()->GetId(ParamBodyAngleX);
 
-    _idParamAngleX = CubismFramework::GetIdManager()->GetId(ParamAngleX);
-    _idParamAngleY = CubismFramework::GetIdManager()->GetId(ParamAngleY);
-    _idParamAngleZ = CubismFramework::GetIdManager()->GetId(ParamAngleZ);
-    _idParamBodyAngleX = CubismFramework::GetIdManager()->GetId(ParamBodyAngleX);
-    _idParamEyeBallX = CubismFramework::GetIdManager()->GetId(ParamEyeBallX);
-    _idParamEyeBallY = CubismFramework::GetIdManager()->GetId(ParamEyeBallY);
+    //_idParamEyeBallX = CubismFramework::GetIdManager()->GetId(ParamEyeBallX);
+    //_idParamEyeBallY = CubismFramework::GetIdManager()->GetId(ParamEyeBallY);
+
 }
 
 LAppModel::~LAppModel()
@@ -102,6 +280,15 @@ LAppModel::~LAppModel()
     _bindTextureId.Clear();
 
     delete _modelSetting;
+    LAppTextureManager* textureManager = LAppDelegate::GetInstance()->GetTextureManager();
+    for (auto& val : hitareas) {
+        for (auto& las : val.second) {
+            if (las == nullptr)continue;
+            if (las) textureManager->ReleaseTexture(las->GetTextureId());
+            delete las;
+            las = NULL;
+        }
+    }
 }
 
 void LAppModel::LoadAssets(const csmChar* dir, const csmChar* fileName)
@@ -210,7 +397,6 @@ void LAppModel::SetupModel(ICubismModelSetting* setting)
     }
 
     //EyeBlink
-    if (_modelSetting->GetEyeBlinkParameterCount() > 0)
     {
         _eyeBlink = CubismEyeBlink::Create(_modelSetting);
     }
@@ -219,15 +405,15 @@ void LAppModel::SetupModel(ICubismModelSetting* setting)
     {
         _breath = CubismBreath::Create();
 
-        csmVector<CubismBreath::BreathParameterData> breathParameters;
+        //csmVector<CubismBreath::BreathParameterData> breathParameters;
 
-        breathParameters.PushBack(CubismBreath::BreathParameterData(_idParamAngleX, 0.0f, 15.0f, 6.5345f, 0.5f));
-        breathParameters.PushBack(CubismBreath::BreathParameterData(_idParamAngleY, 0.0f, 8.0f, 3.5345f, 0.5f));
-        breathParameters.PushBack(CubismBreath::BreathParameterData(_idParamAngleZ, 0.0f, 10.0f, 5.5345f, 0.5f));
-        breathParameters.PushBack(CubismBreath::BreathParameterData(_idParamBodyAngleX, 0.0f, 4.0f, 15.5345f, 0.5f));
-        breathParameters.PushBack(CubismBreath::BreathParameterData(CubismFramework::GetIdManager()->GetId(ParamBreath), 0.5f, 0.5f, 3.2345f, 0.5f));
+        //breathParameters.PushBack(CubismBreath::BreathParameterData(CubismFramework::GetIdManager()->GetId(ParamAngleX), 0.0f, 15.0f, 6.5345f, 0.5f));
+        //breathParameters.PushBack(CubismBreath::BreathParameterData(_idParamAngleY, 0.0f, 8.0f, 3.5345f, 0.5f));
+        //breathParameters.PushBack(CubismBreath::BreathParameterData(_idParamAngleZ, 0.0f, 10.0f, 5.5345f, 0.5f));
+        //breathParameters.PushBack(CubismBreath::BreathParameterData(_idParamBodyAngleX, 0.0f, 4.0f, 15.5345f, 0.5f));
+        //breathParameters.PushBack(CubismBreath::BreathParameterData(CubismFramework::GetIdManager()->GetId(ParamBreath), 0.5f, 0.5f, 3.2345f, 0.5f));
 
-        _breath->SetParameters(breathParameters);
+        //_breath->SetParameters(breathParameters);
     }
 
     //UserData
@@ -240,13 +426,14 @@ void LAppModel::SetupModel(ICubismModelSetting* setting)
         DeleteBuffer(buffer, path.GetRawString());
     }
 
+    //delete
     // EyeBlinkIds
     {
-        csmInt32 eyeBlinkIdCount = _modelSetting->GetEyeBlinkParameterCount();
-        for (csmInt32 i = 0; i < eyeBlinkIdCount; ++i)
-        {
-            _eyeBlinkIds.PushBack(_modelSetting->GetEyeBlinkParameterId(i));
-        }
+        //csmInt32 eyeBlinkIdCount = _modelSetting->GetEyeBlinkParameterCount();
+        //for (csmInt32 i = 0; i < eyeBlinkIdCount; ++i)
+        //{
+        //    _eyeBlinkIds.PushBack(_modelSetting->GetEyeBlinkParameterId(i));
+        //}
     }
 
     // LipSyncIds
@@ -270,6 +457,14 @@ void LAppModel::SetupModel(ICubismModelSetting* setting)
     _modelMatrix->SetupFromLayout(layout);
 
     _model->SaveParameters();
+
+    for (int paramid = 0; paramid < _model->GetParameterCount(); paramid++) {
+        std::string param_str = GetModel()->GetParameterId(paramid)->GetString().GetRawString();
+        if (EYEBLINK_DEF.find(param_str) != EYEBLINK_DEF.end()) {
+            CubismIdHandle handle = CubismFramework::GetIdManager()->GetId(param_str.c_str());
+            _eyeBlinkIdsDef.PushBack(handle);
+        }
+    }
 
     for (csmInt32 i = 0; i < _modelSetting->GetMotionGroupCount(); i++)
     {
@@ -303,11 +498,10 @@ void LAppModel::PreloadMotionGroup(const csmChar* group)
         csmSizeInt size;
         buffer = CreateBuffer(path.GetRawString(), &size);
         CubismMotion* tmpMotion = static_cast<CubismMotion*>(LoadMotion(buffer, size, name.GetRawString(), NULL, NULL, _modelSetting, group, i));
-
         if (tmpMotion)
         {
-            tmpMotion->SetEffectIds(_eyeBlinkIds, _lipSyncIds);
-
+            //对于特殊的眨眼参数、需要考虑对其它组的影响
+            tmpMotion->SetEffectIds(_eyeBlinkIdsDef, _lipSyncIds);
             if (_motions[name] != NULL)
             {
                 ACubismMotion::Delete(_motions[name]);
@@ -361,6 +555,7 @@ void LAppModel::Update()
     _dragManager->Update(deltaTimeSeconds);
     _dragX = _dragManager->GetX();
     _dragY = _dragManager->GetY();
+    csmFloat32 _dragZ = _dragX * _dragY * -1.f;
 
     // モーションによるパラメータ更新の有無
     csmBool motionUpdated = false;
@@ -369,10 +564,27 @@ void LAppModel::Update()
     _model->LoadParameters(); // 前回セーブされた状態をロード
     if (_motionManager->IsFinished())
     {
-        //Shinobu Debug
         // モーションの再生がない場合、待機モーションの中からランダムで再生する
-        StartRandomMotion(/*MotionGroupIdle*/"", PriorityIdle);
-
+        //delete
+        //StartRandomMotion(MotionGroupIdle, PriorityIdle);
+        if (this->animationAutoPlay) {
+            Csm::ICubismModelSetting* lcms = this->GetModelSetting();
+            int  mg_count = lcms->GetMotionGroupCount();
+            if (mg_count > 0) {
+                int gno = rand() % mg_count;
+                int m_count = lcms->GetMotionCount(lcms->GetMotionGroupName(gno));
+                if (m_count > 0) {
+                    int no = rand() % m_count;
+                    const Csm::csmChar* gid = lcms->GetMotionGroupName(gno);
+                    this->StartMotion(gid, no, LAppDefine::PriorityForce);
+                }
+            }
+            int e_count = lcms->GetExpressionCount();
+            if (e_count > 0) {
+                int no = rand() % e_count;
+                this->SetExpression(lcms->GetExpressionName(no));
+            }
+        }
     }
     else
     {
@@ -390,7 +602,8 @@ void LAppModel::Update()
         if (_eyeBlink != NULL)
         {
             // メインモーションの更新がないとき
-            _eyeBlink->UpdateParameters(_model, deltaTimeSeconds); // 目パチ
+            if(canEyeBlink)
+                _eyeBlink->UpdateParameters(_model, deltaTimeSeconds); // 目パチ
         }
     }
 
@@ -401,16 +614,34 @@ void LAppModel::Update()
 
     //ドラッグによる変化
     //ドラッグによる顔の向きの調整
-    _model->AddParameterValue(_idParamAngleX, _dragX * 30); // -30から30の値を加える
-    _model->AddParameterValue(_idParamAngleY, _dragY * 30);
-    _model->AddParameterValue(_idParamAngleZ, _dragX * _dragY * -30);
+    //_model->AddParameterValue(_idParamAngleX, _dragX * 30); // -30から30の値を加える
+    //_model->AddParameterValue(_idParamAngleY, _dragY * 30);
+    //_model->AddParameterValue(_idParamAngleZ, _dragZ * 30);
 
-    //ドラッグによる体の向きの調整
-    _model->AddParameterValue(_idParamBodyAngleX, _dragX * 10); // -10から10の値を加える
+    ////ドラッグによる体の向きの調整
+    //_model->AddParameterValue(_idParamBodyAngleX, _dragX * 10); // -10から10の値を加える
 
-    //ドラッグによる目の向きの調整
-    _model->AddParameterValue(_idParamEyeBallX, _dragX); // -1から1の値を加える
-    _model->AddParameterValue(_idParamEyeBallY, _dragY);
+    ////ドラッグによる目の向きの調整
+    //_model->AddParameterValue(_idParamEyeBallX, _dragX); // -1から1の値を加える
+    //_model->AddParameterValue(_idParamEyeBallY, _dragY);
+
+    for (int i = 0; i < int(_lookTargetParams.size()); ++i) {
+        if (_lookTargetParams[i].enable) {
+            if (_lookTargetParams[i].xyzpos == 0) {
+                _model->AddParameterValue(_lookTargetParams[i].cid, _dragX * _lookTargetParams[i].param);
+
+            }
+            else if (_lookTargetParams[i].xyzpos == 1) {
+                _model->AddParameterValue(_lookTargetParams[i].cid, _dragY * _lookTargetParams[i].param);
+
+            }
+            else if (_lookTargetParams[i].xyzpos == 2) {
+                _model->AddParameterValue(_lookTargetParams[i].cid, _dragZ *_lookTargetParams[i].param);
+
+            }
+
+        }
+    }
 
     // 呼吸など
     if (_breath != NULL)
@@ -472,8 +703,6 @@ CubismMotionQueueEntryHandle LAppModel::StartMotion(const csmChar* group, csmInt
     csmString name = Utils::CubismString::GetFormatedString("%s_%d", group, no);
     CubismMotion* motion = static_cast<CubismMotion*>(_motions[name.GetRawString()]);
     csmBool autoDelete = false;
-    //Shinobu Debug
-    //printf(u8"\n开始播放动画: ");printf(fileName.GetRawString());printf(u8"\n");
 
     if (motion == NULL)
     {
@@ -487,7 +716,8 @@ CubismMotionQueueEntryHandle LAppModel::StartMotion(const csmChar* group, csmInt
 
         if (motion)
         {
-            motion->SetEffectIds(_eyeBlinkIds, _lipSyncIds);
+            //Shinobu Debug
+            motion->SetEffectIds(this->_eyeBlinkIdsDef, _lipSyncIds);
             autoDelete = true; // 終了時にメモリから削除
         }
 
@@ -541,7 +771,8 @@ void LAppModel::Draw(Csm::CubismMatrix44& matrix)
     {
         return;
     }
-
+    //更新Color数据
+    this->UpdateAllColor();
     // 投影行列と乗算
     matrix.MultiplyByMatrix(_modelMatrix);
 
@@ -563,9 +794,15 @@ csmBool LAppModel::HitTest(const csmChar* hitAreaName, csmFloat32 x, csmFloat32 
         if (strcmp(_modelSetting->GetHitAreaName(i), hitAreaName) == 0)
         {
             const CubismIdHandle drawID = _modelSetting->GetHitAreaId(i);
-            //Shinobu Debug
-            printf(drawID->GetString().GetRawString());
-            return IsHit(drawID, x, y);
+            bool hit_return = IsHit(drawID, x, y);
+            if (hit_return) {
+                if (this->hit_id.compare(drawID->GetString().GetRawString()) == 0)
+                    this->hit_num++;
+                else
+                    this->hit_num = 1;
+                this->hit_id=drawID->GetString().GetRawString();
+            }
+            return hit_return;
         }
     }
     return false; // 存在しない場合はfalse

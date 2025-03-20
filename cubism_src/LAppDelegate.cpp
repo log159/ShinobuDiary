@@ -118,7 +118,7 @@ bool LAppDelegate::Initialize()
     _presentParameters.BufferDesc.Width = windowWidth;
     _presentParameters.BufferDesc.Height = windowHeight;
     _presentParameters.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-    _presentParameters.BufferDesc.RefreshRate.Numerator = 60;//DD这里修改60HZ没有用
+    _presentParameters.BufferDesc.RefreshRate.Numerator = 60;
     _presentParameters.BufferDesc.RefreshRate.Denominator = 1;
     _presentParameters.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     _presentParameters.SampleDesc.Count = 1;
@@ -295,15 +295,12 @@ void LAppDelegate::Release()
 
     UnregisterClass(GlobalTemp::CubismWindowClassName, _windowClass.hInstance);
 }
-
-
-
+using namespace std::chrono;
 void LAppDelegate::Run()
 {
     MSG msg;
-    int frameCount = 0;
-    ULONGLONG startTime = GetTickCount64(); // 获取当前时间（毫秒）
-
+    deque<steady_clock::time_point> frameTimes;
+    constexpr double TIME_WINDOW = 1.0;
     do
     {
         // メッセージループ
@@ -315,51 +312,43 @@ void LAppDelegate::Run()
         else
         {
             //限制帧率
-            if (GlobalConfig::getInstance()->window_cubism_addtimefps != 0) {
+            if (GlobalConfig::getInstance()->window_cubism_addtimefps != 0) 
                 std::this_thread::sleep_for(std::chrono::milliseconds(GlobalConfig::getInstance()->window_cubism_addtimefps));
-            }
             //
             PosHandler(_windowHandle);
-
             // 窗口更新
             CubismWindowStyle::Update(_windowHandle);
-
             // 時間更新
             LAppPal::UpdateTime();
-
             // 画面クリアなど
             StartFrame();
-
             // 描画
             _view->Render();
-
             // フレーム末端処理
             EndFrame();
 
-            // 统计循环次数
-            frameCount++;
-            ULONGLONG currentTime = GetTickCount64();
-            if (currentTime - startTime >= 1000) // 一秒时间已过
-            {
-                GlobalTemp::CubismFrameCount = frameCount;
-                frameCount = 0;
-                startTime = currentTime;
-            }
-
+            // 统计帧率
+            auto now = steady_clock::now();
+            frameTimes.push_back(now);
+            while (!frameTimes.empty() &&
+                duration<double>(now - frameTimes.front()).count() > TIME_WINDOW)
+                frameTimes.pop_front();
+            GlobalTemp::CubismFrameCount = int(frameTimes.size() / TIME_WINDOW);
             // アプリケーション終了メッセージでウィンドウを破棄する
             if (GetIsEnd() && _windowHandle != NULL)
             {
-                GlobalTemp::CubismIsRunning = false;
                 DestroyWindow(_windowHandle);
                 _windowHandle = NULL;
             }
         }
     } while (msg.message != WM_QUIT);
 
+    GlobalTemp::CubismIsRunning = false;
     // 解放
     Release();
     // インスタンス削除
     ReleaseInstance();
+
 }
 
 LAppDelegate::LAppDelegate()
@@ -553,7 +542,6 @@ void LAppDelegate::ResizeDevice()
 
 LRESULT WINAPI LAppDelegate::MsgProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-
     switch (msg)
     {
     case WM_DESTROY:// 终了
@@ -612,6 +600,7 @@ LRESULT WINAPI LAppDelegate::MsgProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM l
         return 0;
 
     case WM_MOUSEMOVE:
+        //Shinobu Debug
         //if(s_instance!=NULL)
         //{
         //    s_instance->_mouseX = static_cast<float>(LOWORD(lParam));

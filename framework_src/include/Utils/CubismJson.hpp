@@ -11,7 +11,6 @@
 #include "../Type/csmVector.hpp"
 #include "../Type/csmMap.hpp"
 #include "../Type/csmString.hpp"
-
 //------------ LIVE2D NAMESPACE ------------
 namespace Live2D { namespace Cubism { namespace Framework { namespace Utils {
 class Value;

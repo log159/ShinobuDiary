@@ -25,13 +25,6 @@ struct ModelJsonConfig {
 };
 class LAppModel;
 
-
-struct Uint32Hash {
-    std::size_t operator()(const Csm::csmUint32& i) const {
-        return size_t(i);
-    }
-};
-
 /**
 * @brief サンプルアプリケーションにおいてCubismModelを管理するクラス<br>
 *         モデル生成と破棄、タップイベントの処理、モデル切り替えを行う。
@@ -46,9 +39,9 @@ public:
 
     void RefreshScene(int userid,std::string modelname);
 
-    void RefreshSceneAndUserId(Csm::csmUint32 pos);
+    void RefreshSceneAndUserId(int pos);
 
-    Csm::csmVector<Csm::csmString>& GetModelDir();; ///< モデルディレクトリ名のコンテナ
+    Csm::csmVector<Csm::csmString>& GetModelDir();
 
     /**
      * @brief 解放するモデル格納
@@ -98,7 +91,7 @@ public:
     Csm::csmInt32 GetModelDirSize() const;
 
     //直接返回_models
-    std::unordered_map<Csm::csmUint32, LAppModel*, Uint32Hash>& GetModel();
+    std::unordered_map<int, LAppModel*>& GetModel();
     /**
     * @brief   現在のシーンで保持しているすべてのモデルを解放する
     *
@@ -162,7 +155,7 @@ private:
     virtual ~LAppLive2DManager();
 
     Csm::CubismMatrix44* _viewMatrix; ///< モデル描画に用いるView行列
-    std::unordered_map<Csm::csmUint32,LAppModel*, Uint32Hash> _models; ///< モデルインスタンスのコンテナ
+    std::unordered_map<int,LAppModel*> _models; ///< モデルインスタンスのコンテナ
     //Csm::csmInt32 _sceneIndex; ///< 表示するシーンのインデックス値
 
     Csm::csmVector<Csm::csmString> _modelDir; ///< モデルディレクトリ名のコンテナ

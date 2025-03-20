@@ -12,7 +12,7 @@ namespace Su {
         {
             std::cout << "initSDK failed:" << ret << std::endl;
         }
-        printf(u8"\ninit SparkChain result:%d" RESET, ret);
+        std::cout <<"Init SparkChain result: "<< ret << std::endl;
         std::cout << u8"\n######### 同步调用 #########" << std::endl;
         // 配置大模型参数
         SparkChain::LLMConfig* llmConfig = SparkChain::LLMConfig::builder();

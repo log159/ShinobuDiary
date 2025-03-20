@@ -115,7 +115,6 @@ void LAppView::Initialize()
     // シェーダー作成
     _shader->CreateShader();
 }
-
 void LAppView::Render()
 {
     LAppLive2DManager* live2DManager = LAppLive2DManager::GetInstance();
@@ -150,15 +149,14 @@ void LAppView::Render()
         _power->RenderImmidiate(width, height, textureView, renderContext);
     }
 
-    live2DManager->SetViewMatrix(_viewMatrix);
-
     // Cubism更新・描画
     live2DManager->OnUpdate();
+
+    live2DManager->SetViewMatrix(_viewMatrix);
 
     // 各モデルが持つ描画ターゲットをテクスチャとする場合
     if (_renderTarget == SelectTarget_ModelFrameBuffer && _renderSprite)
     {
-        //Shinobu Debug
         int i = 0;
         for (auto& pair : live2DManager->GetModel()) {
             LAppModel* model = pair.second;
@@ -171,10 +169,34 @@ void LAppView::Render()
                 _renderSprite->RenderImmidiate(width, height, model->GetRenderBuffer().GetTextureView(), renderContext);
             }
         }
-
+    }
+    // 渲染红色边框
+    std::unordered_map<int, LAppModel*>& models = LAppLive2DManager::GetInstance()->GetModel();
+    for (auto& lampair : models) 
+    {
+        LAppModel* lam = lampair.second;
+        if (lam->previewHitareas == false)
+            continue;
+        for (auto& val : lampair.second->hitareas) {
+            float tx_t = lam->GetModelMatrix()->GetArray()[12];
+            float ty_t = lam->GetModelMatrix()->GetArray()[13];
+            float ts_x = lam->GetModelMatrix()->GetArray()[0];
+            float ts_y = lam->GetModelMatrix()->GetArray()[5];
+            Csm::CubismMatrix44* cm4 = LAppDelegate::GetInstance()->GetView()->GetDeviceToScreen();
+            float offx = cm4->InvertTransformX(tx_t)- cm4->InvertTransformX(0);
+            float offy = -(cm4->InvertTransformY(ty_t)- cm4->InvertTransformY(0));
+            float cub_x = cm4->InvertTransformX(tx_t);
+            float cub_y = height - cm4->InvertTransformY(ty_t);
+            for (auto& las : val.second) {
+                LAppSprite*& _hitarea = las;
+                ID3D11ShaderResourceView* textureView = NULL;
+                LAppDelegate::GetInstance()->GetTextureManager()->GetTexture(_hitarea->GetTextureId(), textureView);
+                _hitarea->ResetOffsetRect(offx, offy, ts_x/(lam->def_cubism_cg.cubism_ts_x), ts_y / (lam->def_cubism_cg.cubism_ts_y));
+                _hitarea->RenderImmidiate(width, height, textureView, renderContext);
+            }
+        }
     }
 }
-
 void LAppView::InitializeSprite()
 {
     // 描画領域サイズ
@@ -191,7 +213,9 @@ void LAppView::InitializeSprite()
     float fWidth = 0.0f;
     float fHeight = 0.0f;
 
-    string imageName = ""/*resourcesPath + BackImageName*/;
+    //string imageName = "";
+    //delete
+    /*resourcesPath + BackImageName*/
     //LAppTextureManager::TextureInfo* backgroundTexture = textureManager->CreateTextureFromPngFile(imageName, false);
     //x = width * 0.5f;
     //y = height * 0.5f;
@@ -214,6 +238,10 @@ void LAppView::InitializeSprite()
     //fWidth = static_cast<float>(powerTexture->width);
     //fHeight = static_cast<float>(powerTexture->height);
     //_power = new LAppSprite(x, y, fWidth, fHeight, powerTexture->id, _shader, device);
+
+    _back = nullptr;
+    _gear = nullptr;
+    _power = nullptr;
 
     x = width * 0.5f;
     y = height * 0.5f;
@@ -251,6 +279,7 @@ void LAppView::ReleaseSprite()
     }
     delete _back;
     _back = NULL;
+
 }
 
 void LAppView::ResizeSprite()
@@ -311,7 +340,6 @@ void LAppView::ResizeSprite()
             _gear->ResetRect(x, y, fWidth, fHeight);
         }
     }
-
     if (_renderSprite)
     {
         x = width * 0.5f;
@@ -354,6 +382,7 @@ void LAppView::OnTouchesEnded(float px, float py) const
 
         live2DManager->OnTap(x, y);
 
+        //delete
         //// 歯車にタップしたか
         //if (_gear->IsHit(px, py, width, height))
         //{
@@ -366,16 +395,54 @@ void LAppView::OnTouchesEnded(float px, float py) const
         //    LAppDelegate::GetInstance()->AppEnd();
         //}
         
-        if (GlobalTemp::CubismModelRefreshPos.first) {
-            live2DManager->RefreshSceneAndUserId(GlobalTemp::CubismModelRefreshPos.second);
-            GlobalTemp::CubismModelRefreshPos.first = false;
+        //if (GlobalTemp::CubismModelRefreshPos.first) {
+        //    live2DManager->RefreshSceneAndUserId(GlobalTemp::CubismModelRefreshPos.second);
+        //    GlobalTemp::CubismModelRefreshPos.first = false;
+        //}
+        
+        //动画队列
+        std::queue<std::pair<int, std::pair<int, int>>>& cmm_qp  = GlobalTemp::CubismMotionMessage;
+        while (!cmm_qp.empty()) {
+            if (live2DManager->GetModel().find(cmm_qp.front().first) != live2DManager->GetModel().end()) {
+                LAppModel* lam = live2DManager->GetModel()[cmm_qp.front().first];
+                Csm::ICubismModelSetting* lcms = lam->GetModelSetting();
+                const Csm::csmChar* gid = lam->GetModelSetting()->GetMotionGroupName(cmm_qp.front().second.first);
+                int nid = cmm_qp.front().second.second;
+                if (lcms !=nullptr && gid != nullptr && lcms->GetMotionCount(gid)> nid && nid>=0) {
+                    lam->StartMotion(gid, nid, LAppDefine::PriorityForce);
+                }
+            }
+            cmm_qp.pop();
         }
+        //表情队列
+        std::queue<std::pair<int, int>>& cem_qp  = GlobalTemp::CubismExpressionMessage;
+        while (!cem_qp.empty()) {
+            if (live2DManager->GetModel().find(cem_qp.front().first) != live2DManager->GetModel().end()) {
+                LAppModel* lam = live2DManager->GetModel()[cem_qp.front().first];
+                Csm::ICubismModelSetting* lcms = lam->GetModelSetting();
+                int nid = cem_qp.front().second;
+                if (lcms != nullptr &&  lam->GetModelSetting()->GetExpressionCount()> nid && nid >= 0) {
+                    lam->SetExpression(lcms->GetExpressionName(nid));
+                }
+            }
+            cem_qp.pop();
+        }
+        //加载删除队列
         std::queue<std::pair<int, std::string>>& qp = GlobalTemp::CubismModelMessage;
         while (!qp.empty()) {
-            live2DManager->RefreshScene(qp.front().first, qp.front().second);
+            //-1 归置
+            if (qp.front().first == -1) {
+                std::string str = qp.front().second;
+                int num = -1;
+                std::istringstream ss(str); ss >> num;
+                live2DManager->RefreshSceneAndUserId(num);
+            }
+            //删除或者添加
+            else {
+                live2DManager->RefreshScene(qp.front().first, qp.front().second);
+            }
             qp.pop();
         }
-
     }
 }
 
@@ -473,6 +540,11 @@ void LAppView::SetRenderTargetClearColor(float r, float g, float b)
 void LAppView::DestroyOffscreenSurface()
 {
     _renderBuffer.DestroyOffscreenSurface();
+}
+
+LAppSpriteShader* LAppView::GetShader()
+{
+    return _shader;
 }
 
 float LAppView::GetSpriteAlpha(int assign) const

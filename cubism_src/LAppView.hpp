@@ -13,6 +13,7 @@
 #include <Math/CubismMatrix44.hpp>
 #include <Math/CubismViewMatrix.hpp>
 #include "CubismFramework.hpp"
+#include <unordered_map>
 
 class TouchManager;
 class LAppSprite;
@@ -158,6 +159,8 @@ public:
      * @brief   内部レンダリングバッファの破棄
      */
     void DestroyOffscreenSurface();
+
+    LAppSpriteShader* GetShader();
 
 private:
     TouchManager* _touchManager;                 ///< タッチマネージャー

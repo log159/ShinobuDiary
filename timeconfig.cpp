@@ -8,7 +8,6 @@ std::ostringstream oss;\
 oss << std::put_time(&timeStruct, S);\
 return oss.str();
 
-
 std::string getCurrentTime() {
 
     auto now = std::chrono::system_clock::now(); 

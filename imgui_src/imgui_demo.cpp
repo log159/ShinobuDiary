@@ -8180,7 +8180,7 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
                 ImGui::SetItemTooltip(TT_116);
                 ImGui::SameLine();
 #endif
-                ImGui::ColorEdit4("##color", (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | alpha_flags);
+                ImGui::ColorEdit4("##color", (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar/* | alpha_flags*/);
                 if (memcmp(&style.Colors[i], &ref->Colors[i], sizeof(ImVec4)) != 0)
                 {
                     // Tips: in a real user application, you may want to merge and use an icon font into the main font,

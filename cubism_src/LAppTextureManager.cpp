@@ -9,8 +9,7 @@
 #include "LAppDefine.hpp"
 #include "LAppPal.hpp"
 #include "LAppDelegate.hpp"
-
-
+#include <vector>
 using namespace LAppDefine;
 
 LAppTextureManager::LAppTextureManager()
@@ -22,6 +21,92 @@ LAppTextureManager::~LAppTextureManager()
 {
     ReleaseTextures();
 }
+LAppTextureManager::TextureInfo* LAppTextureManager::CreateTextureFromRGBA(float r, float g, float b, float a, UINT width, UINT height)
+{
+    ID3D11Device* device = LAppDelegate::GetD3dDevice();
+    ID3D11DeviceContext* context = LAppDelegate::GetD3dContext();
+
+    if (!device || !context)
+    {
+        return nullptr;
+    }
+
+    ID3D11Texture2D* texture = nullptr;
+    ID3D11ShaderResourceView* textureView = nullptr;
+    LAppTextureManager::TextureInfo* textureInfo = nullptr;
+
+    // 填充背景颜色
+    std::vector<uint8_t> rgbaData(width * height * 4, 0);
+    uint8_t rByte = static_cast<uint8_t>(r * 255);
+    uint8_t gByte = static_cast<uint8_t>(g * 255);
+    uint8_t bByte = static_cast<uint8_t>(b * 255);
+    uint8_t aByte = static_cast<uint8_t>(a * 255);
+
+    for (UINT y = 0; y < height; ++y)
+    {
+        for (UINT x = 0; x < width; ++x)
+        {
+            size_t index = (y * width + x) * 4;
+            rgbaData[index + 0] = rByte; // R
+            rgbaData[index + 1] = gByte; // G
+            rgbaData[index + 2] = bByte; // B
+            rgbaData[index + 3] = aByte; // A
+        }
+    }
+
+    D3D11_TEXTURE2D_DESC desc = {};
+    desc.Width = width;
+    desc.Height = height;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+    D3D11_SUBRESOURCE_DATA initData = {};
+    initData.pSysMem = rgbaData.data();
+    initData.SysMemPitch = width * 4;
+
+    HRESULT hr = device->CreateTexture2D(&desc, &initData, &texture);
+    if (FAILED(hr))
+    {
+        if (DebugLogEnable)
+        {
+            LAppPal::PrintLogLn("Texture Creation Error");
+        }
+        return nullptr;
+    }
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = desc.Format;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1;
+    hr = device->CreateShaderResourceView(texture, &srvDesc, &textureView);
+    if (FAILED(hr))
+    {
+        texture->Release();
+        return nullptr;
+    }
+
+    textureInfo = new LAppTextureManager::TextureInfo();
+    if (!textureInfo)
+    {
+        textureView->Release();
+        texture->Release();
+        return nullptr;
+    }
+
+    textureInfo->width = width;
+    textureInfo->height = height;
+    textureInfo->id = ++_sequenceId;
+    _texturesInfo.PushBack(textureInfo);
+    _textures.PushBack(texture);
+    _textureView.PushBack(textureView);
+
+    return textureInfo;
+}
+
 
 LAppTextureManager::TextureInfo* LAppTextureManager::CreateTextureFromPngFile(std::string fileName, bool isPreMult, UINT maxSize)
 {

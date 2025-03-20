@@ -96,6 +96,8 @@ public:
      */
     void ResetRect(float x, float y, float width, float height);
 
+    void ResetOffsetRect(float ox, float oy, float ow, float oh);
+
     /**
      * @brief 色設定
      *
@@ -114,6 +116,7 @@ private:
 
     Csm::csmUint64 _textureId;  ///< テクスチャID
     Rect _rect;                 ///< 矩形
+    Rect _rect_def;
 
     ID3D11Buffer* _vertexBuffer;    ///< 頂点バッファ
     ID3D11Buffer* _indexBuffer;     ///< インデックスバッファ

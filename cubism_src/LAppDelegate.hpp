@@ -14,7 +14,7 @@
 #include <CubismFramework.hpp>
 
 #include "LAppAllocator.hpp"
-
+#include "../cubism_src/LAppView.hpp"
 
 class LAppView;
 class LAppTextureManager;

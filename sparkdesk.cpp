@@ -3,9 +3,9 @@ int initSDK()
 {
 	// 全局初始化
 	SparkChainConfig* config = SparkChainConfig::builder();
-	config->appID("")        // 你的appid
+	config->appID("")       // 你的appid
 		->apiKey("")        // 你的apikey
-		->apiSecret(""); // 你的apisecret
+		->apiSecret("");	// 你的apisecret
 	int ret = SparkChain::init(config);
 	printf(RED "\ninit SparkChain result:%d" RESET, ret);
 	return ret;

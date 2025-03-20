@@ -1,20 +1,17 @@
-﻿#include "filesetting.h"
+﻿//using SI_Error = int;
+//constexpr int SI_OK = 0;        //!< No error
+//constexpr int SI_UPDATED = 1;   //!< An existing value was updated
+//constexpr int SI_INSERTED = 2;  //!< A new value was inserted
+//// note: test for any error with (retval < 0)
+//constexpr int SI_FAIL = -1;     //!< Generic failure
+//constexpr int SI_NOMEM = -2;    //!< Out of memory error
+//constexpr int SI_FILE = -3;     //!< File error (see errno for detail error)
+
+#include "filesetting.h"
 
 CSimpleIniA* FileSetting::delay_ini = nullptr;
 CSimpleIniA FileSetting::read_ini;
 bool FileSetting::can_read = false;
-
-//#define SS(SET_FUNCTION) CSimpleIniA ini;\
-//static char ss[DEFPATHSIZE];\
-//memset(ss, sizeof(ss), 0);\
-//snprintf(ss, sizeof(ss), s, id);\
-//ini.SetUnicode(true);\
-//if(ini.LoadFile(INITFILE) < 0)\
-//printf("New File!\n");\
-//ini.SET_FUNCTION(ss, k, n);\
-//ini.SaveFile(INITFILE);\
-//printf("FileSetting Save ");
-
 #define SS(SET_FUNCTION) \
 if (delay_ini == nullptr)return;\
 static char ss[DEFPATHSIZE];\
@@ -31,40 +28,26 @@ if (!can_read)\
 return RETURN_TYPE(n);\
 return RETURN_TYPE(read_ini.GET_FUNCTION(ss, k, n));
 
-
-//using SI_Error = int;
-//constexpr int SI_OK = 0;        //!< No error
-//constexpr int SI_UPDATED = 1;   //!< An existing value was updated
-//constexpr int SI_INSERTED = 2;  //!< A new value was inserted
-//// note: test for any error with (retval < 0)
-//constexpr int SI_FAIL = -1;     //!< Generic failure
-//constexpr int SI_NOMEM = -2;    //!< Out of memory error
-//constexpr int SI_FILE = -3;     //!< File error (see errno for detail error)
-
-
 void FileSetting::BeginSave(CSimpleIniA & ini)
 {
     delay_ini = &ini;
     ini.SetUnicode(true);
     if (ini.LoadFile(INITFILE) < 0)
-        printf("New File!\n"); 
+        std::cout << "New Ini File!" << std::endl;
 }
-
 void FileSetting::EndSave(CSimpleIniA& ini)
 {
     delay_ini = nullptr;
     ini.SaveFile(INITFILE);
-    printf("FileSetting Save\n");
+    std::cout << "FileSetting Save" << std::endl;
     FileSetting::RefreshRead();
-    printf("FileSetting RefreshRead\n");
+    std::cout << "FileSetting RefreshRead" << std::endl;
 }
-
 void FileSetting::RefreshRead()
 {
     if (read_ini.LoadFile(INITFILE)<0) can_read = false;
     else can_read = true;
 }
-
 void FileSetting::SetValue(int id, const char* s, const char* k, const char* wn) {
     std::string str = wn;
     std::string target = " ";
@@ -118,10 +101,8 @@ bool FileSetting::GetBoolValue(int id, const char* s, const char* k, bool n) {
 
 void FileSetting::ClearFile()
 {
-    if (std::remove(INITFILE) == 0) {
-        std::printf("File %s deleted successfully.\n", INITFILE);
-    }
-    else {
-        perror("Error deleting file");
-    }
+    if (std::remove(INITFILE) == 0) 
+        std::cout << "File " << INITFILE << " deleted successfully." << std::endl;
+    else 
+        std::cout << "Error deleting file." << std::endl;
 }

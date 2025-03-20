@@ -8,48 +8,56 @@
 #include "CubismBreath.hpp"
 #include <math.h>
 #include "../Math/CubismMath.hpp"
+#include <cmath>
 
-namespace Live2D { namespace Cubism { namespace Framework {
+namespace Live2D {
+    namespace Cubism {
+        namespace Framework {
 
-CubismBreath* CubismBreath::Create()
-{
-    return CSM_NEW CubismBreath();
-}
+            CubismBreath* CubismBreath::Create()
+            {
+                return CSM_NEW CubismBreath();
+            }
 
-void CubismBreath::Delete(CubismBreath* instance)
-{
-    CSM_DELETE_SELF(CubismBreath, instance);
-}
+            void CubismBreath::Delete(CubismBreath* instance)
+            {
+                CSM_DELETE_SELF(CubismBreath, instance);
+            }
 
-CubismBreath::CubismBreath()
-                            : _currentTime(0.0f)
-{ }
+            CubismBreath::CubismBreath()
+                : _currentTime(0.0f)
+            {
+            }
 
-CubismBreath::~CubismBreath()
-{ }
+            CubismBreath::~CubismBreath()
+            {
+            }
 
-void CubismBreath::SetParameters(const csmVector<BreathParameterData>& breathParameters)
-{
-    _breathParameters = breathParameters;
-}
+            void CubismBreath::SetParameters(const csmVector<BreathParameterData>& breathParameters)
+            {
+                _breathParameters = breathParameters;
+            }
 
-const csmVector<CubismBreath::BreathParameterData>& CubismBreath::GetParameters() const
-{
-    return _breathParameters;
-}
+            csmVector<CubismBreath::BreathParameterData>& CubismBreath::GetParameters()
+            {
+                return _breathParameters;
+            }
 
-void CubismBreath::UpdateParameters(CubismModel* model, csmFloat32 deltaTimeSeconds)
-{
-    _currentTime += deltaTimeSeconds;
+            void CubismBreath::UpdateParameters(CubismModel* model, csmFloat32 deltaTimeSeconds)
+            {
+                if (!canBreath)return;
+                _currentTime += deltaTimeSeconds;
 
-    const csmFloat32 t = _currentTime * 2.0f * CubismMath::Pi;
+                const csmFloat32 t = _currentTime * 2.0f * CubismMath::Pi;
 
-    for (csmUint32 i = 0; i < _breathParameters.GetSize(); ++i)
-    {
-        BreathParameterData* data = &_breathParameters[i];
+                for (csmUint32 i = 0; i < _breathParameters.GetSize(); ++i)
+                {
+                    BreathParameterData* data = &_breathParameters[i];
+                    if(data->Enable && fabs(data->Cycle)>(1e-6))
+                        model->AddParameterValue(data->ParameterId, data->Offset + (data->Peak * sinf(t / data->Cycle)), data->Weight);
+                }
+            }
 
-        model->AddParameterValue(data->ParameterId, data->Offset + (data->Peak * sinf(t / data->Cycle)), data->Weight);
+        }
     }
 }
-
-}}}

@@ -94,7 +94,7 @@ void CubismUserModelExtend::SetAssetDirectory(const std::string& path)
     _currentModelDirectory = path;
 }
 
-void CubismUserModelExtend::LoadAsset(const std::string & fiileName, const std::function<void(Csm::csmByte*, Csm::csmSizeInt)>& afterLoadCallback) const
+void CubismUserModelExtend::LoadAsset(const std::string& fiileName, const std::function<void(Csm::csmByte*, Csm::csmSizeInt)>& afterLoadCallback) const
 {
     Csm::csmSizeInt bufferSize = 0;
     Csm::csmByte* buffer = nullptr;
@@ -145,19 +145,16 @@ void CubismUserModelExtend::SetupModel()
 
     //ポーズデータの読み込み
     LoadAsset(_modelJson->GetPoseFileName(), [=](Csm::csmByte* buffer, Csm::csmSizeInt bufferSize) {
-        printf("%s\n",_modelJson->GetPoseFileName());
         LoadPose(buffer, bufferSize);
     });
 
     // 物理演算データの読み込み
     LoadAsset(_modelJson->GetPhysicsFileName(), [=](Csm::csmByte* buffer, Csm::csmSizeInt bufferSize) {
-        printf("%s\n", _modelJson->GetPhysicsFileName());
         LoadPhysics(buffer, bufferSize);
     });
 
     // モデルに付属するユーザーデータの読み込み
     LoadAsset(_modelJson->GetUserDataFile(), [=](Csm::csmByte* buffer, Csm::csmSizeInt bufferSize) {
-        printf("%s\n", _modelJson->GetUserDataFile());
         LoadUserData(buffer, bufferSize);
     });
 
@@ -323,9 +320,9 @@ void CubismUserModelExtend::ModelParamUpdate()
 
     if (_motionManager->IsFinished())
     {
-        //Shinobu Debug
         // モーションの再生がない場合、始めに登録されているモーションを再生する
-        StartMotion(/*LAppDefine::MotionGroupIdle*/"", 0, LAppDefine::PriorityIdle);
+        //delete
+        //StartMotion(LAppDefine::MotionGroupIdle, 0, LAppDefine::PriorityIdle);
     }
     else
     {
@@ -453,7 +450,7 @@ void CubismUserModelExtend::ModelOnUpdate()
 {
     int width, height;
     // ウィンドウサイズを取得
-    CubismDirectXRenderer::GetInstance()->GetClientSize(width,height);
+    CubismDirectXRenderer::GetInstance()->GetClientSize(width, height);
 
     // D3D11 フレーム先頭処理
     // 各フレームでの、Cubism SDK の処理前にコール
