@@ -1,0 +1,31 @@
+# License Statement  
+
+## Live2D Cubism SDK License  
+
+### 1. Commercial Use Requirement  
+- **If a company's sales revenue in the most recent fiscal year reaches or exceeds 10 million JPY**, it must obtain the **Cubism SDK Publishing License** (Publishing License Agreement).  
+  - For details, see: [Cubism SDK Release License](https://www.live2d.com/en/sdk/license/)  
+
+### 2. Component Licenses  
+The official Live2D license details are as follows:  
+
+- **Live2D Cubism Core**: Subject to the **Live2D Proprietary Software License**.  
+- **Live2D Cubism Samples**: Subject to the **Live2D Open Software License**.  
+- **Live2D Cubism Framework**: Subject to the **Live2D Open Software License**.  
+
+### 3. Related Agreements  
+- [Live2D Proprietary Software License Agreement](https://www.live2d.com/eula/live2d-proprietary-software-license-agreement_en.html)  
+- [Live2D Open Software License Agreement](https://www.live2d.com/eula/live2d-open-software-license-agreement_en.html)  
+
+## License for Other Components  
+
+Except for **Live2D Cubism SDK** related components, all other parts are licensed under the **MIT License**.  
+
+## Dependencies  
+
+This project depends on the **C++ Standard Library (STL)**, which is subject to its respective licenses:  
+
+- **Microsoft C++ Standard Library** (for MSVC): **Apache License 2.0 with LLVM Exception**  
+- **GNU libstdc++** (for GCC): **GPL with GCC Runtime Library Exception**  
+
+For more details, please refer to the official license documentation of the respective standard libraries.  
