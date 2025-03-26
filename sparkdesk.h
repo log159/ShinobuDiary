@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 #include <atomic>
-#include <Windows.h>
+#include <windows.h>
 #include <regex>
 using namespace SparkChain;
 #define GREEN "\033[32m"

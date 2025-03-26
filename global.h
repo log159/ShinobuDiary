@@ -1,5 +1,4 @@
 ﻿#pragma once
-
 #include <map>
 #include <queue>
 #include "sizedef.h"
@@ -24,8 +23,6 @@ public:
     static std::queue<std::pair<int, std::string>>  CubismModelMessage;
     static std::queue<std::pair<int, std::pair<int, int>>>  CubismMotionMessage;
     static std::queue<std::pair<int, int>>                  CubismExpressionMessage;
-
-
     static bool                                     CubismIsRunning;
     static bool                                     TableBools[DEFSIZE][DEFSIZEK16];
     static float                                    GuiButtonWidth;

@@ -1,11 +1,15 @@
 ﻿#include "sufunction.h"
 #include <algorithm>
 #include <stdio.h>
-#include <direct.h>
-#include <Windows.h>
+#include <windows.h>
 #include <map>
+#include <cmath>
+#include <sstream>
 #include "global.h"
 #include "translator.h"
+#include "timeconfig.h"
+#include "sizedef.h"
+#include <pdh.h>
 
 namespace Su {
     int ShinobuExList::CompareItemsByValue(const void* lhs, const void* rhs)
@@ -132,6 +136,38 @@ namespace Su {
         }
         return happen_move;
     }
+
+    ShinobuScrollingBuffer::ShinobuScrollingBuffer(int max_size) {
+        MaxSize = max_size;
+        Offset = 0;
+        Data.reserve(MaxSize);
+    }
+    void ShinobuScrollingBuffer::AddPoint(float x, float y) {
+        if (Data.size() < MaxSize)
+            Data.push_back(ImVec2(x, y));
+        else {
+            Data[Offset] = ImVec2(x, y);
+            Offset = (Offset + 1) % MaxSize;
+        }
+    }
+    void ShinobuScrollingBuffer::Erase() {
+        if (Data.size() > 0) {
+            Data.shrink(0);
+            Offset = 0;
+        }
+    }
+
+    ShinobuRollingBuffer::ShinobuRollingBuffer() {
+        Span = 10.0f;
+        Data.reserve(2000);
+    }
+    void ShinobuRollingBuffer::AddPoint(float x, float y) {
+        float xmod = fmodf(x, Span);
+        if (!Data.empty() && xmod < Data.back().x)
+            Data.shrink(0);
+        Data.push_back(ImVec2(xmod, y));
+    }
+
     void MemsetStr(char* str, size_t size) {
         memset(str, 0, size);
     }
@@ -184,4 +220,5 @@ namespace Su {
         case 5: default: out_r = v; out_g = p; out_b = q; break;
         }
     }
+
 }

@@ -1,4 +1,9 @@
 ﻿#include "timeconfig.h"
+#include <iostream>
+#include <chrono>
+#include <iomanip>
+#include <sstream>
+
 #define GETCURRENT(S)\
 auto now = std::chrono::system_clock::now();\
 auto timeT = std::chrono::system_clock::to_time_t(now);\
@@ -20,35 +25,22 @@ std::string getCurrentTime() {
     oss << std::put_time(&timeStruct, "%Y-%m-%d %H:%M:%S"); 
     oss << "." << std::setfill('0') << std::setw(3) << milliseconds; 
     return oss.str();
-
 }
-
-std::string getCurrentYear()
-{
+std::string getCurrentYear(){
     GETCURRENT("%Y")
 }
-
-std::string getCurrentMonth()
-{
+std::string getCurrentMonth(){
     GETCURRENT("%m")
 }
-
-std::string getCurrentDay()
-{
+std::string getCurrentDay(){
     GETCURRENT("%d")
 }
-
-std::string getCurrentHours()
-{
+std::string getCurrentHours(){
     GETCURRENT("%H")
 }
-
-std::string getCurrentMinutes()
-{
+std::string getCurrentMinutes(){
     GETCURRENT("%M")
 }
-
-std::string getCurrentSeconds()
-{
+std::string getCurrentSeconds(){
     GETCURRENT("%S")
 }

@@ -3,7 +3,7 @@
 #include <string>
 #include "../global.h"
 
-struct CsmMess {
+struct CSM_MESS {
 	std::string group;
 	std::string handle;
 	std::string parameter;
@@ -20,7 +20,7 @@ static const char* window_style_mark="WindowStyle";
 
 class CubismLoom
 {
-	static std::list<CsmMess> messageList;
+	static std::list<CSM_MESS> messageList;
 public:
 	static void addMessageList(const char* gm, const char* hm, const char* pm);
 	static void handleMessageUpdate();

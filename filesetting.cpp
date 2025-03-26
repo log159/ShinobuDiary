@@ -8,6 +8,9 @@
 //constexpr int SI_FILE = -3;     //!< File error (see errno for detail error)
 
 #include "filesetting.h"
+#include <iostream>
+using std::cout;
+using std::endl;
 
 CSimpleIniA* FileSetting::delay_ini = nullptr;
 CSimpleIniA FileSetting::read_ini;

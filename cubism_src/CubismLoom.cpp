@@ -1,10 +1,10 @@
 ﻿#include "CubismLoom.h"
 #include <iostream>
-std::list<CsmMess> CubismLoom::messageList;
+std::list<CSM_MESS> CubismLoom::messageList;
 void CubismLoom::addMessageList(const char* gm, const char* hm, const char* pm)
 {
 	//添加新消息
-	CsmMess cm;
+	CSM_MESS cm;
 	cm.group = std::string(gm);
 	cm.handle = std::string(hm);
 	cm.parameter = std::string(pm);
@@ -19,7 +19,7 @@ void CubismLoom::handleMessageUpdate()
 {
 	if (messageList.empty())
 		return;
-	CsmMess cm = messageList.front();
+	CSM_MESS cm = messageList.front();
 	messageList.pop_front();
 
 	std::cout <<u8"处理消息：" << cm.group << " " << cm.handle << " " << cm.parameter << std::endl;

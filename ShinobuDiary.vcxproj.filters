@@ -25,6 +25,9 @@
     <Filter Include="cubism_src">
       <UniqueIdentifier>{67abd2ec-79a0-4b3a-aea9-d1137e9b7a5e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="implot">
+      <UniqueIdentifier>{0e523ced-7d2a-4cf4-acd7-890ce3924525}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="imgui_impl_dx11.cpp">
@@ -143,6 +146,15 @@
     </ClCompile>
     <ClCompile Include="sufunction.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="implot\implot.cpp">
+      <Filter>implot</Filter>
+    </ClCompile>
+    <ClCompile Include="implot\implot_demo.cpp">
+      <Filter>implot</Filter>
+    </ClCompile>
+    <ClCompile Include="implot\implot_items.cpp">
+      <Filter>implot</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -304,6 +316,12 @@
     </ClInclude>
     <ClInclude Include="sizedef.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="implot\implot.h">
+      <Filter>implot</Filter>
+    </ClInclude>
+    <ClInclude Include="implot\implot_internal.h">
+      <Filter>implot</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

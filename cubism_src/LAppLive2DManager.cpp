@@ -20,6 +20,9 @@
 #include "LAppView.hpp"
 #include <CubismDefaultParameterId.hpp>
 #include <./Id/CubismIdManager.hpp>
+#include <CubismCdiJson.hpp>
+#include <iostream>
+#include <fstream>
 
 using namespace Csm;
 using namespace LAppDefine;
@@ -217,6 +220,8 @@ void LAppLive2DManager::OnTap(csmFloat32 x, csmFloat32 y)
     }
     for (auto& pair : _models) {
         LAppModel* lam = pair.second;
+        if (lam->canHitareas == false)
+            continue;
         Csm::ICubismModelSetting* lms = pair.second->GetModelSetting();
         for (int i = 0; i < lms->GetHitAreasCount(); ++i) {
             if (pair.second->HitTest(lms->GetHitAreaName(i), x, y)) {
@@ -239,7 +244,7 @@ void LAppLive2DManager::OnTap(csmFloat32 x, csmFloat32 y)
                     lam->hit_expression_name = lam->GetModelSetting()->GetExpressionName(ep);
                     std::cout << lam->hit_expression_name << std::endl;
                 }
-                std::cout << u8"ID " << lam->GetModelSetting()->GetHitAreaId(i)->GetString().GetRawString() << " " << lam->hit_name << std::endl;
+                std::cout << u8"Hit ID " << lam->GetModelSetting()->GetHitAreaId(i)->GetString().GetRawString() << " " << lam->hit_name << std::endl;
             }
         }
     }
@@ -354,7 +359,7 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
 {
     if (_modelDir.GetSize() <= 0)
         return;
-    static const std::string defdir = "./Resources/";
+    static const std::string defdir = ResourcesPath;
     if (modelname.size() <= defdir.size()) {
         if (_models.find(userid) != _models.end()) {
             ReleaseOneModel(userid);
@@ -463,8 +468,17 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
     uc->cubism_config.enable_blink = true;
     uc->cubism_config.blink_sel_list.Items[0].clear();
     uc->cubism_config.blink_sel_list.Items[1].clear();
+    uc->cubism_config.blinking_interval_seconds = 4.0f;
+    uc->cubism_config.closing_seconds = 0.10f;
+    uc->cubism_config.closed_seconds = 0.05f;
+    uc->cubism_config.opening_seconds = 0.15f;
     lam->canEyeBlink = uc->cubism_config.enable_blink;
     lam->GetEyeBlinkIds().Clear();
+    lam->GetBlinkingIntervalSeconds() = uc->cubism_config.blinking_interval_seconds;
+    lam->GetClosingSeconds()= uc->cubism_config.closing_seconds;
+    lam->GetClosedSeconds() = uc->cubism_config.closed_seconds;
+    lam->GetOpeningSeconds() = uc->cubism_config.opening_seconds;
+
     for (int paramid = 0; paramid < lam->GetModel()->GetParameterCount(); paramid++) {
         std::string param_str = lam->GetModel()->GetParameterId(paramid)->GetString().GetRawString();
         if (EYEBLINK_DEF.find(param_str) != EYEBLINK_DEF.end()) {
@@ -479,18 +493,20 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
         std::string param_str = lam->GetModel()->GetParameterId(pid)->GetString().GetRawString();
         lam->GetEyeBlinkIds().PushBack(CubismFramework::GetIdManager()->GetId(param_str.c_str()));
     }
-    for (const ImGuiID& pid : uc->cubism_config.blink_sel_list.Items[1]) {
-        lam->def_blink_list_ids.push_back(pid);
-    }
+    for (const ImGuiID& pid : uc->cubism_config.blink_sel_list.Items[1])
+        lam->def_blink_list_ids[1].push_back(pid);
+    for (const ImGuiID& pid : uc->cubism_config.blink_sel_list.Items[0]) 
+        lam->def_blink_list_ids[0].push_back(pid);
 
     //动画
-    //没有动画自动播放
     uc->cubism_config.enable_anim_autoplay = false;
     lam->animationAutoPlay = uc->cubism_config.enable_anim_autoplay;
 
-    //点击触发初始化
-    //启用预览
-    lam->previewHitareas = false;
+    //触发
+    uc->cubism_config.enable_hitareas = true;
+    uc->cubism_config.enable_preview_hitareas = false;
+    lam->canHitareas = uc->cubism_config.enable_hitareas;
+    lam->previewHitareas = uc->cubism_config.enable_preview_hitareas;
     Csm::ICubismModelSetting* lcms = lam->GetModelSetting();
     CubismModel* lamcm = lam->GetModel();
     LAppTextureManager* textureManager = LAppDelegate::GetInstance()->GetTextureManager();
@@ -571,6 +587,10 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
     //屏幕色组
     lam->InitPartScreenColor();
 
+    //观测
+    lam->sdata1_v.resize(lam->GetModel()->GetParameterCount());
+
+
     ////预期初始化
     //if (!uc->need_init_cubism) {
     //    lam->GetModelMatrix()->GetArray()[12] = uc->cubism_config.cubism_cg.cubism_tx_t;
@@ -582,6 +602,30 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
     //    lam->GetModelMatrix()->GetArray()[7] = uc->cubism_config.cubism_cg.cubism_tx_p;
     //    lam->GetModelMatrix()->GetArray()[3] = uc->cubism_config.cubism_cg.cubism_ty_p;
     //}
+
+
+    std::string cdifile = mjc.modelPath.GetRawString();
+    cdifile += lam->GetModelSetting()->GetDisplayInfoFileName();
+    std::cout << cdifile << std::endl;
+    std::ifstream file(cdifile, std::ios::binary | std::ios::ate); 
+    if (!file) {
+        std::cout << u8"无法打开cdi文件或没有cdi文件: " << cdifile << std::endl;
+    }
+    else {
+        std::streamsize size = file.tellg();
+        file.seekg(0, std::ios::beg);
+        unsigned char* buffer = new unsigned char[static_cast<int>(size)];
+        if (file.read(reinterpret_cast<char*>(buffer), size)) {
+            std::cout << u8"成功读取 JSON 文件，大小: " << size << u8" 字节" << std::endl;
+            lam->cdi_json = new CubismCdiJson(buffer, static_cast<csmSizeInt>(size));
+            lam->cdi_exist = true;
+        }
+        else {
+            std::cout << u8"读取文件失败" << std::endl;
+        }
+        delete[] buffer;
+        buffer = nullptr;
+    }
 
     uc->need_init_cubism = false;
     _models[userid] = lam;

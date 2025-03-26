@@ -21,6 +21,7 @@
 #include "../global.h"
 #include "./LAppSprite.hpp"
 #include "./LAppTextureManager.hpp"
+#include <CubismCdiJson.hpp>
 
 namespace Csc = Live2D::Cubism::Core;
 /**
@@ -111,6 +112,7 @@ private:
     float                                           flashTime           = 0.0f;
     float                                           flashing            = false;
     float                                           rgb_backup[4]       = { 0.0f };
+
 public:
     long long                                       hit_num             = 0;
     std::string                                     hit_name;
@@ -121,21 +123,39 @@ public:
     std::unordered_map<int, int>                    expression_map;
     std::string                                     hit_motion_name;
     std::string                                     hit_expression_name;
+    std::string                                     current_motion_name;
+    std::string                                     current_expression_name;
+    float                                           multiply_color[4]       = { 1.0f,1.0f, 1.0f, 1.0f };
+    float                                           screen_color[4]         = { 0.0f,0.0f, 0.0f, 1.0f };
     float                                           multiply_group_color[4] = { 1.0f,1.0f, 1.0f, 1.0f };
     float                                           screen_group_color[4]   = { 0.0f,0.0f, 0.0f, 1.0f };
-    bool                                            set_all_mp_mark = false;
-    bool                                            set_all_sp_mark = false;
+    bool                                            set_all_m_mark          = false;
+    bool                                            set_all_s_mark          = false;
+    bool                                            set_all_mp_mark         = false;
+    bool                                            set_all_sp_mark         = false;
+    Csm::CubismCdiJson*                             cdi_json                = nullptr;
+    bool                                            cdi_exist               = false;
+    std::vector<Su::ShinobuScrollingBuffer>         sdata1_v;
+    float                                           add_t                   = 0.f;
+    float                                           history_t               = 10.0f;
+
+
 public:
     CCG                                                 def_cubism_cg;
     std::vector<LookParam>                              def_look_target_params;
     std::vector<Csm::CubismBreath::BreathParameterData> def_breath_params;
-    std::vector<ImGuiID>                                def_blink_list_ids;
+    std::vector<ImGuiID>                                def_blink_list_ids[2];
 
 public:
     bool                canLookMouse                                = false;    //是否看向
     bool                canEyeBlink                                 = false;    //是否自动眨眼
+    bool                canHitareas                                 = true;     //是否启用触发
     bool                previewHitareas                             = false;    //预览触发区域
     bool                animationAutoPlay                           = false;    //启用动画自动播放
+    bool                overwriteFlagForModelMultiplyColors         = false;
+    bool                overwriteFlagForModelScreenColors           = false;
+    bool                overwriteFlagForModelCullings               = false;
+
     float               drawable_multiply_color[DEFSIZEK16][4]      = { 0.f };  //正片叠底参数
     float               drawable_screen_color[DEFSIZEK16][4]        = { 0.f};   //屏幕色参数
     float               drawable_part_multiply_color[DEFSIZEK16][4] = { 0.f };  //正片叠底组参数
@@ -144,26 +164,28 @@ public:
     std::unordered_map<std::string, Su::ShinobuExList>              hit_areas_motion_map;
     std::unordered_map<std::string, Su::ShinobuExList>              hit_areas_expression_map;
 
-    void InitMultiplyColor();
-    void InitScreenColor();
-    void InitPartMultiplyColor();
-    void InitPartScreenColor();
-
-    void StartFlashColor(int mark,int index);
-    void UpdateFlashColor();
-    void UpdateAllColor();
-
-    Csm::ICubismModelSetting*   GetModelSetting() const;
-    Csm::CubismTargetPoint*     GetModelDragManager()const;
-    float&                      GetLookTargetDamping();                             //看向目标阻尼
-    bool&                       GetCanBreath();                                     //是否呼吸
-    Csm::csmFloat32&            GetBlinkingIntervalSeconds();                       //眨眼的时间间隔
-    Csm::csmFloat32&            GetClosingSeconds();                                //闭眼所需的时间
-    Csm::csmFloat32&            GetClosedSeconds();                                 //完全闭合状态的持续时间
-    Csm::csmFloat32&            GetOpeningSeconds();                                //闭合到完全睁开的过渡时间
-    std::vector<LookParam>&                 GetLookTargetParams();                  //看向参数
-    Csm::csmVector<Csm::CubismIdHandle>&    GetEyeBlinkIds();                       //眨眼参数
-    Csm::csmVector<Csm::CubismBreath::BreathParameterData>& GetBreathParameters();  //呼吸参数
+    //初始化
+    void                                    InitMultiplyColor();
+    void                                    InitScreenColor();
+    void                                    InitPartMultiplyColor();
+    void                                    InitPartScreenColor();
+    //颜色闪烁
+    void                                    StartFlashColor(int mark,int index);
+    void                                    UpdateFlashColor();
+    void                                    UpdateAllColor();
+    //对象实例获取
+    Csm::ICubismModelSetting*               GetModelSetting() const;
+    Csm::CubismTargetPoint*                 GetModelDragManager()const;
+    //参数获取
+    float&                                  GetLookTargetDamping();                             //看向目标阻尼
+    bool&                                   GetCanBreath();                                     //是否呼吸
+    Csm::csmFloat32&                        GetBlinkingIntervalSeconds();                       //眨眼的时间间隔
+    Csm::csmFloat32&                        GetClosingSeconds();                                //闭眼所需的时间
+    Csm::csmFloat32&                        GetClosedSeconds();                                 //完全闭合状态的持续时间
+    Csm::csmFloat32&                        GetOpeningSeconds();                                //闭合到完全睁开的过渡时间
+    std::vector<LookParam>&                 GetLookTargetParams();                              //看向参数
+    Csm::csmVector<Csm::CubismIdHandle>&    GetEyeBlinkIds();                                   //眨眼参数
+    Csm::csmVector<Csm::CubismBreath::BreathParameterData>& GetBreathParameters();              //呼吸参数
     /**
      * @brief コンストラクタ
      */

@@ -1,4 +1,6 @@
 ﻿#include"suconfig.h"
+#include "translator.h"
+#include "filesetting.h"
 
 namespace Su {
     UserConfig::UserConfig(int useid) :
@@ -220,7 +222,56 @@ namespace Su {
         FileSetting::SetDoubleValue(uc->user_id, INIGROUPMARKSTR, inifreemark_map[FREEMARK::CUBISM_CG_CUBISM_TY_P], uc->cubism_config.cubism_cg.cubism_ty_p);
 
         FileSetting::EndSave(ini);
+    }
 
+    template<typename FT, typename T>
+    void SaveKasb(FT* uc, T* tc) {
+        static char key[DEFSIZE2];
+        static char appid[DEFSIZE2];
+        static char secret[DEFSIZE2];
+        static char baseurl[DEFSIZE2];
+        GetGuiMark(key, sizeof(key), inimark_map[INIMARK::KEY], tc->name);
+        GetGuiMark(appid, sizeof(appid), inimark_map[INIMARK::APPID], tc->name);
+        GetGuiMark(secret, sizeof(secret), inimark_map[INIMARK::SECRET], tc->name);
+        GetGuiMark(baseurl, sizeof(baseurl), inimark_map[INIMARK::BASEURL], tc->name);
+        if (POS_0 & tc->kasb.needpos)FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, key, tc->kasb.key);
+        if (POS_1 & tc->kasb.needpos)FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, appid, tc->kasb.appid);
+        if (POS_2 & tc->kasb.needpos)FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, secret, tc->kasb.secret);
+        if (POS_3 & tc->kasb.needpos)FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, baseurl, tc->kasb.baseurl);
+    }
+    template<typename FT, typename T>
+    void SaveAp(FT* uc, T* tc) {
+        static char address[DEFSIZE2];
+        static char port[DEFSIZE2];
+        GetGuiMark(address, sizeof(address), inimark_map[INIMARK::ADDRESS], tc->name);
+        GetGuiMark(port, sizeof(port), inimark_map[INIMARK::PORT], tc->name);
+        FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, address, tc->ap.address);
+        FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, port, tc->ap.port);
+    }
+
+    template<typename FT, typename T>
+    void InitKasb(FT* uc, T* tc) {
+        static char key[DEFSIZE2];
+        static char appid[DEFSIZE2];
+        static char secret[DEFSIZE2];
+        static char baseurl[DEFSIZE2];
+        GetGuiMark(key, sizeof(key), inimark_map[INIMARK::KEY], tc->name);
+        GetGuiMark(appid, sizeof(appid), inimark_map[INIMARK::APPID], tc->name);
+        GetGuiMark(secret, sizeof(secret), inimark_map[INIMARK::SECRET], tc->name);
+        GetGuiMark(baseurl, sizeof(baseurl), inimark_map[INIMARK::BASEURL], tc->name);
+        if (POS_0 & tc->kasb.needpos)strcpy_s(tc->kasb.key, sizeof(tc->kasb.key), FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, key, INITSTR).c_str());
+        if (POS_1 & tc->kasb.needpos)strcpy_s(tc->kasb.appid, sizeof(tc->kasb.appid), FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, appid, INITSTR).c_str());
+        if (POS_2 & tc->kasb.needpos)strcpy_s(tc->kasb.secret, sizeof(tc->kasb.secret), FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, secret, INITSTR).c_str());
+        if (POS_3 & tc->kasb.needpos)strcpy_s(tc->kasb.baseurl, sizeof(tc->kasb.baseurl), FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, baseurl, INITSTR).c_str());
+    }
+    template<typename FT, typename T>
+    void InitAp(FT* uc, T* tc) {
+        static char address[DEFSIZE2];
+        static char port[DEFSIZE2];
+        GetGuiMark(address, sizeof(address), inimark_map[INIMARK::ADDRESS], tc->name);
+        GetGuiMark(port, sizeof(port), inimark_map[INIMARK::PORT], tc->name);
+        strcpy_s(tc->ap.address, sizeof(tc->ap.address), FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, address, INITSTR).c_str());
+        strcpy_s(tc->ap.port, sizeof(tc->ap.port), FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, port, INITSTR).c_str());
     }
 
 }

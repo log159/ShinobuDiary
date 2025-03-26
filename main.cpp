@@ -8,13 +8,15 @@
 
 #include <d3d11.h>
 #include <tchar.h>
-#include <Windows.h>
+#include <windows.h>
 #include <iostream>
+#include <sstream>
 #include <thread>
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include "shinobuwidget.h"
+#include "./implot/implot.h"
 #include "./cubism_src/LAppDelegate.hpp"
 
 static ID3D11Device*            g_pd3dDevice            = nullptr;
@@ -25,6 +27,7 @@ static UINT                     g_ResizeWidth           = 0;
 static UINT                     g_ResizeHeight          = 0;
 static ID3D11RenderTargetView*  g_mainRenderTargetView  = nullptr;
 static bool                     while_done              = false;
+
 
 bool            CreateDeviceD3D(HWND hWnd);
 void            CleanupDeviceD3D();
@@ -56,6 +59,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     DWORD cubismThreadId;
     CreateThread(NULL, 0, CubismThread, NULL, 0, &cubismThreadId);
+
     std::cout << u8"Cubism 进程ID" << cubismThreadId << std::endl;
     // Cubism 运行后可继续
     while (!GlobalTemp::CubismIsRunning);
@@ -101,14 +105,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         ImGui::NewFrame();
         //WINDOWS BEGIN--------------------------------------------------------------------------
         //Demo Window
-        //static bool show_demo_window = true;
-        //if (show_demo_window)ImGui::ShowDemoWindow(&show_demo_window);
+        static bool show_demo_window = true;
+        if (show_demo_window)ImGui::ShowDemoWindow(&show_demo_window);
+
+        //MAIN WINDOWS
         static bool show_shinobu_window = true;
         ShowShinobuWindow(&show_shinobu_window);
         ShowShinobuStyleEditor();
         ShowShinobuInteractively();
         ShowShinobuErrorWindow();//Error Window
         ShowShinobuDebugWindow();//Debug Window
+        ShowShinobuPlot();
+
         //WINDOWS END--------------------------------------------------------------------------
         if (show_shinobu_window == false)QuitHandle();
         //限制帧率
@@ -141,7 +149,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 }
 void QuitHandle() {
     while_done = true;
-    std::cout << u8"全局退出预备" << std::endl;
+    std::cout << u8"全局退出消息" << std::endl;
     LAppDelegate::GetInstance()->AppEnd();
     std::cout << u8"Cubism 退出" << std::endl;
     ::GlobalConfig::GlobalConfigSave();
@@ -169,6 +177,8 @@ DWORD WINAPI CubismThread(LPVOID lpParam)
     std::cout << u8"Cubism 终了" << std::endl;
     return 0;
 }
+
+
 void FrontPart() {
     // 全局UTF-8
     SetConsoleOutputCP(CP_UTF8);
@@ -194,6 +204,7 @@ void FrontPart() {
     // Setup context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -218,7 +229,7 @@ void PosteriorPart() {
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
-
+    ImPlot::DestroyContext();
     CleanupDeviceD3D();
     ::DestroyWindow(GlobalTemp::WindowMainHandle);
     ::UnregisterClassW(GlobalTemp::WindowMainWc.lpszClassName, GlobalTemp::WindowMainWc.hInstance);

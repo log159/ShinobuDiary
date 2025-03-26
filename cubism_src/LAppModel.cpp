@@ -45,9 +45,6 @@ namespace {
         LAppPal::ReleaseBytes(buffer);
     }
 }
-
-
-
 void LAppModel::InitMultiplyColor()
 {
     for (int i = 0; i < int(this->GetModel()->GetDrawableCount()); i++)
@@ -280,6 +277,8 @@ LAppModel::~LAppModel()
     _bindTextureId.Clear();
 
     delete _modelSetting;
+    _modelSetting = nullptr;
+    //删除标记触发区域纹理
     LAppTextureManager* textureManager = LAppDelegate::GetInstance()->GetTextureManager();
     for (auto& val : hitareas) {
         for (auto& las : val.second) {
@@ -289,6 +288,9 @@ LAppModel::~LAppModel()
             las = NULL;
         }
     }
+    //删除cdi json数据
+    delete cdi_json;
+    cdi_json = nullptr;
 }
 
 void LAppModel::LoadAssets(const csmChar* dir, const csmChar* fileName)
@@ -677,6 +679,13 @@ void LAppModel::Update()
         _pose->UpdateParameters(_model, deltaTimeSeconds);
     }
 
+    //状态观测
+    this->add_t += deltaTimeSeconds;
+    for (int i = 0; i < this->GetModel()->GetParameterCount(); ++i) {
+        Su::ShinobuScrollingBuffer& sdata1 = this->sdata1_v[i];
+        sdata1.AddPoint(this->add_t, this->GetModel()->GetParameterValue(i));
+    }
+
     _model->Update();
 
 }
@@ -742,6 +751,8 @@ CubismMotionQueueEntryHandle LAppModel::StartMotion(const csmChar* group, csmInt
     {
         LAppPal::PrintLogLn("[APP]start motion: [%s_%d]", group, no);
     }
+
+    this->current_motion_name = fileName.GetRawString();
     return  _motionManager->StartMotionPriority(motion, autoDelete, priority);
 }
 
@@ -815,7 +826,7 @@ void LAppModel::SetExpression(const csmChar* expressionID)
     {
         LAppPal::PrintLogLn("[APP]expression: [%s]", expressionID);
     }
-
+    this->current_expression_name = expressionID;
     if (motion != NULL)
     {
         _expressionManager->StartMotion(motion, false);

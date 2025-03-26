@@ -126,7 +126,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dxgi.lib;Dwmapi.lib;SparkChain.lib;Framework.lib;-NODEFAULTLIB:libcmt.lib;Live2DCubismCore_MT.lib;DirectXTK.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dxgi.lib;Dwmapi.lib;SparkChain.lib;Framework.lib;-NODEFAULTLIB:libcmt.lib;Live2DCubismCore_MT.lib;DirectXTK.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;pdh.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>./sparkdesk_src/libs/x86;./framework_src/libs;./directxtk_src/libs;./native_src./libs/windows/x86/143;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -187,6 +187,9 @@
     <ClCompile Include="cubism_src\TouchManager.cpp" />
     <ClCompile Include="filesetting.cpp" />
     <ClCompile Include="global.cpp" />
+    <ClCompile Include="implot\implot.cpp" />
+    <ClCompile Include="implot\implot_demo.cpp" />
+    <ClCompile Include="implot\implot_items.cpp" />
     <ClCompile Include="llmhome.cpp" />
     <ClCompile Include="simpleini-4.22_src\ConvertUTF.cpp" />
     <ClCompile Include="suconfig.cpp" />
@@ -231,6 +234,8 @@
     <ClInclude Include="global.h" />
     <ClInclude Include="imgui_impl_dx11.h" />
     <ClInclude Include="imgui_impl_win32.h" />
+    <ClInclude Include="implot\implot.h" />
+    <ClInclude Include="implot\implot_internal.h" />
     <ClInclude Include="llmhome.h" />
     <ClInclude Include="shinobuwidget.h" />
     <ClInclude Include="simpleini-4.22_src\ConvertUTF.h" />

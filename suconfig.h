@@ -3,9 +3,6 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
-#include "filesetting.h"
-#include "translator.h"
-#include "imgui.h"
 #include "sufunction.h"
 #include "cubism_src/LAppModel.hpp"
 
@@ -13,22 +10,16 @@
 #define POS_1 uint32_t(0x2)
 #define POS_2 uint32_t(0x4)
 #define POS_3 uint32_t(0x8)
-
 using std::cout;
 using std::endl;
 enum class LAN :int;
 class GlobalConfig;
 
 namespace Su{
-    struct Kasb;
-    struct Ap;
-    class ConfigBase;
-    class LLMConfig;
-    class TTSConfig;
-    class STTConfig;
-    class MTConfig;
-    class UserConfig;
-    class CubismConfig;
+    struct  Kasb; struct  Ap;
+    class   ConfigBase;
+    class   LLMConfig; class   TTSConfig; class   STTConfig; class   MTConfig;
+    class   UserConfig; class   CubismConfig;
     struct  Su::ShinobuExList;
     enum LLM { CHATGPT, SPARKDESK, DEEPSEEK };
     enum TTS { VITS_SIMPLE_API, GPT_SOVITS, MYSELF_VITS };
@@ -40,11 +31,17 @@ namespace Su{
         std::string                                             model_dir;
         CCG                                                     cubism_cg;
         //New Member
-        bool                                                    enable_look_mouse;      //true
-        float                                                   damping;                //0.15
-        bool                                                    enable_breath;          //true
-        bool                                                    enable_blink;           //true
-        bool                                                    enable_anim_autoplay;   //false
+        bool                                                    enable_look_mouse;          //true
+        float                                                   damping;                    //0.15f
+        bool                                                    enable_breath;              //true
+        bool                                                    enable_blink;               //true
+        float                                                   blinking_interval_seconds;  //4.0f
+        float                                                   closing_seconds;            //0.10f
+        float                                                   closed_seconds;             //0.05f
+        float                                                   opening_seconds;            //0.15f
+        bool                                                    enable_anim_autoplay;       //false
+        bool                                                    enable_hitareas;            //true
+        bool                                                    enable_preview_hitareas;    //false
         std::vector<LookParam>                                  look_target_params;
         std::vector<Csm::CubismBreath::BreathParameterData>     breath_params;
         Su::ShinobuExList                                       blink_sel_list;
@@ -69,16 +66,16 @@ namespace Su{
         Su::TTS                      select_tts;
         Su::STT                      select_stt;
         Su::MT                       select_mt;
-        int                          vits_simple_api_model_id;
-        int                          vits_simple_api_speaker_id;
-        int                          vits_simple_api_emotion_id;
-        int                          gpt_sovits_target_language_id;
         std::string                  myself_vits;
         CubismConfig                 cubism_config;
         std::vector<LLMConfig>       llms;
         std::vector<TTSConfig>       ttss;
         std::vector<STTConfig>       stts;
         std::vector<MTConfig>        mts;
+        int                          vits_simple_api_model_id;
+        int                          vits_simple_api_speaker_id;
+        int                          vits_simple_api_emotion_id;
+        int                          gpt_sovits_target_language_id;
     public:
         explicit UserConfig(int useid);
         void operator=(const UserConfig& uc);
@@ -109,11 +106,12 @@ namespace Su{
 
 
     struct Kasb {
-        uint32_t needpos = 1;               /* key appid secret baseurl -> 2^0 / 2^1 / 2^2 / 2^3 */
-        char key[DEFSIZE] = INITSTR;        //1
-        char appid[DEFSIZE] = INITSTR;      //2
-        char secret[DEFSIZE] = INITSTR;     //4
-        char baseurl[DEFSIZE] = INITSTR;    //8
+        /* key appid secret baseurl -> 2^0 / 2^1 / 2^2 / 2^3 */
+        uint32_t needpos        = 1;
+        char key[DEFSIZE]       = INITSTR;  //1
+        char appid[DEFSIZE]     = INITSTR;  //2
+        char secret[DEFSIZE]    = INITSTR;  //4
+        char baseurl[DEFSIZE]   = INITSTR;  //8
     };
     struct Ap {
         char address[DEFSIZE] = INITSTR;
@@ -165,59 +163,17 @@ namespace Su{
 
     void AllConfigInit();
     void UserConfigInit(UserConfig* uc);
-
     void AllConfigSave();
     void UserConfigSave(UserConfig* uc);
 
     //配置信息保存到文件
     template<typename FT, typename T>
-    void SaveKasb(FT* uc, T* tc) {
-        static char key[DEFSIZE2];
-        static char appid[DEFSIZE2];
-        static char secret[DEFSIZE2];
-        static char baseurl[DEFSIZE2];
-        GetGuiMark(key, sizeof(key), inimark_map[INIMARK::KEY], tc->name);
-        GetGuiMark(appid, sizeof(appid), inimark_map[INIMARK::APPID], tc->name);
-        GetGuiMark(secret, sizeof(secret), inimark_map[INIMARK::SECRET], tc->name);
-        GetGuiMark(baseurl, sizeof(baseurl), inimark_map[INIMARK::BASEURL], tc->name);
-        if (POS_0 & tc->kasb.needpos)FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, key, tc->kasb.key);
-        if (POS_1 & tc->kasb.needpos)FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, appid, tc->kasb.appid);
-        if (POS_2 & tc->kasb.needpos)FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, secret, tc->kasb.secret);
-        if (POS_3 & tc->kasb.needpos)FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, baseurl, tc->kasb.baseurl);
-    }
+    void SaveKasb(FT* uc, T* tc);
     template<typename FT, typename T>
-    void SaveAp(FT* uc, T* tc) {
-        static char address[DEFSIZE2]; 
-        static char port[DEFSIZE2];
-        GetGuiMark(address, sizeof(address), inimark_map[INIMARK::ADDRESS], tc->name);
-        GetGuiMark(port, sizeof(port), inimark_map[INIMARK::PORT], tc->name);
-        FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, address,tc->ap.address);
-        FileSetting::SetValue(uc->user_id, INIGROUPMARKSTR, port, tc->ap.port);
-    }
-
+    void SaveAp(FT* uc, T* tc);
     template<typename FT,typename T>
-    void InitKasb(FT* uc, T* tc) {
-        static char key[DEFSIZE2];
-        static char appid[DEFSIZE2];
-        static char secret[DEFSIZE2];
-        static char baseurl[DEFSIZE2];
-        GetGuiMark(key, sizeof(key), inimark_map[INIMARK::KEY], tc->name);
-        GetGuiMark(appid, sizeof(appid), inimark_map[INIMARK::APPID], tc->name);
-        GetGuiMark(secret, sizeof(secret), inimark_map[INIMARK::SECRET], tc->name);
-        GetGuiMark(baseurl, sizeof(baseurl), inimark_map[INIMARK::BASEURL], tc->name);
-        if (POS_0 & tc->kasb.needpos)strcpy_s(tc->kasb.key,sizeof(tc->kasb.key), FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, key, INITSTR).c_str());
-        if (POS_1 & tc->kasb.needpos)strcpy_s(tc->kasb.appid, sizeof(tc->kasb.appid),FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, appid, INITSTR).c_str());
-        if (POS_2 & tc->kasb.needpos)strcpy_s(tc->kasb.secret, sizeof(tc->kasb.secret), FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, secret, INITSTR).c_str());
-        if (POS_3 & tc->kasb.needpos)strcpy_s(tc->kasb.baseurl, sizeof(tc->kasb.baseurl), FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, baseurl, INITSTR).c_str());
-    }
+    void InitKasb(FT* uc, T* tc);
     template<typename FT, typename T>
-    void InitAp(FT* uc, T* tc) {
-        static char address[DEFSIZE2];
-        static char port[DEFSIZE2];
-        GetGuiMark(address, sizeof(address), inimark_map[INIMARK::ADDRESS], tc->name);
-        GetGuiMark(port, sizeof(port), inimark_map[INIMARK::PORT], tc->name);
-        strcpy_s(tc->ap.address,sizeof(tc->ap.address), FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, address, INITSTR).c_str());
-        strcpy_s(tc->ap.port, sizeof(tc->ap.port),FileSetting::GetValue(uc->user_id, INIGROUPMARKSTR, port, INITSTR).c_str());
-    }
+    void InitAp(FT* uc, T* tc);
 
 }

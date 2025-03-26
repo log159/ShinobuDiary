@@ -1,13 +1,9 @@
 ﻿#pragma once
-#include<iostream>
-#include<string>
+#include "sizedef.h"
+#include <string>
 #include "./simpleini-4.22_src/ConvertUTF.h"
 #include "./simpleini-4.22_src/SimpleIni.h"
-#include <wincrypt.h>
-#include "sizedef.h"
 
-using std::cout;
-using std::endl;
 #define INITSTR ""
 #define INITINT 0
 #define INITDOUBLE 0.0

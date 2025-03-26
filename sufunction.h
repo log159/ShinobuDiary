@@ -1,13 +1,10 @@
 ﻿#pragma once
-#include <iostream>
-#include <string.h>
-#include <string>
-#include <vector>
-#include "timeconfig.h"
-#include "sizedef.h"
-#include <cmath>
+
 #include "imgui.h"
 #include "imgui_internal.h"
+#include <string>
+#include <vector>
+#include <iostream>
 
 namespace Su {
 
@@ -23,6 +20,22 @@ namespace Su {
         void ApplySelectionRequests(ImGuiMultiSelectIO* ms_io, int side);
         bool Show(const char** ex_name);
     };
+    struct ShinobuScrollingBuffer {
+        int MaxSize;
+        int Offset;
+        ImVector<ImVec2> Data;
+        ShinobuScrollingBuffer(int max_size = 4000);
+        void AddPoint(float x, float y);
+        void Erase();
+    };
+
+    struct ShinobuRollingBuffer {
+        float Span;
+        ImVector<ImVec2> Data;
+        ShinobuRollingBuffer();
+        void AddPoint(float x, float y);
+    };
+
     extern void MemsetStr(char* str, size_t size);
     extern void GetGuiMark(char* markbuf, size_t size, const char* name, const char* id);
     extern void StringSplit(std::string str, const char split, std::vector<std::string>& sv);

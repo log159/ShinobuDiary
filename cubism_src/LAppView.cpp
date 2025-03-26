@@ -6,8 +6,9 @@
  */
 
 #include "LAppView.hpp"
-#include <math.h>
+#include <cmath>
 #include <string>
+#include <sstream>
 #include "LAppPal.hpp"
 #include "LAppDelegate.hpp"
 #include "LAppLive2DManager.hpp"
@@ -17,7 +18,6 @@
 #include "LAppSprite.hpp"
 #include "LAppSpriteShader.hpp"
 #include "LAppModel.hpp"
-
 #include "../global.h"
 
 using namespace std;

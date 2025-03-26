@@ -1,8 +1,5 @@
 ﻿#pragma once
-#include <iostream>
-#include <chrono>
-#include <iomanip>
-#include <sstream>
+#include <string>
 
 extern std::string getCurrentTime();
 extern std::string getCurrentYear();

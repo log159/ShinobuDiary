@@ -1,0 +1,1 @@
+./Resources/ModelDir/*.model3.json

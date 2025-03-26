@@ -1,6 +1,7 @@
 ﻿#include "global.h"
 #include <vector>
 #include <string>
+#include <sstream>
 
 #define IS_WINDOWS
 #ifdef IS_WINDOWS
@@ -9,16 +10,15 @@
 #endif // IS_WINDOWS
 
 std::ostringstream GlobalTemp:: DebugOss;
-bool GlobalTemp::               ShowStyleEditor = false;
+bool GlobalTemp::               ShowStyleEditor                 = false;
 HWND GlobalTemp::               WindowMainHandle;
 WNDCLASSEXW GlobalTemp::        WindowMainWc;
-int GlobalTemp::                CubismFrameCount = 0;
-bool GlobalTemp::               RefreshTable = true;
-bool GlobalTemp::               RefreshCubism = true;
-bool GlobalTemp::               CubismIsRunning = false;
+int GlobalTemp::                CubismFrameCount                = 0;
+bool GlobalTemp::               RefreshTable                    = true;
+bool GlobalTemp::               RefreshCubism                   = true;
+bool GlobalTemp::               CubismIsRunning                 = false;
 bool GlobalTemp::               TableBools[DEFSIZE][DEFSIZEK16] = {false};
-float  GlobalTemp::             GuiButtonWidth = 200.f;
-
+float  GlobalTemp::             GuiButtonWidth                  = 200.f;
 
 const LPCWSTR GlobalTemp::CubismDirectXClassName    = L"Cubism DirectX11 Sample";
 const LPCWSTR GlobalTemp::CubismWindowClassName     = L"ShinobuDiary Cubism";
