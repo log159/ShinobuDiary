@@ -3,14 +3,8 @@
 #include <string>
 #include "./simpleini-4.22_src/ConvertUTF.h"
 #include "./simpleini-4.22_src/SimpleIni.h"
+#include "./somemacros.h"
 
-#define INITSTR ""
-#define INITINT 0
-#define INITDOUBLE 0.0
-#define INITBOOL false
-#define INITFILE "./Saves/userconfig.ini"
-#define ZEROFLOAT (float(1e-6))
-#define ZERODOUBLE (double(1e-15))
 
 class FileSetting {
 public:

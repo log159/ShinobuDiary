@@ -35,7 +35,7 @@ extern void ShowShinobuCsmBreath(Su::UserConfig& uc, LAppModel* lam);
 extern void ShowShinobuCsmBlink(Su::UserConfig& uc, LAppModel* lam);
 extern void ShowShinobuCsmAnimation(Su::UserConfig& uc, LAppModel* lam);
 extern void ShowShinobuCsmHitareas(Su::UserConfig& uc, LAppModel* lam);
-extern void ShowShinobuCsmColor(Su::UserConfig& uc, LAppModel* lam);
+extern void ShowShinobuCsmRendering(Su::UserConfig& uc, LAppModel* lam);
 extern void ShowShinobuCsmObserve(Su::UserConfig& uc, LAppModel* lam);
 //shinobu func
 extern void RemoveUserHandle(int re_userid);

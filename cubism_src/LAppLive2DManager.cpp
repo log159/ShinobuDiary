@@ -586,6 +586,8 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
     lam->InitPartMultiplyColor();
     //屏幕色组
     lam->InitPartScreenColor();
+    //透明组
+    lam->InitPartOpacity();
 
     //观测
     lam->sdata1_v.resize(lam->GetModel()->GetParameterCount());

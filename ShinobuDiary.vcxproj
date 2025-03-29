@@ -241,6 +241,7 @@
     <ClInclude Include="simpleini-4.22_src\ConvertUTF.h" />
     <ClInclude Include="simpleini-4.22_src\SimpleIni.h" />
     <ClInclude Include="sizedef.h" />
+    <ClInclude Include="somemacros.h" />
     <ClInclude Include="sparkdesk.h" />
     <ClInclude Include="imgui_src\imconfig.h" />
     <ClInclude Include="imgui_src\imgui.h" />

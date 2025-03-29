@@ -35,11 +35,15 @@ namespace Su {
         ShinobuRollingBuffer();
         void AddPoint(float x, float y);
     };
-
     extern void MemsetStr(char* str, size_t size);
-    extern void GetGuiMark(char* markbuf, size_t size, const char* name, const char* id);
+    extern void JoinGuiMark(char* markbuf, size_t size, const char* name, const char* id);
+
     extern void StringSplit(std::string str, const char split, std::vector<std::string>& sv);
     extern void HelpMarker(const char* desc);
     extern void ColorConvertHSVtoRGB(float h, float s, float v, float& out_r, float& out_g, float& out_b);
 
+    template <typename T>
+    T Clamp(T value, T min, T max) {
+        return (value < min) ? min : (value > max ? max : value);
+    }
 }

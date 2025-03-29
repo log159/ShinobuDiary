@@ -8021,9 +8021,9 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
 
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.50f);
 
-    if (ImGui::ShowStyleSelector(TT_43))
+    if (ImGui::ShowStyleSelector(GETGUIID(TT_43)))
         ref_saved_style = style;
-    ImGui::ShowFontSelector(TT_44);
+    ImGui::ShowFontSelector(GETGUIID(TT_44));
 
     // Simplified Settings (expose floating-pointer border sizes as boolean representing 0.0f or 1.0f)
     if (ImGui::SliderFloat(TT_45, &style.FrameRounding, 0.0f, 12.0f, "%.0f"))

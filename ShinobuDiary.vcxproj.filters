@@ -323,5 +323,8 @@
     <ClInclude Include="implot\implot_internal.h">
       <Filter>implot</Filter>
     </ClInclude>
+    <ClInclude Include="somemacros.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -105,8 +105,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         ImGui::NewFrame();
         //WINDOWS BEGIN--------------------------------------------------------------------------
         //Demo Window
-        static bool show_demo_window = true;
-        if (show_demo_window)ImGui::ShowDemoWindow(&show_demo_window);
+        //static bool show_demo_window = true;
+        //if (show_demo_window)ImGui::ShowDemoWindow(&show_demo_window);
 
         //MAIN WINDOWS
         static bool show_shinobu_window = true;

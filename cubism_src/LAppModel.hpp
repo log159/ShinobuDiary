@@ -104,14 +104,26 @@ struct CCG {
     float cubism_ty_p;
 };
 
+struct FLICKER {
+    std::string             hash_mark;
+    float                   flash_time      = 1.0f;
+    float*                  flash_color[4]  = { nullptr ,nullptr ,nullptr ,nullptr };
+    float                   rgb_backup[4]   = { 0.0f,0.0f,0.0f,0.0f };
+};
+struct FLICKER_OPACITY {
+    std::string             hash_mark;
+    float                   flash_time      = 1.0f;
+    float*                  flash_color     = nullptr;
+    float                   rgb_backup      = 1.0f;
+};
+
 class LAppModel : public Csm::CubismUserModel
 {
 private:
-    bool                                            canFlash            = false;
-    float*                                          flashColor[4]       = { nullptr };
-    float                                           flashTime           = 0.0f;
-    float                                           flashing            = false;
-    float                                           rgb_backup[4]       = { 0.0f };
+    //对于颜色标识位置
+    std::vector<FLICKER>                            flicker_v;
+    //对于透明标识位置
+    std::vector<FLICKER_OPACITY>                    flicker_opacity_v;
 
 public:
     long long                                       hit_num             = 0;
@@ -129,10 +141,12 @@ public:
     float                                           screen_color[4]         = { 0.0f,0.0f, 0.0f, 1.0f };
     float                                           multiply_group_color[4] = { 1.0f,1.0f, 1.0f, 1.0f };
     float                                           screen_group_color[4]   = { 0.0f,0.0f, 0.0f, 1.0f };
+    float                                           group_opacity           = 1.0f;
     bool                                            set_all_m_mark          = false;
     bool                                            set_all_s_mark          = false;
     bool                                            set_all_mp_mark         = false;
     bool                                            set_all_sp_mark         = false;
+    bool                                            set_all_po_mark         = false;
     Csm::CubismCdiJson*                             cdi_json                = nullptr;
     bool                                            cdi_exist               = false;
     std::vector<Su::ShinobuScrollingBuffer>         sdata1_v;
@@ -152,14 +166,16 @@ public:
     bool                canHitareas                                 = true;     //是否启用触发
     bool                previewHitareas                             = false;    //预览触发区域
     bool                animationAutoPlay                           = false;    //启用动画自动播放
-    bool                overwriteFlagForModelMultiplyColors         = false;
-    bool                overwriteFlagForModelScreenColors           = false;
-    bool                overwriteFlagForModelCullings               = false;
+    bool                overwriteFlagForModelMultiplyColors         = false;    //启用正片叠底
+    bool                overwriteFlagForModelScreenColors           = false;    //启用屏幕色
+    bool                overwriteFlagForModelCullings               = false;    //启用剔除规则
 
-    float               drawable_multiply_color[DEFSIZEK16][4]      = { 0.f };  //正片叠底参数
-    float               drawable_screen_color[DEFSIZEK16][4]        = { 0.f};   //屏幕色参数
-    float               drawable_part_multiply_color[DEFSIZEK16][4] = { 0.f };  //正片叠底组参数
-    float               drawable_part_screen_color[DEFSIZEK16][4]   = { 0.f };  //屏幕色组参数
+    float               drawable_multiply_color[DEFSIZEK16][4];                 //正片叠底参数
+    float               drawable_screen_color[DEFSIZEK16][4];                   //屏幕色参数
+    float               drawable_part_multiply_color[DEFSIZEK16][4];            //正片叠底组参数
+    float               drawable_part_screen_color[DEFSIZEK16][4];              //屏幕色组参数
+    float               drawable_part_opacity[DEFSIZEK16];                      //透明组参数
+
     std::unordered_map<std::string, std::vector<LAppSprite*>>       hitareas;   //点击触发预览区域 对应 N * 4 个矩形
     std::unordered_map<std::string, Su::ShinobuExList>              hit_areas_motion_map;
     std::unordered_map<std::string, Su::ShinobuExList>              hit_areas_expression_map;
@@ -169,9 +185,12 @@ public:
     void                                    InitScreenColor();
     void                                    InitPartMultiplyColor();
     void                                    InitPartScreenColor();
+    void                                    InitPartOpacity();
     //颜色闪烁
     void                                    StartFlashColor(int mark,int index);
+    void                                    StartFlashOpacity(int index);
     void                                    UpdateFlashColor();
+    void                                    UpdateFlashOpacity();
     void                                    UpdateAllColor();
     //对象实例获取
     Csm::ICubismModelSetting*               GetModelSetting() const;

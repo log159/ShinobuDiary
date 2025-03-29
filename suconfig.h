@@ -5,11 +5,8 @@
 #include <unordered_map>
 #include "sufunction.h"
 #include "cubism_src/LAppModel.hpp"
+#include "./somemacros.h"
 
-#define POS_0 uint32_t(0x1)
-#define POS_1 uint32_t(0x2)
-#define POS_2 uint32_t(0x4)
-#define POS_3 uint32_t(0x8)
 using std::cout;
 using std::endl;
 enum class LAN :int;

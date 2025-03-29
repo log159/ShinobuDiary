@@ -5,9 +5,7 @@
 #include "filesetting.h"
 #include "imgui.h"
 #include "sufunction.h"
-#define STYLEWAY "./Saves/style.data"
-
-class FileSetting;
+#include "./somemacros.h"
 
 class GlobalTemp {
 public:
@@ -26,7 +24,6 @@ public:
     static bool                                     CubismIsRunning;
     static bool                                     TableBools[DEFSIZE][DEFSIZEK16];
     static float                                    GuiButtonWidth;
-
 };
 
 enum FREEMARK {

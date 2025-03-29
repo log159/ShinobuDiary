@@ -50,7 +50,7 @@ void ShowShinobuStart()
 {
     static std::vector<std::string>column_names_v;
     static int column_names_size = (int)Su::UserConfig::getUserVector().size() + 1;
-    static const char* column_names[DEFSIZE] = {  };
+    static const char* column_names[DEFSIZE];
     const char* rows_names[] = { TT_258,TT_259/* ,TT_260, TT_261, TT_262,TT_263,TT_264*/ };
     static ImGuiTableFlags table_flags = ImGuiTableFlags_ScrollX | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_Hideable | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_HighlightHoveredColumn;
     static ImGuiTableColumnFlags column_flags = ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
@@ -70,7 +70,7 @@ void ShowShinobuStart()
         std::cout << u8"变化用户表格实例" << std::endl;
         column_names_v.clear();
         column_names_v.reserve(column_names_size);
-        static char tabname[DEFSIZE];
+        static char tabname[DEFSIZEK16];
         memset(tabname, 0, sizeof(tabname));
         column_names[0] = TT_265;
         for (int i = 0; i < column_names_size-1; ++i) {
@@ -112,7 +112,7 @@ void ShowShinobuStart()
         }
     }
 
-    if (ImGui::CollapsingHeader(TT_256))
+    if (ImGui::CollapsingHeader(GETGUIID(TT_256)))
     {
         if (Su::UserConfig::getUserVector().size() <= 0) {
             ImGui::Text(TT_257);
@@ -175,7 +175,7 @@ void ShowShinobuStyleEditor()
 {
     if (GlobalTemp::ShowStyleEditor) {
         ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
-        ImGui::Begin(TT_39, &GlobalTemp::ShowStyleEditor);
+        ImGui::Begin(GETGUIID(TT_39), &GlobalTemp::ShowStyleEditor);
         ImGui::ShowStyleEditor();
         ImGui::End();
     }
@@ -204,7 +204,8 @@ void ShowShinobuInteractively()
         if (uc.enable_widget) {
 
             memset(winname, 0, sizeof(winname));
-            strcpy_s(winname, sizeof(winname), TT_279);
+            strcpy_s(winname, sizeof(winname), GETGUIID(TT_279));
+            strcat_s(winname, sizeof(winname), "_%d");
             snprintf(winname, sizeof(winname), winname, uc.user_id, uc.user_id);
             ImGui::Begin(winname, &GlobalTemp::TableBools[0][uc.user_id]);
             const char* tab_buf[DEFSIZE] = { TT_366,TT_367,TT_368,TT_369,TT_370,TT_371,TT_372,TT_376 };
@@ -226,7 +227,7 @@ void ShowShinobuInteractively()
                 case 3:ShowShinobuCsmBlink(uc, lam); break;
                 case 4:ShowShinobuCsmAnimation(uc, lam); break;
                 case 5:ShowShinobuCsmHitareas(uc, lam); break;
-                case 6:ShowShinobuCsmColor(uc, lam); break;
+                case 6:ShowShinobuCsmRendering(uc, lam); break;
                 case 7:ShowShinobuCsmObserve(uc, lam); break;
                 default:break;
             }
@@ -256,7 +257,7 @@ void ShowShinobuCubism()
 }
 void ShowShinobuCSM(Su::UserConfig* _uc)
 {
-    ImGui::SeparatorText(TT_267);
+    ImGui::SeparatorText(GETGUIID(TT_267));
 
     Csm::csmVector<Csm::csmString>& csmModelDir = LAppLive2DManager::GetInstance()->GetModelDir();
     if (csmModelDir.GetSize() <= 0) {
@@ -322,21 +323,21 @@ void ShowShinobuLanguage() {
     auto f = [fl](const char* headertitle) {
         if (ImGui::CollapsingHeader(headertitle))fl(TT_4);
     };
-    f(TT_5);
+    f(GETGUIID(TT_5));
 }
 void ShowShinobuStyle()
 {
-    if(ImGui::CollapsingHeader(TT_40)) {
+    if(ImGui::CollapsingHeader(GETGUIID(TT_40))) {
         ImGui::Checkbox(TT_41, &GlobalTemp::ShowStyleEditor);
     }
 }
 void ShowShinobuGlobal()
 {
-    if (ImGui::CollapsingHeader(TT_224))
+    if (ImGui::CollapsingHeader(GETGUIID(TT_224)))
     {
         float halfWidth = ImGui::GetWindowSize().x / 2.0f;
 
-        if (ImGui::TreeNode(TT_231)) {
+        if (ImGui::TreeNode(GETGUIID(TT_231))) {
 
             ImGuiIO& io = ImGui::GetIO(); (void)io;
             ImGui::SeparatorText(TT_232);
@@ -390,7 +391,7 @@ void ShowShinobuGlobal()
 
             ImGui::TreePop();
         }
-        if (ImGui::TreeNode(TT_225)) {
+        if (ImGui::TreeNode(GETGUIID(TT_225))) {
             ImGui::SeparatorText(TT_230);
             static int e = ::GlobalConfig::getInstance()->window_cubism_style_id;
             ImGui::RadioButton(TT_226, &e, 0); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth * 0.5f);
@@ -414,7 +415,7 @@ void ShowShinobuGlobal()
 }
 void ShowShinobuUser()
 {
-    if (ImGui::CollapsingHeader(TT_32))
+    if (ImGui::CollapsingHeader(GETGUIID(TT_32)))
     {
         ImGui::BeginGroup();//G1
         // Left
@@ -422,7 +423,7 @@ void ShowShinobuUser()
         ImGui::BeginChild("###BeginChild___ShowShinobuUser_L", ImVec2(150,400), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX);//C1
         for (int i = 0; i < int(Su::UserConfig::getUserVector().size()); i++)
         {
-            char label[DEFSIZE];
+            static char label[DEFSIZE];
             sprintf_s(label, sizeof(label), TT_33, Su::UserConfig::getUserVector()[i].user_id);
             if (ImGui::Selectable(label, selected == i))
                 selected = i;
@@ -468,7 +469,7 @@ void ShowShinobuUser()
         ImGui::Text(TT_33, _uc->user_id);
         ImGui::Separator();
         if (ImGui::BeginTabBar("###BeginTabBar___ShowShinobuUser", ImGuiTabBarFlags_None)) {
-            if (ImGui::BeginTabItem(TT_267)) { ShowShinobuCSM(_uc); ImGui::EndTabItem(); }
+            if (ImGui::BeginTabItem(GETGUIID(TT_267))) { ShowShinobuCSM(_uc); ImGui::EndTabItem(); }
             //if (ImGui::BeginTabItem(TT_7)) { ShowShinobuLLM(_uc); ImGui::EndTabItem(); }
             //if (ImGui::BeginTabItem(TT_10)) { ShowShinibuTTS(_uc); ImGui::EndTabItem(); }
             //if (ImGui::BeginTabItem(TT_12)) { ShowShinobuSTT(_uc); ImGui::EndTabItem(); }
@@ -497,7 +498,7 @@ void ShowShinobuLLM(Su::UserConfig* _uc) {
     };
     auto ft = [fb](const char* nodename, Su::LLMConfig* llmc, const char* butname) {
         static char button[DEFSIZE];
-        Su::GetGuiMark(button, sizeof(button), butname, llmc->name);
+        Su::JoinGuiMark(button, sizeof(button), butname, llmc->name);
         KASB_FUNCTION(llmc)
         fb(button);
     };
@@ -512,7 +513,7 @@ void ShowShinobuLLM(Su::UserConfig* _uc) {
                 ft(val.getLanName(), &val, butname);
         }
     };
-    f(TT_7, TT_8);
+    f(GETGUIID(TT_7), TT_8);
 }
 
 void ShowShinibuTTS(Su::UserConfig* _uc) {
@@ -578,15 +579,15 @@ void ShowShinibuTTS(Su::UserConfig* _uc) {
         }
         else if(ttsc->tts== Su::TTS::MYSELF_VITS){
             static char url[DEFSIZE];
-            static char input_url[DEFSIZE16]; 
+            static char input_url[DEFSIZEK16];
             strcpy_s(input_url, sizeof(input_url), _uc->myself_vits.c_str());
-            Su::GetGuiMark(url, sizeof(url), TT_31, ttsc->name);
+            Su::JoinGuiMark(url, sizeof(url), TT_31, ttsc->name);
             ImGui::InputText(url, input_url, IM_ARRAYSIZE(input_url));
             _uc->myself_vits.assign(input_url);
 
         }
 
-        Su::GetGuiMark(button, sizeof(button), butname, ttsc->name);
+        Su::JoinGuiMark(button, sizeof(button), butname, ttsc->name);
         fb(button);
 
     };
@@ -602,7 +603,7 @@ void ShowShinibuTTS(Su::UserConfig* _uc) {
         }
 
     };
-    f(TT_10, TT_8);
+    f(GETGUIID(TT_10), TT_8);
 }
 
 void ShowShinobuSTT(Su::UserConfig* _uc) {
@@ -616,7 +617,7 @@ void ShowShinobuSTT(Su::UserConfig* _uc) {
     auto ft = [fb](const char* nodename, Su::STTConfig* sttc, const char* butname) {
 
         static char button[DEFSIZE];
-        Su::GetGuiMark(button, sizeof(button), butname, sttc->name);
+        Su::JoinGuiMark(button, sizeof(button), butname, sttc->name);
         KASB_FUNCTION(sttc)
         fb(button);
     };
@@ -632,7 +633,7 @@ void ShowShinobuSTT(Su::UserConfig* _uc) {
                 ft(val.getLanName(), &val, butname);
         }
     };
-    f(TT_12, TT_8);
+    f(GETGUIID(TT_12), TT_8);
 
 }
 void ShowShinobuMT(Su::UserConfig* _uc) {
@@ -646,7 +647,7 @@ void ShowShinobuMT(Su::UserConfig* _uc) {
     auto ft = [fb](const char* nodename, Su::MTConfig* mtc, const char* butname) {
 
             static char button[DEFSIZE];
-            Su::GetGuiMark(button, sizeof(button), butname, mtc->name);
+            Su::JoinGuiMark(button, sizeof(button), butname, mtc->name);
             KASB_FUNCTION(mtc)
             fb(button);
     };
@@ -661,7 +662,7 @@ void ShowShinobuMT(Su::UserConfig* _uc) {
                 ft(val.getLanName(), &val, butname);
         }
     };
-    f(TT_14, TT_8);
+    f(GETGUIID(TT_14), TT_8);
 }
 void ShowShinobuHelp() {
     auto f = [](const char* headertitle, const char* title, const char* text) {
@@ -671,7 +672,7 @@ void ShowShinobuHelp() {
             ImGui::BulletText(text);
         }
     };
-    f(TT_15, TT_16, TT_17);
+    f(GETGUIID(TT_15), TT_16, TT_17);
 }
 void ShowShinobuAbout() {
 
@@ -684,12 +685,11 @@ void ShowShinobuAbout() {
 
         }
     };
-    f(TT_0, TT_1, TT_2, TT_3);
-
+    f(GETGUIID(TT_0), TT_1, TT_2, TT_3);
 }
 void ShowShinobuError(SUERROR se)
 {
-    ImGui::Begin(TT_346);
+    ImGui::Begin(GETGUIID(TT_346));
     switch (se) {
     case SUERROR::CUBISM_NOT_RUNNING:
         ImGui::Text(TT_345);
@@ -701,7 +701,7 @@ void ShowShinobuError(SUERROR se)
 
 void ShowShinobuDebugWindow()
 {
-    ImGui::Begin(TT_364);
+    ImGui::Begin(GETGUIID(TT_364));
     std::vector<std::string> dv;
     Su::StringSplit(GlobalTemp::DebugOss.str(), '\n', dv);
     for (int i = dv.size() - 1; i >= 0;i--) {
@@ -713,8 +713,6 @@ void ShowShinobuPlot()
 {
     //static bool show_demo_window = true;
     //ImPlot::ShowDemoWindow(&show_demo_window);
-
-    
     
     ImGui::BulletText("Move your mouse to change the data!");
     ImGui::BulletText("This example assumes 60 FPS. Higher FPS requires larger buffer size.");
@@ -755,7 +753,7 @@ void ShowShinobuPlot()
 }
 void ShowShinobuCsmGeometry(Su::UserConfig& uc, LAppModel* lam)
 {
-    static char name_buf[DEFSIZE] = { 0 };
+    static char name_buf[DEFSIZE];
 
     ImGui::SeparatorText(TT_291);
     float& ts_s = uc.cubism_config.cubism_cg.cubism_ts_s;
@@ -778,64 +776,64 @@ void ShowShinobuCsmGeometry(Su::UserConfig& uc, LAppModel* lam)
     lam->GetModelMatrix()->GetArray()[3] = ty_p;
 
     ImGui::DragFloat("###DragFloat___ShowShinobuInteractively_ts_s", &ts_s, 0.005f, -100.f, 100.f, "%.2f", ImGuiSliderFlags_None);//大小缩放
-    ImGui::SameLine(); Su::GetGuiMark(name_buf, sizeof(name_buf), TT_293, "ts_s");
+    ImGui::SameLine(); Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_293, "ts_s");
     if (ImGui::Button(name_buf))ts_s = lam->def_cubism_cg.cubism_ts_s;
     ImGui::SameLine(); ImGui::Text(TT_280);
 
     ImGui::DragFloat("###DragFloat___ShowShinobuInteractively_tx_t", &tx_t, 0.005f, -100.f, 100.f, "%.2f", ImGuiSliderFlags_None);//水平坐标
-    ImGui::SameLine(); Su::GetGuiMark(name_buf, sizeof(name_buf), TT_293, "tx_t");
+    ImGui::SameLine(); Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_293, "tx_t");
     if (ImGui::Button(name_buf))tx_t = lam->def_cubism_cg.cubism_tx_t;
     ImGui::SameLine(); ImGui::Text(TT_283);
 
     ImGui::DragFloat("###DragFloat___ShowShinobuInteractively_ty_t", &ty_t, 0.005f, -100.f, 100.f, "%.2f", ImGuiSliderFlags_None);//垂直坐标
-    ImGui::SameLine(); Su::GetGuiMark(name_buf, sizeof(name_buf), TT_293, "ty_t");
+    ImGui::SameLine(); Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_293, "ty_t");
     if (ImGui::Button(name_buf))ty_t = lam->def_cubism_cg.cubism_ty_t;
     ImGui::SameLine(); ImGui::Text(TT_284);
 
     ImGui::DragFloat("###DragFloat___ShowShinobuInteractively_ts_x", &ts_x, 0.005f, -100.f, 100.f, "%.2f", ImGuiSliderFlags_None);//横轴缩放
-    ImGui::SameLine(); Su::GetGuiMark(name_buf, sizeof(name_buf), TT_293, "ts_x");
+    ImGui::SameLine(); Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_293, "ts_x");
     if (ImGui::Button(name_buf))ts_x = lam->def_cubism_cg.cubism_ts_x;
     ImGui::SameLine(); ImGui::Text(TT_281);
 
     ImGui::DragFloat("###DragFloat___ShowShinobuInteractively_ts_y", &ts_y, 0.005f, -100.f, 100.f, "%.2f", ImGuiSliderFlags_None);//纵轴缩放
-    ImGui::SameLine(); Su::GetGuiMark(name_buf, sizeof(name_buf), TT_293, "ts_y");
+    ImGui::SameLine(); Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_293, "ts_y");
     if (ImGui::Button(name_buf))ts_y = lam->def_cubism_cg.cubism_ts_y;
     ImGui::SameLine(); ImGui::Text(TT_282);
 
     ImGui::DragFloat("###DragFloat___ShowShinobuInteractively_tx_s", &tx_s, 0.005f, -100.f, 100.f, "%.2f", ImGuiSliderFlags_None);//水平拉伸
-    ImGui::SameLine(); Su::GetGuiMark(name_buf, sizeof(name_buf), TT_293, "tx_s");
+    ImGui::SameLine(); Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_293, "tx_s");
     if (ImGui::Button(name_buf))tx_s = lam->def_cubism_cg.cubism_tx_s;
     ImGui::SameLine(); ImGui::Text(TT_285);
 
     ImGui::DragFloat("###DragFloat___ShowShinobuInteractively_ty_s", &ty_s, 0.005f, -100.f, 100.f, "%.2f", ImGuiSliderFlags_None);//垂直拉伸
-    ImGui::SameLine(); Su::GetGuiMark(name_buf, sizeof(name_buf), TT_293, "ty_s");
+    ImGui::SameLine(); Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_293, "ty_s");
     if (ImGui::Button(name_buf))ty_s = lam->def_cubism_cg.cubism_ty_s;
     ImGui::SameLine(); ImGui::Text(TT_286);
 
     ImGui::DragFloat("###DragFloat___ShowShinobuInteractively_tx_p", &tx_p, 0.005f, -100.f, 100.f, "%.2f", ImGuiSliderFlags_None);//水平透视
-    ImGui::SameLine(); Su::GetGuiMark(name_buf, sizeof(name_buf), TT_293, "tx_p");
+    ImGui::SameLine(); Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_293, "tx_p");
     if (ImGui::Button(name_buf))tx_p = lam->def_cubism_cg.cubism_tx_p;
     ImGui::SameLine(); ImGui::Text(TT_287);
 
     ImGui::DragFloat("###DragFloat___ShowShinobuInteractively_ty_p", &ty_p, 0.005f, -100.f, 100.f, "%.2f", ImGuiSliderFlags_None);//垂直透视
-    ImGui::SameLine(); Su::GetGuiMark(name_buf, sizeof(name_buf), TT_293, "ty_p");
+    ImGui::SameLine(); Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_293, "ty_p");
     if (ImGui::Button(name_buf))ty_p = lam->def_cubism_cg.cubism_ty_p;
     ImGui::SameLine(); ImGui::Text(TT_288);
 
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_8, "___GeometrySaveButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_8, "___GeometrySaveButton");
     if (ImGui::Button(name_buf, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         //Su::UserConfigSave(&uc);
     }
     ImGui::SameLine();
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_294, "___GeometrySetNullButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_294, "___GeometrySetNullButton");
     if (ImGui::Button(name_buf, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         uc.cubism_config.cubism_cg = lam->def_cubism_cg;
     }
 }
 void ShowShinobuCsmLook(Su::UserConfig& uc, LAppModel* lam)
 {
-    static char name_buf[DEFSIZE] = { 0 };
-    static char input_buf[DEFSIZE16] = { 0 };
+    static char name_buf[DEFSIZE];
+    static char input_buf[DEFSIZE16];
     ImGui::SeparatorText(TT_295);
     ImGui::Checkbox(TT_296, &uc.cubism_config.enable_look_mouse);
     lam->canLookMouse = uc.cubism_config.enable_look_mouse;
@@ -844,30 +842,31 @@ void ShowShinobuCsmLook(Su::UserConfig& uc, LAppModel* lam)
     lam->GetLookTargetDamping() = uc.cubism_config.damping;
 
     ImGui::SameLine(); Su::HelpMarker(TT_298);
-    if (ImGui::TreeNode(TT_299)) {
+    if (ImGui::TreeNode(GETGUIID(TT_299))) {
         static ImGuiTableFlags flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoSavedSettings;
-        if (ImGui::BeginTable("###Table___ShowShinobuInteractively_LookingMouse", 4, flags, ImVec2(0.0f, ImGui::GetTextLineHeightWithSpacing() * 5)))
+        if (ImGui::BeginTable("###Table___ShowShinobuInteractively_LookingMouse", 5, flags, ImVec2(0.0f, ImGui::GetTextLineHeightWithSpacing() * 5)))
         {
             ImGui::TableSetupColumn(TT_300, ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn(TT_380, ImGuiTableColumnFlags_WidthStretch);
             ImGui::TableSetupColumn(TT_301, ImGuiTableColumnFlags_WidthStretch);
             ImGui::TableSetupColumn(TT_302, ImGuiTableColumnFlags_WidthStretch);
             ImGui::TableSetupColumn(TT_303, ImGuiTableColumnFlags_WidthStretch);
-
             ImGui::TableHeadersRow();
             for (int paramid = 0; paramid < lam->GetModel()->GetParameterCount(); paramid++) {
                 LookParam& cubism_lp = lam->GetLookTargetParams()[paramid];
                 LookParam& user_lp = uc.cubism_config.look_target_params[paramid];
                 ImGui::PushID(paramid);
                 ImGui::TableNextColumn();
-                Su::MemsetStr(name_buf, sizeof(name_buf));
-                sprintf_s(name_buf, sizeof(name_buf), "%s:%d", TT_318, paramid);
-                if (lam->cdi_exist) {
-                    Su::HelpMarker(lam->cdi_json->GetParametersName(paramid));
-                    ImGui::SameLine();
-                    sprintf_s(name_buf, sizeof(name_buf), "%s", lam->cdi_json->GetParametersName(paramid));
-                }
+                ImGui::PushItemWidth(-1);
                 strcpy_s(input_buf, sizeof(input_buf), lam->GetModel()->GetParameterId(paramid)->GetString().GetRawString());
-                ImGui::InputText(name_buf, input_buf, sizeof(input_buf), ImGuiInputTextFlags_ReadOnly);
+                ImGui::InputText("###InputText___ShowShinobuCsmLook_Id", input_buf, sizeof(input_buf), ImGuiInputTextFlags_ReadOnly);
+                ImGui::TableNextColumn();
+                ImGui::PushItemWidth(-1);
+                if (lam->cdi_exist)
+                    strcpy_s(input_buf, sizeof(input_buf), lam->cdi_json->GetParametersName(paramid));
+                else 
+                    strcpy_s(input_buf, sizeof(input_buf), TT_322);
+                ImGui::InputText("###InputText___ShowShinobuCsmLook_Exp", input_buf, sizeof(input_buf), ImGuiInputTextFlags_ReadOnly);
                 ImGui::TableNextColumn();
                 ImGui::Checkbox(TT_304, &user_lp.enable);
                 cubism_lp.enable = user_lp.enable;
@@ -894,12 +893,12 @@ void ShowShinobuCsmLook(Su::UserConfig& uc, LAppModel* lam)
         ImGui::TreePop();
     }
 
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_8, "___LookingMouseSaveButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_8, "___LookingMouseSaveButton");
     if (ImGui::Button(name_buf, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         //Su::UserConfigSave(&uc);
     }
     ImGui::SameLine();
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_294, "___LookingMouseSetNullButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_294, "___LookingMouseSetNullButton");
     if (ImGui::Button(name_buf, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         uc.cubism_config.enable_look_mouse = true;
         uc.cubism_config.damping = 0.15f;
@@ -911,17 +910,18 @@ void ShowShinobuCsmLook(Su::UserConfig& uc, LAppModel* lam)
 }
 void ShowShinobuCsmBreath(Su::UserConfig& uc, LAppModel* lam)
 {
-    static char name_buf[DEFSIZE] = { 0 };
-    static char input_buf[DEFSIZE16] = { 0 };
+    static char name_buf[DEFSIZE];
+    static char input_buf[DEFSIZE16];
     ImGui::SeparatorText(TT_307);
     ImGui::Checkbox(TT_308, &uc.cubism_config.enable_breath);
     lam->GetCanBreath() = uc.cubism_config.enable_breath;
     ImGui::Separator();
-    if (ImGui::TreeNode(TT_309)) {
+    if (ImGui::TreeNode(GETGUIID(TT_309))) {
         static ImGuiTableFlags flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoSavedSettings;
-        if (ImGui::BeginTable("###Table___ShowShinobuInteractively_Breath", 6, flags, ImVec2(0.0f, ImGui::GetTextLineHeightWithSpacing() * 5)))
+        if (ImGui::BeginTable("###Table___ShowShinobuInteractively_Breath", 7, flags, ImVec2(0.0f, ImGui::GetTextLineHeightWithSpacing() * 5)))
         {
             ImGui::TableSetupColumn(TT_300, ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn(TT_380, ImGuiTableColumnFlags_WidthStretch);
             ImGui::TableSetupColumn(TT_301, ImGuiTableColumnFlags_WidthStretch);
             ImGui::TableSetupColumn(TT_310, ImGuiTableColumnFlags_WidthStretch);
             ImGui::TableSetupColumn(TT_311, ImGuiTableColumnFlags_WidthStretch);
@@ -933,15 +933,16 @@ void ShowShinobuCsmBreath(Su::UserConfig& uc, LAppModel* lam)
                 Csm::CubismBreath::BreathParameterData& user_cb = uc.cubism_config.breath_params[paramid];
                 ImGui::PushID(paramid);
                 ImGui::TableNextColumn();
-                Su::MemsetStr(name_buf, sizeof(name_buf));
-                sprintf_s(name_buf, sizeof(name_buf), "%s:%d", TT_318, paramid);
-                if (lam->cdi_exist) {
-                    Su::HelpMarker(lam->cdi_json->GetParametersName(paramid));
-                    ImGui::SameLine();
-                    sprintf_s(name_buf, sizeof(name_buf), "%s", lam->cdi_json->GetParametersName(paramid));
-                }
+                ImGui::PushItemWidth(-1);
                 strcpy_s(input_buf, sizeof(input_buf), lam->GetModel()->GetParameterId(paramid)->GetString().GetRawString());
-                ImGui::InputText(name_buf, input_buf, sizeof(input_buf), ImGuiInputTextFlags_ReadOnly);
+                ImGui::InputText("###InputText___ShowShinobuCsmBreath_Id", input_buf, sizeof(input_buf), ImGuiInputTextFlags_ReadOnly);
+                ImGui::TableNextColumn();
+                ImGui::PushItemWidth(-1);
+                if (lam->cdi_exist)
+                    strcpy_s(input_buf, sizeof(input_buf), lam->cdi_json->GetParametersName(paramid));
+                else
+                    strcpy_s(input_buf, sizeof(input_buf), TT_322);
+                ImGui::InputText("###InputText___ShowShinobuCsmBreath_Exp", input_buf, sizeof(input_buf), ImGuiInputTextFlags_ReadOnly);
                 ImGui::TableNextColumn();
                 ImGui::Checkbox(TT_304, &user_cb.Enable);
                 cubism_cb.Enable = user_cb.Enable;
@@ -963,12 +964,12 @@ void ShowShinobuCsmBreath(Su::UserConfig& uc, LAppModel* lam)
         }
         ImGui::TreePop();
     }
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_8, "___BreathSaveButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_8, "___BreathSaveButton");
     if (ImGui::Button(name_buf, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         //Su::UserConfigSave(&uc);
     }
     ImGui::SameLine();
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_294, "___BreathSetNullButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_294, "___BreathSetNullButton");
     if (ImGui::Button(name_buf, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         uc.cubism_config.enable_breath = true;
         uc.cubism_config.breath_params = lam->def_breath_params;
@@ -980,8 +981,8 @@ void ShowShinobuCsmBreath(Su::UserConfig& uc, LAppModel* lam)
 }
 void ShowShinobuCsmBlink(Su::UserConfig& uc, LAppModel* lam)
 {
-    static char name_buf[DEFSIZE] = { 0 };
-    static char input_buf[DEFSIZE16] = { 0 };
+    static char name_buf[DEFSIZE];
+    static char input_buf[DEFSIZE16];
     ImGui::SeparatorText(TT_319);
     ImGui::Checkbox(TT_320, &uc.cubism_config.enable_blink);
     lam->canEyeBlink = uc.cubism_config.enable_blink;
@@ -1012,7 +1013,7 @@ void ShowShinobuCsmBlink(Su::UserConfig& uc, LAppModel* lam)
     for (int paramid = 0; paramid < lam->GetModel()->GetParameterCount(); paramid++) {
         blinklist[paramid] = lam->GetModel()->GetParameterId(paramid)->GetString().GetRawString();
     }
-    if (ImGui::TreeNode(TT_327))
+    if (ImGui::TreeNode(GETGUIID(TT_327)))
     {
         Su::ShinobuExList& sel = uc.cubism_config.blink_sel_list;
         const char** ex_name = blinklist;
@@ -1026,12 +1027,12 @@ void ShowShinobuCsmBlink(Su::UserConfig& uc, LAppModel* lam)
         ImGui::TreePop();
     }
 
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_8, "___BlinkSaveButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_8, "___BlinkSaveButton");
     if (ImGui::Button(name_buf, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         //Su::UserConfigSave(&uc);
     }
     ImGui::SameLine();
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_294, "___BlinkSetNullButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_294, "___BlinkSetNullButton");
     if (ImGui::Button(name_buf, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         uc.cubism_config.enable_blink = true;
         uc.cubism_config.blinking_interval_seconds = 4.0f;
@@ -1058,13 +1059,13 @@ void ShowShinobuCsmBlink(Su::UserConfig& uc, LAppModel* lam)
 }
 void ShowShinobuCsmAnimation(Su::UserConfig& uc, LAppModel* lam)
 {
-    static char name_buf[DEFSIZE] = { 0 };
-    static char input_buf[DEFSIZE16] = { 0 };
+    static char name_buf[DEFSIZE];
+    static char input_buf[DEFSIZE16];
     Csm::ICubismModelSetting* lcms = lam->GetModelSetting();
     ImGui::SeparatorText(TT_290);
     ImGui::Checkbox(TT_359, &uc.cubism_config.enable_anim_autoplay);
     lam->animationAutoPlay = uc.cubism_config.enable_anim_autoplay;
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_330, "___RandomMotionButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_330, "___RandomMotionButton");
     if (ImGui::Button(name_buf)) {
         int  mg_count = lam->GetModelSetting()->GetMotionGroupCount();
         if (mg_count > 0) {
@@ -1077,7 +1078,7 @@ void ShowShinobuCsmAnimation(Su::UserConfig& uc, LAppModel* lam)
         }
     }
     ImGui::SameLine();
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_331, "___RandomExpressionButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_331, "___RandomExpressionButton");
     if (ImGui::Button(name_buf)) {
         if (lam->GetModelSetting()->GetExpressionCount() > 0) {
             int no = rand() % lam->GetModelSetting()->GetExpressionCount();
@@ -1091,7 +1092,7 @@ void ShowShinobuCsmAnimation(Su::UserConfig& uc, LAppModel* lam)
     strcpy_s(input_buf, sizeof(input_buf), TT_375);
     strcat_s(input_buf, sizeof(input_buf), lam->current_expression_name.c_str());
     ImGui::Text(input_buf);
-    if (ImGui::TreeNode(TT_328)) {
+    if (ImGui::TreeNode(GETGUIID(TT_328))) {
         for (int i = 0; i < lam->GetModelSetting()->GetMotionGroupCount(); ++i) {
             strcpy_s(input_buf, sizeof(input_buf), TT_292);
             strcat_s(input_buf, sizeof(input_buf), lam->GetModelSetting()->GetMotionGroupName(i));
@@ -1111,7 +1112,7 @@ void ShowShinobuCsmAnimation(Su::UserConfig& uc, LAppModel* lam)
         }
         ImGui::TreePop();
     }
-    if (ImGui::TreeNode(TT_329)) {
+    if (ImGui::TreeNode(GETGUIID(TT_329))) {
         for (int i = 0; i < lam->GetModelSetting()->GetExpressionCount(); ++i) {
             ImGui::PushID(i);
             strcpy_s(input_buf, sizeof(input_buf), lcms->GetExpressionName(i));
@@ -1124,12 +1125,12 @@ void ShowShinobuCsmAnimation(Su::UserConfig& uc, LAppModel* lam)
         }
         ImGui::TreePop();
     }
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_8, "___AnimationSaveButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_8, "___AnimationSaveButton");
     if (ImGui::Button(name_buf, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         //Su::UserConfigSave(&uc);
     }
     ImGui::SameLine();
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_294, "___AnimationSetNullButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_294, "___AnimationSetNullButton");
     if (ImGui::Button(name_buf, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         uc.cubism_config.enable_anim_autoplay = false;
         lam->animationAutoPlay = uc.cubism_config.enable_anim_autoplay;
@@ -1138,8 +1139,8 @@ void ShowShinobuCsmAnimation(Su::UserConfig& uc, LAppModel* lam)
 }
 void ShowShinobuCsmHitareas(Su::UserConfig& uc, LAppModel* lam)
 {
-    static char name_buf[DEFSIZE] = { 0 };
-    static char input_buf[DEFSIZE16] = { 0 };
+    static char name_buf[DEFSIZE];
+    static char input_buf[DEFSIZE16];
     Csm::ICubismModelSetting* lcms = lam->GetModelSetting();
     ImGui::SeparatorText(TT_349);
     ImGui::Checkbox(TT_373, &uc.cubism_config.enable_hitareas);
@@ -1164,12 +1165,12 @@ void ShowShinobuCsmHitareas(Su::UserConfig& uc, LAppModel* lam)
     strcat_s(input_buf, sizeof(input_buf), lam->hit_expression_name.c_str());
     ImGui::Text(input_buf);
     ImGui::Separator();
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_8, "___HitareasSaveButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_8, "___HitareasSaveButton");
     if (ImGui::Button(name_buf, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         //Su::UserConfigSave(&uc);
     }
     ImGui::SameLine();
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_294, "___HitareasSetNullButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_294, "___HitareasSetNullButton");
     if (ImGui::Button(name_buf, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         uc.cubism_config.enable_hitareas = true;
         uc.cubism_config.enable_preview_hitareas = false;
@@ -1235,10 +1236,10 @@ void ShowShinobuCsmHitareas(Su::UserConfig& uc, LAppModel* lam)
 
 
 }
-void ShowShinobuCsmColor(Su::UserConfig& uc, LAppModel* lam)
+void ShowShinobuCsmRendering(Su::UserConfig& uc, LAppModel* lam)
 {
-    static char name_buf[DEFSIZE] = { 0 };
-    static char edit_name[DEFSIZE] = { 0 };
+    static char name_buf[DEFSIZE];
+    static char edit_name[DEFSIZE];
     ImGui::SeparatorText(TT_332);
     ImGui::Checkbox(TT_333, (bool*)(&lam->GetModel()->GetOverwriteFlagForModelMultiplyColorsRef()));// 正片叠底色覆盖标志
     ImGui::SameLine();
@@ -1246,27 +1247,27 @@ void ShowShinobuCsmColor(Su::UserConfig& uc, LAppModel* lam)
     ImGui::SameLine();
     ImGui::Checkbox(TT_360, (bool*)(&lam->GetModel()->GetOverwriteFlagForModelCullingsRef()));      // 剔除规则
     ImGui::Separator();
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_8, "___ColorsSaveButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_8, "___ColorsSaveButton");
     if (ImGui::Button(name_buf, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         //Su::UserConfigSave(&uc);
     }
     ImGui::SameLine();
-    Su::GetGuiMark(name_buf, sizeof(name_buf), TT_294, "___ColorsSetNullButton");
+    Su::JoinGuiMark(name_buf, sizeof(name_buf), TT_294, "___ColorsSetNullButton");
     if (ImGui::Button(name_buf, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         lam->GetModel()->GetOverwriteFlagForModelMultiplyColorsRef() = false;
         lam->GetModel()->GetOverwriteFlagForModelScreenColorsRef() = false;
         lam->GetModel()->GetOverwriteFlagForModelCullingsRef() = false;
     }
 
-    if (ImGui::BeginTabBar("###BeginTabBar___ShowShinobuInteractively_color", ImGuiTabBarFlags_None)) {
+    if (ImGui::BeginTabBar("###BeginTabBar___ShowShinobuInteractively_Rendering", ImGuiTabBarFlags_None)) {
         //------------------------------------------------正片叠底
-        if (ImGui::BeginTabItem(TT_335)) {
+        if (ImGui::BeginTabItem(GETGUIID(TT_335))) {
             ImGui::SeparatorText(TT_336);
             if (ImGui::Button(TT_50, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
                 lam->set_all_m_mark = false;
                 lam->InitMultiplyColor();
             }
-            Su::GetGuiMark(edit_name, sizeof(edit_name), TT_362, u8"___Multiply_Synchronize_ColorEdit4");
+            Su::JoinGuiMark(edit_name, sizeof(edit_name), TT_362, u8"___Multiply_Synchronize_ColorEdit4");
             ImGui::ColorEdit4(edit_name, (float*)&(lam->multiply_color), ImGuiColorEditFlags_AlphaBar);
             ImGui::SameLine();
             ImGui::Checkbox(TT_363, &lam->set_all_m_mark);
@@ -1287,7 +1288,7 @@ void ShowShinobuCsmColor(Su::UserConfig& uc, LAppModel* lam)
                     lam->StartFlashColor(0, i);
                 ImGui::SetItemTooltip(TT_116);
                 ImGui::SameLine();
-                Su::GetGuiMark(edit_name, sizeof(edit_name), lam->GetModel()->GetDrawableId(i)->GetString().GetRawString(), std::to_string(i).c_str());
+                Su::JoinGuiMark(edit_name, sizeof(edit_name), lam->GetModel()->GetDrawableId(i)->GetString().GetRawString(), std::to_string(i).c_str());
                 ImGui::ColorEdit4(edit_name, (float*)&(lam->drawable_multiply_color[i]), ImGuiColorEditFlags_AlphaBar);
                 ImGui::PopID();
             }
@@ -1295,13 +1296,13 @@ void ShowShinobuCsmColor(Su::UserConfig& uc, LAppModel* lam)
             ImGui::EndTabItem();
         }
         //------------------------------------------------屏幕色
-        if (ImGui::BeginTabItem(TT_337)) {
+        if (ImGui::BeginTabItem(GETGUIID(TT_337))) {
             ImGui::SeparatorText(TT_338);
             if (ImGui::Button(TT_50, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
                 lam->set_all_s_mark = false;
                 lam->InitScreenColor();
             }
-            Su::GetGuiMark(edit_name, sizeof(edit_name), TT_362, u8"___Screen_Synchronize_ColorEdit4");
+            Su::JoinGuiMark(edit_name, sizeof(edit_name), TT_362, u8"___Screen_Synchronize_ColorEdit4");
             ImGui::ColorEdit4(edit_name, (float*)&(lam->screen_color), ImGuiColorEditFlags_AlphaBar);
             ImGui::SameLine();
             ImGui::Checkbox(TT_363, &lam->set_all_s_mark);
@@ -1322,14 +1323,14 @@ void ShowShinobuCsmColor(Su::UserConfig& uc, LAppModel* lam)
                     lam->StartFlashColor(1, i);
                 ImGui::SetItemTooltip(TT_116);
                 ImGui::SameLine();
-                Su::GetGuiMark(edit_name, sizeof(edit_name), lam->GetModel()->GetDrawableId(i)->GetString().GetRawString(), std::to_string(i).c_str());
+                Su::JoinGuiMark(edit_name, sizeof(edit_name), lam->GetModel()->GetDrawableId(i)->GetString().GetRawString(), std::to_string(i).c_str());
                 ImGui::ColorEdit4(edit_name, (float*)&(lam->drawable_screen_color[i]), ImGuiColorEditFlags_AlphaBar);
                 ImGui::PopID();
             }
             ImGui::EndTabItem();
         }
         //------------------------------------------------正片叠底组
-        if (ImGui::BeginTabItem(TT_339)) {
+        if (ImGui::BeginTabItem(GETGUIID(TT_339))) {
             ImGui::SeparatorText(TT_340);
             if (ImGui::Button(TT_341, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
                 for (int i = 0; i < lam->GetModel()->GetPartCount(); i++) {
@@ -1347,7 +1348,7 @@ void ShowShinobuCsmColor(Su::UserConfig& uc, LAppModel* lam)
                 lam->set_all_mp_mark = false;
                 lam->InitPartMultiplyColor();
             }
-            Su::GetGuiMark(edit_name, sizeof(edit_name), TT_362, u8"___MultiplyPart_Synchronize_ColorEdit4");
+            Su::JoinGuiMark(edit_name, sizeof(edit_name), TT_362, u8"___MultiplyPart_Synchronize_ColorEdit4");
             ImGui::ColorEdit4(edit_name, (float*)&(lam->multiply_group_color), ImGuiColorEditFlags_AlphaBar);
             ImGui::SameLine();
             ImGui::Checkbox(TT_363, &lam->set_all_mp_mark);
@@ -1370,7 +1371,7 @@ void ShowShinobuCsmColor(Su::UserConfig& uc, LAppModel* lam)
                 ImGui::SameLine();
                 ImGui::Checkbox(TT_342, &lam->GetModel()->GetPartMultiplyColorsRef()[i].IsOverwritten);
                 ImGui::SameLine();
-                Su::GetGuiMark(edit_name, sizeof(edit_name), lam->GetModel()->GetPartId(i)->GetString().GetRawString(), std::to_string(i).c_str());
+                Su::JoinGuiMark(edit_name, sizeof(edit_name), lam->GetModel()->GetPartId(i)->GetString().GetRawString(), std::to_string(i).c_str());
                 ImGui::ColorEdit4(edit_name, (float*)&(lam->drawable_part_multiply_color[i]), ImGuiColorEditFlags_AlphaBar);
                 if (lam->cdi_exist) {
                     ImGui::SameLine();
@@ -1383,7 +1384,7 @@ void ShowShinobuCsmColor(Su::UserConfig& uc, LAppModel* lam)
             ImGui::EndTabItem();
         }
         //------------------------------------------------屏幕色组
-        if (ImGui::BeginTabItem(TT_343)) {
+        if (ImGui::BeginTabItem(GETGUIID(TT_343))) {
             ImGui::SeparatorText(TT_344);
             if (ImGui::Button(TT_341, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
                 for (int i = 0; i < lam->GetModel()->GetPartCount(); i++) {
@@ -1401,7 +1402,7 @@ void ShowShinobuCsmColor(Su::UserConfig& uc, LAppModel* lam)
                 lam->set_all_sp_mark = false;
                 lam->InitPartScreenColor();
             }
-            Su::GetGuiMark(edit_name, sizeof(edit_name), TT_362, u8"___ScreenPart_Synchronize_ColorEdit4");
+            Su::JoinGuiMark(edit_name, sizeof(edit_name), TT_362, u8"___ScreenPart_Synchronize_ColorEdit4");
             ImGui::ColorEdit4(edit_name, (float*)&(lam->screen_group_color), ImGuiColorEditFlags_AlphaBar);
             ImGui::SameLine();
             ImGui::Checkbox(TT_363, &lam->set_all_sp_mark);
@@ -1426,7 +1427,7 @@ void ShowShinobuCsmColor(Su::UserConfig& uc, LAppModel* lam)
                 ImGui::Checkbox(TT_342, &lam->GetModel()->GetPartScreenColorsRef()[i].IsOverwritten);
                 ImGui::SameLine();
 
-                Su::GetGuiMark(edit_name, sizeof(edit_name), lam->GetModel()->GetPartId(i)->GetString().GetRawString(), std::to_string(i).c_str());
+                Su::JoinGuiMark(edit_name, sizeof(edit_name), lam->GetModel()->GetPartId(i)->GetString().GetRawString(), std::to_string(i).c_str());
                 ImGui::ColorEdit4(edit_name, (float*)&(lam->drawable_part_screen_color[i]), ImGuiColorEditFlags_AlphaBar);
                 if (lam->cdi_exist) {
                     ImGui::SameLine();
@@ -1439,69 +1440,46 @@ void ShowShinobuCsmColor(Su::UserConfig& uc, LAppModel* lam)
             ImGui::EndTabItem();
         }
 
-
         //控件渲染
-        if (ImGui::BeginTabItem(/*TT_343*/u8"控件透明###xr")) {
-            ImGui::SeparatorText(/*TT_344*/u8"控件透明###xr");
-
-            //lam->GetModel()->SetPartOpacity(Csm::CubismFramework::GetIdManager()->GetId(lam->GetModel()->GetPartId(i)->GetString().GetRawString()), 0.1);
-
-            //if (ImGui::Button(TT_341, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
-            //    for (int i = 0; i < lam->GetModel()->GetPartCount(); i++) {
-            //        lam->GetModel()->GetPartScreenColorsRef()[i].IsOverwritten = true;
-            //    }
-            //}
-            //ImGui::SameLine();
-            //if (ImGui::Button(TT_361, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
-            //    for (int i = 0; i < lam->GetModel()->GetPartCount(); i++) {
-            //        lam->GetModel()->GetPartScreenColorsRef()[i].IsOverwritten = false;
-            //    }
-            //}
-            //ImGui::SameLine();
-            //if (ImGui::Button(TT_50, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
-            //    lam->set_all_sp_mark = false;
-            //    lam->InitPartScreenColor();
-            //}
-            //Su::GetGuiMark(edit_name, sizeof(edit_name), TT_362, u8"___ScreenPart_Synchronize_ColorEdit4");
-            //ImGui::ColorEdit4(edit_name, (float*)&(lam->screen_group_color), ImGuiColorEditFlags_AlphaBar);
-            //ImGui::SameLine();
-            //ImGui::Checkbox(TT_363, &lam->set_all_sp_mark);
-            //if (lam->set_all_sp_mark) {
-            //    for (int i = 0; i < lam->GetModel()->GetPartCount(); i++)
-            //    {
-            //        lam->drawable_part_screen_color[i][0] = lam->screen_group_color[0];
-            //        lam->drawable_part_screen_color[i][1] = lam->screen_group_color[1];
-            //        lam->drawable_part_screen_color[i][2] = lam->screen_group_color[2];
-            //        lam->drawable_part_screen_color[i][3] = lam->screen_group_color[3];
-            //    }
-            //}
-            //ImGui::Separator();
-            //for (int i = 0; i < lam->GetModel()->GetPartCount(); i++)
-            //{
-            //    ImGui::PushID(i);
-            //    if (ImGui::Button("?"))
-            //        lam->StartFlashColor(3, i);
-            //    ImGui::SetItemTooltip(TT_116);
-            //    ImGui::SameLine();
-
-            //    ImGui::Checkbox(TT_342, &lam->GetModel()->GetPartScreenColorsRef()[i].IsOverwritten);
-            //    ImGui::SameLine();
-
-            //    Su::GetGuiMark(edit_name, sizeof(edit_name), lam->GetModel()->GetPartId(i)->GetString().GetRawString(), std::to_string(i).c_str());
-            //    ImGui::ColorEdit4(edit_name, (float*)&(lam->drawable_part_screen_color[i]), ImGuiColorEditFlags_AlphaBar);
-            //    if (lam->cdi_exist) {
-            //        ImGui::SameLine();
-            //        sprintf_s(edit_name, sizeof(edit_name), "%s", lam->cdi_json->GetPartsName(i));
-            //        Su::HelpMarker(edit_name);
-            //    }
-            //    ImGui::PopID();
-
-            //}
+        if (ImGui::BeginTabItem(GETGUIID(TT_381))) {
+            ImGui::SeparatorText(TT_382);
+            if (ImGui::Button(TT_50, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
+                lam->set_all_po_mark = false;
+                lam->InitPartOpacity();
+            }
+            Su::JoinGuiMark(edit_name, sizeof(edit_name),TT_383, u8"___PartOpacity_Synchronize_ColorEdit4");
+            if (ImGui::DragFloat(edit_name, &lam->group_opacity, 0.005f, 0.0f, 1.0f, "%.2f", ImGuiSliderFlags_None)) {
+                lam->group_opacity = Su::Clamp(lam->group_opacity, 0.0f, 1.0f);
+            }
+            ImGui::SameLine();
+            ImGui::Checkbox(TT_363, &lam->set_all_po_mark);
+            if (lam->set_all_po_mark) {
+                for (int i = 0; i < lam->GetModel()->GetPartCount(); i++)
+                    lam->drawable_part_opacity[i] = lam->group_opacity;
+            }
+            ImGui::Separator();
+            for (int i = 0; i < lam->GetModel()->GetPartCount(); i++)
+            {
+                ImGui::PushID(i);
+                if (ImGui::Button("?")) 
+                    lam->StartFlashOpacity(i);
+                ImGui::SetItemTooltip(TT_116);
+                ImGui::SameLine();
+                const Csm::CubismId* part_id = Csm::CubismFramework::GetIdManager()->GetId(lam->GetModel()->GetPartId(i)->GetString().GetRawString());
+                if (ImGui::DragFloat("", &lam->drawable_part_opacity[i], 0.005f, 0.0f, 1.0f, "%.2f", ImGuiSliderFlags_None)) {
+                    lam->drawable_part_opacity[i] = Su::Clamp(lam->drawable_part_opacity[i], 0.0f, 1.0f);
+                }
+                ImGui::SameLine();
+                if (ImGui::Button(TT_293)) {
+                    lam->drawable_part_opacity[i] = 1.0f;
+                }
+                ImGui::SameLine(); ImGui::Text(part_id->GetString().GetRawString());
+                ImGui::PopID();
+            }
             ImGui::EndTabItem();
         }
 
 
-        ///1234567890-
         ImGui::EndTabBar();
     }
 }
@@ -1553,10 +1531,10 @@ void AddExpressionStart(int uid, int nid)
 
 void ShowShinobuWindow(bool* p_open) {
     if (*p_open == false) { return; }
-    char buf[128];
-    sprintf_s(buf, sizeof(buf), TT_38, "|/-\\"[(int)(ImGui::GetTime() / 0.25f) & 3], ::getCurrentTime().c_str());
+    static char title_buf[128];
+    sprintf_s(title_buf, sizeof(title_buf), GETGUIID(TT_38), "|/-\\"[(int)(ImGui::GetTime() / 0.25f) & 3], ::getCurrentTime().c_str());
     ImGui::SetNextWindowPos(ImVec2(0,0), ImGuiCond_FirstUseEver);
-    ImGui::Begin(buf, p_open);
+    ImGui::Begin(title_buf, p_open);
 
     ShowShinobuHead();
     ShowShinobuStart();

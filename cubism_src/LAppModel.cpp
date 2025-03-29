@@ -21,6 +21,7 @@
 #include "LAppTextureManager.hpp"
 #include "LAppDelegate.hpp"
 #include "../sufunction.h"
+#include <string>
 
 using namespace Live2D::Cubism::Framework;
 using namespace Live2D::Cubism::Framework::DefaultParameterId;
@@ -71,10 +72,10 @@ void LAppModel::InitPartMultiplyColor()
 {
     for (int i = 0; i < this->GetModel()->GetPartCount(); i++)
     {
-        this->drawable_part_multiply_color[i][0] = 1.0;
-        this->drawable_part_multiply_color[i][1] = 1.0;
-        this->drawable_part_multiply_color[i][2] = 1.0;
-        this->drawable_part_multiply_color[i][3] = 1.0;
+        this->drawable_part_multiply_color[i][0] = 1.0f;
+        this->drawable_part_multiply_color[i][1] = 1.0f;
+        this->drawable_part_multiply_color[i][2] = 1.0f;
+        this->drawable_part_multiply_color[i][3] = 1.0f;
     }
 }
 
@@ -82,70 +83,128 @@ void LAppModel::InitPartScreenColor()
 {
     for (int i = 0; i < this->GetModel()->GetPartCount(); i++)
     {
-        this->drawable_part_screen_color[i][0] = 0.0;
-        this->drawable_part_screen_color[i][1] = 0.0;
-        this->drawable_part_screen_color[i][2] = 0.0;
-        this->drawable_part_screen_color[i][3] = 1.0;
+        this->drawable_part_screen_color[i][0] = 0.0f;
+        this->drawable_part_screen_color[i][1] = 0.0f;
+        this->drawable_part_screen_color[i][2] = 0.0f;
+        this->drawable_part_screen_color[i][3] = 1.0f;
     }
+}
+
+void LAppModel::InitPartOpacity()
+{
+    for (int i = 0; i < this->GetModel()->GetPartCount(); i++) {
+        this->drawable_part_opacity[i] = 1.0f;
+    }
+
 }
 
 void LAppModel::StartFlashColor(int mark, int index) {
     if (index <= -1)
         return;
-    if (flashColor[0] != nullptr && flashColor[1] != nullptr && flashColor[2] != nullptr && flashColor[3] != nullptr ) {
-        *flashColor[0] = rgb_backup[0];
-        *flashColor[1] = rgb_backup[1];
-        *flashColor[2] = rgb_backup[2];
-        *flashColor[3] = rgb_backup[3];
-    }
-    float* tmpf = { nullptr };
-    if (mark == 0)tmpf = drawable_multiply_color[index];
-    else if (mark == 1)tmpf = drawable_screen_color[index];
-    else if (mark == 2)tmpf = drawable_part_multiply_color[index];
-    else if (mark == 3)tmpf = drawable_part_screen_color[index];
+    float* tmpf = nullptr;
+    if (mark == 0)      tmpf = drawable_multiply_color[index];
+    else if (mark == 1) tmpf = drawable_screen_color[index];
+    else if (mark == 2) tmpf = drawable_part_multiply_color[index];
+    else if (mark == 3) tmpf = drawable_part_screen_color[index];
     else return;
     if (tmpf == nullptr)return;
-    flashColor[0] = &(tmpf[0]);
-    flashColor[1] = &(tmpf[1]);
-    flashColor[2] = &(tmpf[2]);
-    flashColor[3] = &(tmpf[3]);
-    rgb_backup[0] = *(&tmpf[0]);
-    rgb_backup[1] = *(&tmpf[1]);
-    rgb_backup[2] = *(&tmpf[2]);
-    rgb_backup[3] = *(&tmpf[3]);
-    std::cout << "Save Color: " << rgb_backup[0] << " " << rgb_backup[1] << " " << rgb_backup[2] << std::endl;
-    canFlash = true;
+    FLICKER fr;
+    fr.hash_mark = std::to_string(mark) +"_" +std::to_string(index);
+    fr.flash_color[0] = &(tmpf[0]); fr.flash_color[1] = &(tmpf[1]);
+    fr.flash_color[2] = &(tmpf[2]); fr.flash_color[3] = &(tmpf[3]);
+    fr.rgb_backup[0] = *(&tmpf[0]); fr.rgb_backup[1] = *(&tmpf[1]);
+    fr.rgb_backup[2] = *(&tmpf[2]); fr.rgb_backup[3] = *(&tmpf[3]);
+    bool have = false;
+    for (const auto& val : flicker_v) {
+        if (val.hash_mark == fr.hash_mark) {
+            have = true;
+            break;
+        }
+    }
+    if (have == false) {
+        std::cout << "Flicker Save Color: " << fr.rgb_backup[0] << " " << fr.rgb_backup[1] << " " << fr.rgb_backup[2] << std::endl;
+        flicker_v.push_back(fr);
+    }
+}
+
+void LAppModel::StartFlashOpacity(int index)
+{
+    if (index < 0)
+        return;
+    float* tmpf = nullptr;
+    tmpf = &drawable_part_opacity[index];
+    if (tmpf == nullptr)
+        return;
+    FLICKER_OPACITY fr;
+    fr.hash_mark = std::to_string(index);
+    fr.flash_color = &(*tmpf);
+    fr.rgb_backup = *tmpf;
+    bool have = false;
+    for (const auto& val : flicker_opacity_v) {
+        if (val.hash_mark == fr.hash_mark) {
+            have = true;
+            break;
+        }
+    }
+    if (have == false) {
+        std::cout << "Flicker Save Opacity: " << fr.rgb_backup << std::endl;
+        flicker_opacity_v.push_back(fr);
+    }
 }
 
 void LAppModel::UpdateFlashColor()
 {
-    if (canFlash) {
-        canFlash = false;
+    for (int i = 0; i < int(flicker_v.size()); ++i) {
+        FLICKER& fr =flicker_v[i];
+        Su::ColorConvertHSVtoRGB(cosf(fr.flash_time * 6.0f) * 0.5f + 0.5f, 0.5f, 0.5f, *fr.flash_color[0], *fr.flash_color[1], *fr.flash_color[2]);
+        *fr.flash_color[3] = 1.0f;
+        if ((fr.flash_time -= (1.f / float(GlobalTemp::CubismFrameCount))) <= 0.0f) {
+            std::cout << "Flicker Goback Color: " << fr.rgb_backup[0] << " " << fr.rgb_backup[1] << " " << fr.rgb_backup[2] << std::endl;
+            *fr.flash_color[0] = fr.rgb_backup[0];
+            *fr.flash_color[1] = fr.rgb_backup[1];
+            *fr.flash_color[2] = fr.rgb_backup[2];
+            *fr.flash_color[3] = fr.rgb_backup[3];
+        }
+        if (fr.flash_time <= 0.0f) {
+            fr.flash_time = 0.0f;
+            continue;
+        }
+    }
 
-        flashTime = 1.0f;
-        flashing = true;
-    }
-    if (flashing) {
-        if (flashTime <= 0.0f) {
-            flashTime = 0.0f;
-            flashing = false;
-            return;
+    flicker_v.erase(
+        std::remove_if(flicker_v.begin(), flicker_v.end(),
+            [](const FLICKER& fr) { return std::fabs(fr.flash_time) < ZEROFLOAT; }
+        ),
+        flicker_v.end()
+    );
+}
+
+void LAppModel::UpdateFlashOpacity()
+{
+    for (int i = 0; i < int(flicker_opacity_v.size()); ++i) {
+        FLICKER_OPACITY& fr = flicker_opacity_v[i];
+        *fr.flash_color = fabs(sinf(asinf(fr.rgb_backup) + (1.0f-fr.flash_time) * 4.0f *acosf(-1)));
+        if ((fr.flash_time -= (1.f / float(GlobalTemp::CubismFrameCount))) <= 0.0f) {
+            std::cout << "Flicker Goback Opacity: " << fr.rgb_backup << std::endl;
+            *fr.flash_color = fr.rgb_backup;
         }
-        Su::ColorConvertHSVtoRGB(cosf(flashTime * 6.0f) * 0.5f + 0.5f, 0.5f, 0.5f, *flashColor[0], *flashColor[1], *flashColor[2]);
-        *flashColor[3] = 1.0f;
-        if ((flashTime -= (1.f/float(GlobalTemp::CubismFrameCount)) ) <= 0.0f) {
-            std::cout << "Goback Color: " << rgb_backup[0] << " " << rgb_backup[1] << " " << rgb_backup[2] << std::endl;
-            *flashColor[0] = rgb_backup[0];
-            *flashColor[1] = rgb_backup[1];
-            *flashColor[2] = rgb_backup[2];
-            *flashColor[3] = rgb_backup[3];
+        if (fr.flash_time <= 0.0f) {
+            fr.flash_time = 0.0f;
+            continue;
         }
     }
+    flicker_opacity_v.erase(
+        std::remove_if(flicker_opacity_v.begin(), flicker_opacity_v.end(),
+            [](const FLICKER_OPACITY& fr) { return std::fabs(fr.flash_time) < ZEROFLOAT; }
+        ),
+        flicker_opacity_v.end()
+    );
 }
 
 void LAppModel::UpdateAllColor()
 {
     UpdateFlashColor();
+    UpdateFlashOpacity();
     for (int i = 0; i < this->GetModel()->GetDrawableCount(); ++i) {
         this->GetModel()->GetMultiplyColorRef()[i].Color.R = this->drawable_multiply_color[i][0];
         this->GetModel()->GetMultiplyColorRef()[i].Color.G = this->drawable_multiply_color[i][1];
@@ -171,7 +230,11 @@ void LAppModel::UpdateAllColor()
         float ps_b = this->drawable_part_screen_color[i][2];
         float ps_a = this->drawable_part_screen_color[i][3];
         this->GetModel()->SetPartScreenColor(i, ps_r, ps_g, ps_b, ps_a);
+
+        this->GetModel()->SetPartOpacity(i, this->drawable_part_opacity[i]);
+
     }
+
 
 }
 

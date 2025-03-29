@@ -171,7 +171,7 @@ namespace Su {
     void MemsetStr(char* str, size_t size) {
         memset(str, 0, size);
     }
-    void GetGuiMark(char* markbuf, size_t size, const char* name, const char* id) {
+    void JoinGuiMark(char* markbuf, size_t size, const char* name, const char* id) {
         MemsetStr(markbuf, size);
         strcpy_s(markbuf, size, name);
         strcat_s(markbuf, size, "##");
