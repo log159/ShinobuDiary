@@ -17,7 +17,7 @@
 #include <vector>
 #include <iostream>
 #include "../global.h"
-#include "../suconfig.h"
+#include "../shinobugui_src/suconfig.h"
 
 struct ModelJsonConfig {
     Csm::csmString modelPath;

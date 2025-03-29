@@ -124,7 +124,6 @@ private:
     std::vector<FLICKER>                            flicker_v;
     //对于透明标识位置
     std::vector<FLICKER_OPACITY>                    flicker_opacity_v;
-
 public:
     long long                                       hit_num             = 0;
     std::string                                     hit_name;
@@ -149,12 +148,11 @@ public:
     bool                                            set_all_po_mark         = false;
     Csm::CubismCdiJson*                             cdi_json                = nullptr;
     bool                                            cdi_exist               = false;
-    std::vector<Su::ShinobuScrollingBuffer>         sdata1_v;
+    std::vector<Su::ShinobuScrollingBuffer>         sdatal_v;
+    bool                                            sdatal_ui_mark          = false;
     float                                           add_t                   = 0.f;
     float                                           history_t               = 10.0f;
 
-
-public:
     CCG                                                 def_cubism_cg;
     std::vector<LookParam>                              def_look_target_params;
     std::vector<Csm::CubismBreath::BreathParameterData> def_breath_params;
@@ -166,9 +164,6 @@ public:
     bool                canHitareas                                 = true;     //是否启用触发
     bool                previewHitareas                             = false;    //预览触发区域
     bool                animationAutoPlay                           = false;    //启用动画自动播放
-    bool                overwriteFlagForModelMultiplyColors         = false;    //启用正片叠底
-    bool                overwriteFlagForModelScreenColors           = false;    //启用屏幕色
-    bool                overwriteFlagForModelCullings               = false;    //启用剔除规则
 
     float               drawable_multiply_color[DEFSIZEK16][4];                 //正片叠底参数
     float               drawable_screen_color[DEFSIZEK16][4];                   //屏幕色参数

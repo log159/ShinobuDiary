@@ -25,8 +25,14 @@
     <Filter Include="cubism_src">
       <UniqueIdentifier>{67abd2ec-79a0-4b3a-aea9-d1137e9b7a5e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="implot">
+    <Filter Include="implot_src">
       <UniqueIdentifier>{0e523ced-7d2a-4cf4-acd7-890ce3924525}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shinobugui_src">
+      <UniqueIdentifier>{deacfee4-ebcc-4f42-b033-f688557ce46c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="llm_src">
+      <UniqueIdentifier>{91129289-0778-47d9-87a1-14b685180f6d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -55,18 +61,6 @@
       <Filter>imgui_src</Filter>
     </ClCompile>
     <ClCompile Include="filesetting.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="suconfig.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="shinobuwidget.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="sparkdesk.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="llmhome.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="global.cpp">
@@ -141,20 +135,29 @@
     <ClCompile Include="cubism_src\CubismLoom.cpp">
       <Filter>cubism_src</Filter>
     </ClCompile>
-    <ClCompile Include="timeconfig.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="sufunction.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="implot\implot.cpp">
-      <Filter>implot</Filter>
+      <Filter>implot_src</Filter>
     </ClCompile>
     <ClCompile Include="implot\implot_demo.cpp">
-      <Filter>implot</Filter>
+      <Filter>implot_src</Filter>
     </ClCompile>
     <ClCompile Include="implot\implot_items.cpp">
-      <Filter>implot</Filter>
+      <Filter>implot_src</Filter>
+    </ClCompile>
+    <ClCompile Include="shinobugui_src\shinobuwidget.cpp">
+      <Filter>shinobugui_src</Filter>
+    </ClCompile>
+    <ClCompile Include="shinobugui_src\suconfig.cpp">
+      <Filter>shinobugui_src</Filter>
+    </ClCompile>
+    <ClCompile Include="shinobugui_src\sufunction.cpp">
+      <Filter>shinobugui_src</Filter>
+    </ClCompile>
+    <ClCompile Include="llm_src\llmhome.cpp">
+      <Filter>llm_src</Filter>
+    </ClCompile>
+    <ClCompile Include="llm_src\sparkdesk.cpp">
+      <Filter>llm_src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -176,9 +179,6 @@
     <ClInclude Include="imgui_src\imstb_truetype.h">
       <Filter>imgui_src</Filter>
     </ClInclude>
-    <ClInclude Include="compoundgui.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="filesetting.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -186,18 +186,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="imgui_impl_win32.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="llmhome.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="shinobuwidget.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="sparkdesk.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="suconfig.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="translator.h">
@@ -308,23 +296,35 @@
     <ClInclude Include="cubism_src\CubismLoom.h">
       <Filter>cubism_src</Filter>
     </ClInclude>
-    <ClInclude Include="timeconfig.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="sufunction.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="sizedef.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="implot\implot.h">
-      <Filter>implot</Filter>
+      <Filter>implot_src</Filter>
     </ClInclude>
     <ClInclude Include="implot\implot_internal.h">
-      <Filter>implot</Filter>
+      <Filter>implot_src</Filter>
     </ClInclude>
-    <ClInclude Include="somemacros.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="shinobugui_src\shinobuwidget.h">
+      <Filter>shinobugui_src</Filter>
+    </ClInclude>
+    <ClInclude Include="shinobugui_src\compoundgui.h">
+      <Filter>shinobugui_src</Filter>
+    </ClInclude>
+    <ClInclude Include="shinobugui_src\sizedef.h">
+      <Filter>shinobugui_src</Filter>
+    </ClInclude>
+    <ClInclude Include="shinobugui_src\somemacros.h">
+      <Filter>shinobugui_src</Filter>
+    </ClInclude>
+    <ClInclude Include="shinobugui_src\suconfig.h">
+      <Filter>shinobugui_src</Filter>
+    </ClInclude>
+    <ClInclude Include="shinobugui_src\sufunction.h">
+      <Filter>shinobugui_src</Filter>
+    </ClInclude>
+    <ClInclude Include="llm_src\llmhome.h">
+      <Filter>llm_src</Filter>
+    </ClInclude>
+    <ClInclude Include="llm_src\sparkdesk.h">
+      <Filter>llm_src</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

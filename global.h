@@ -1,11 +1,11 @@
 ﻿#pragma once
 #include <map>
 #include <queue>
-#include "sizedef.h"
+#include "./shinobugui_src/sizedef.h"
+#include "./shinobugui_src/somemacros.h"
 #include "filesetting.h"
 #include "imgui.h"
-#include "sufunction.h"
-#include "./somemacros.h"
+#include "./shinobugui_src/sufunction.h"
 
 class GlobalTemp {
 public:
@@ -127,6 +127,20 @@ static const char* gpt_sovits_target_language_list[] = { "zh","ja","en" };
 
 #define LANGUAGE_ENUM_DEF(E,...) enum class LAN:int {E, ##__VA_ARGS__};
 LANGUAGE_ENUM_DEF(CN, EN /*other*/)
+#define PAIR(key,value) {key, value}
+#define MAP_TYPE_DEF(KEY_TYPE,VALUE_TYPE) static std::map<KEY_TYPE, VALUE_TYPE>
+#define LANGUAGE_MAP(KEY_TYPE,VALUE_TYPE,...) \
+MAP_TYPE_DEF(KEY_TYPE,VALUE_TYPE)language_map = {__VA_ARGS__};
+static const char* language_list[] = { u8"简体中文", u8"English"/*other*/ };
+LANGUAGE_MAP(int, LAN, PAIR(0, LAN::CN), PAIR(1, LAN::EN)/*other*/)
+#define LANGUAGE_ADD(T,...) \
+static const char* ARR[] = {T,##__VA_ARGS__};
+#define LANGUAGE_LAM(...) (([]()->const char* {\
+        LANGUAGE_ADD(__VA_ARGS__)\
+        return ARR[(int)::language_map[(int)::GlobalConfig::getInstance()->select_lan]];\
+})())
+#define AT(...) (LANGUAGE_LAM(__VA_ARGS__))
+
 class GlobalConfig {
 public:
     ::LAN select_lan;
@@ -166,17 +180,3 @@ private:
     GlobalConfig& operator=(const GlobalConfig&);
     ~GlobalConfig();
 };
-#define PAIR(key,value) {key, value}
-#define MAP_TYPE_DEF(KEY_TYPE,VALUE_TYPE) static std::map<KEY_TYPE, VALUE_TYPE>
-#define LANGUAGE_MAP(KEY_TYPE,VALUE_TYPE,...) \
-MAP_TYPE_DEF(KEY_TYPE,VALUE_TYPE)language_map = {__VA_ARGS__};
-static const char* language_list[] = { u8"简体中文", u8"English"/*other*/ };
-LANGUAGE_MAP(int, LAN, PAIR(0, LAN::CN), PAIR(1, LAN::EN)/*other*/)
-#define LANGUAGE_ADD(T,...) \
-static const char* ARR[] = {T,##__VA_ARGS__};
-#define LANGUAGE_LAM(...) (([]()->const char* {\
-        LANGUAGE_ADD(__VA_ARGS__)\
-        return ARR[(int)::language_map[(int)::GlobalConfig::getInstance()->select_lan]];\
-})())
-#define AT(...) (LANGUAGE_LAM(__VA_ARGS__))
-

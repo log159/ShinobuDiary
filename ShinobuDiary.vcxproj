@@ -190,9 +190,12 @@
     <ClCompile Include="implot\implot.cpp" />
     <ClCompile Include="implot\implot_demo.cpp" />
     <ClCompile Include="implot\implot_items.cpp" />
-    <ClCompile Include="llmhome.cpp" />
+    <ClCompile Include="llm_src\llmhome.cpp" />
+    <ClCompile Include="llm_src\sparkdesk.cpp" />
+    <ClCompile Include="shinobugui_src\shinobuwidget.cpp" />
+    <ClCompile Include="shinobugui_src\suconfig.cpp" />
+    <ClCompile Include="shinobugui_src\sufunction.cpp" />
     <ClCompile Include="simpleini-4.22_src\ConvertUTF.cpp" />
-    <ClCompile Include="suconfig.cpp" />
     <ClCompile Include="imgui_impl_dx11.cpp" />
     <ClCompile Include="imgui_impl_win32.cpp" />
     <ClCompile Include="imgui_src\imgui.cpp" />
@@ -201,13 +204,8 @@
     <ClCompile Include="imgui_src\imgui_tables.cpp" />
     <ClCompile Include="imgui_src\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="shinobuwidget.cpp" />
-    <ClCompile Include="sparkdesk.cpp" />
-    <ClCompile Include="sufunction.cpp" />
-    <ClCompile Include="timeconfig.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="compoundgui.h" />
     <ClInclude Include="cubism_src\CubismDirectXRenderer.hpp" />
     <ClInclude Include="cubism_src\CubismDirectXView.hpp" />
     <ClInclude Include="cubism_src\CubismLoom.h" />
@@ -236,13 +234,16 @@
     <ClInclude Include="imgui_impl_win32.h" />
     <ClInclude Include="implot\implot.h" />
     <ClInclude Include="implot\implot_internal.h" />
-    <ClInclude Include="llmhome.h" />
-    <ClInclude Include="shinobuwidget.h" />
+    <ClInclude Include="llm_src\llmhome.h" />
+    <ClInclude Include="llm_src\sparkdesk.h" />
+    <ClInclude Include="shinobugui_src\compoundgui.h" />
+    <ClInclude Include="shinobugui_src\shinobuwidget.h" />
+    <ClInclude Include="shinobugui_src\sizedef.h" />
+    <ClInclude Include="shinobugui_src\somemacros.h" />
+    <ClInclude Include="shinobugui_src\suconfig.h" />
+    <ClInclude Include="shinobugui_src\sufunction.h" />
     <ClInclude Include="simpleini-4.22_src\ConvertUTF.h" />
     <ClInclude Include="simpleini-4.22_src\SimpleIni.h" />
-    <ClInclude Include="sizedef.h" />
-    <ClInclude Include="somemacros.h" />
-    <ClInclude Include="sparkdesk.h" />
     <ClInclude Include="imgui_src\imconfig.h" />
     <ClInclude Include="imgui_src\imgui.h" />
     <ClInclude Include="imgui_src\imgui_internal.h" />
@@ -259,9 +260,6 @@
     <ClInclude Include="sparkdesk_src\include\sc_qachain.h" />
     <ClInclude Include="sparkdesk_src\include\sc_type.h" />
     <ClInclude Include="sparkdesk_src\include\sparkchain.h" />
-    <ClInclude Include="suconfig.h" />
-    <ClInclude Include="sufunction.h" />
-    <ClInclude Include="timeconfig.h" />
     <ClInclude Include="translator.h" />
   </ItemGroup>
   <ItemGroup>

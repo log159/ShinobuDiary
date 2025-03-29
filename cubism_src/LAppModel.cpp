@@ -20,7 +20,7 @@
 #include "LAppPal.hpp"
 #include "LAppTextureManager.hpp"
 #include "LAppDelegate.hpp"
-#include "../sufunction.h"
+#include "../shinobugui_src/sufunction.h"
 #include <string>
 
 using namespace Live2D::Cubism::Framework;
@@ -48,6 +48,11 @@ namespace {
 }
 void LAppModel::InitMultiplyColor()
 {
+    this->set_all_m_mark = false;
+    this->multiply_color[0] = 1.0f;
+    this->multiply_color[1] = 1.0f;
+    this->multiply_color[2] = 1.0f;
+    this->multiply_color[3] = 1.0f;
     for (int i = 0; i < int(this->GetModel()->GetDrawableCount()); i++)
     {
         this->drawable_multiply_color[i][0] = this->GetModel()->GetDrawableMultiplyColor(i).X;
@@ -59,6 +64,11 @@ void LAppModel::InitMultiplyColor()
 
 void LAppModel::InitScreenColor()
 {
+    this->set_all_s_mark = false;
+    this->screen_color[0] = 0.0f;
+    this->screen_color[1] = 0.0f;
+    this->screen_color[2] = 0.0f;
+    this->screen_color[3] = 1.0f;
     for (int i = 0; i < int(this->GetModel()->GetDrawableCount()); i++)
     {
         this->drawable_screen_color[i][0] = this->GetModel()->GetDrawableScreenColor(i).X;
@@ -70,6 +80,11 @@ void LAppModel::InitScreenColor()
 
 void LAppModel::InitPartMultiplyColor()
 {
+    this->set_all_mp_mark = false;
+    this->multiply_group_color[0] = 1.0f;
+    this->multiply_group_color[1] = 1.0f;
+    this->multiply_group_color[2] = 1.0f;
+    this->multiply_group_color[3] = 1.0f;
     for (int i = 0; i < this->GetModel()->GetPartCount(); i++)
     {
         this->drawable_part_multiply_color[i][0] = 1.0f;
@@ -81,6 +96,11 @@ void LAppModel::InitPartMultiplyColor()
 
 void LAppModel::InitPartScreenColor()
 {
+    this->set_all_sp_mark = false;
+    this->screen_group_color[0] = 0.0f;
+    this->screen_group_color[1] = 0.0f;
+    this->screen_group_color[2] = 0.0f;
+    this->screen_group_color[3] = 1.0f;
     for (int i = 0; i < this->GetModel()->GetPartCount(); i++)
     {
         this->drawable_part_screen_color[i][0] = 0.0f;
@@ -92,6 +112,8 @@ void LAppModel::InitPartScreenColor()
 
 void LAppModel::InitPartOpacity()
 {
+    this->set_all_po_mark = false;
+    this->group_opacity = 1.0f;
     for (int i = 0; i < this->GetModel()->GetPartCount(); i++) {
         this->drawable_part_opacity[i] = 1.0f;
     }
@@ -745,7 +767,7 @@ void LAppModel::Update()
     //状态观测
     this->add_t += deltaTimeSeconds;
     for (int i = 0; i < this->GetModel()->GetParameterCount(); ++i) {
-        Su::ShinobuScrollingBuffer& sdata1 = this->sdata1_v[i];
+        Su::ShinobuScrollingBuffer& sdata1 = this->sdatal_v[i];
         sdata1.AddPoint(this->add_t, this->GetModel()->GetParameterValue(i));
     }
 

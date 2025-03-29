@@ -15,7 +15,7 @@
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
-#include "shinobuwidget.h"
+#include "./shinobugui_src/shinobuwidget.h"
 #include "./implot/implot.h"
 #include "./cubism_src/LAppDelegate.hpp"
 
@@ -27,7 +27,6 @@ static UINT                     g_ResizeWidth           = 0;
 static UINT                     g_ResizeHeight          = 0;
 static ID3D11RenderTargetView*  g_mainRenderTargetView  = nullptr;
 static bool                     while_done              = false;
-
 
 bool            CreateDeviceD3D(HWND hWnd);
 void            CleanupDeviceD3D();
@@ -104,9 +103,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
         //WINDOWS BEGIN--------------------------------------------------------------------------
-        //Demo Window
-        //static bool show_demo_window = true;
-        //if (show_demo_window)ImGui::ShowDemoWindow(&show_demo_window);
+
+        //ImGui::ShowDemoWindow();//Demo Window
+        //ShowShinobuDebugWindow();//Debug Window
 
         //MAIN WINDOWS
         static bool show_shinobu_window = true;
@@ -114,8 +113,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         ShowShinobuStyleEditor();
         ShowShinobuInteractively();
         ShowShinobuErrorWindow();//Error Window
-        ShowShinobuDebugWindow();//Debug Window
-        ShowShinobuPlot();
 
         //WINDOWS END--------------------------------------------------------------------------
         if (show_shinobu_window == false)QuitHandle();

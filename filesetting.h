@@ -1,10 +1,9 @@
 ﻿#pragma once
-#include "sizedef.h"
 #include <string>
+#include "./shinobugui_src/sizedef.h"
 #include "./simpleini-4.22_src/ConvertUTF.h"
 #include "./simpleini-4.22_src/SimpleIni.h"
-#include "./somemacros.h"
-
+#include "./shinobugui_src/somemacros.h"
 
 class FileSetting {
 public:

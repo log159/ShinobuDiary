@@ -1,3 +1,0 @@
-.\Resources\modeldir_1\name_1.model3.json
-.\Resources\modeldir_2\name_2.model3.json
-...

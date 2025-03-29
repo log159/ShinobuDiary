@@ -590,7 +590,7 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
     lam->InitPartOpacity();
 
     //观测
-    lam->sdata1_v.resize(lam->GetModel()->GetParameterCount());
+    lam->sdatal_v.resize(lam->GetModel()->GetParameterCount());
 
 
     ////预期初始化
