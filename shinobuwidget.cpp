@@ -258,16 +258,14 @@ void ShowShinobuCubism()
 void ShowShinobuCSM(Su::UserConfig* _uc)
 {
     ImGui::SeparatorText(GETGUIID(TT_267));
-
     Csm::csmVector<Csm::csmString>& csmModelDir = LAppLive2DManager::GetInstance()->GetModelDir();
     if (csmModelDir.GetSize() <= 0) {
         if (ImGui::BeginCombo(TT_268, TT_269)) {
             ImGui::EndCombo();
         };
-        ImGui::TreePop();
         return;
     }
-    static const char* modelDirs[DEFSIZEK16] = { nullptr };
+    static const char* modelDirs[DEFSIZEK16];
     static int modelDirsSize = -1;
     int select = ([_uc,csmModelDir]()->int {
         int pos = 0;
@@ -1009,7 +1007,7 @@ void ShowShinobuCsmBlink(Su::UserConfig& uc, LAppModel* lam)
     ImGui::SliderFloat(TT_326, &uc.cubism_config.opening_seconds, 0.01f, 2.0f, "%.2f", ImGuiSliderFlags_None);   //闭合到完全睁开的过渡时间
     lam->GetOpeningSeconds() = uc.cubism_config.opening_seconds;
 
-    static const char* blinklist[DEFSIZEK16] = { 0 };
+    static const char* blinklist[DEFSIZEK16];
     for (int paramid = 0; paramid < lam->GetModel()->GetParameterCount(); paramid++) {
         blinklist[paramid] = lam->GetModel()->GetParameterId(paramid)->GetString().GetRawString();
     }
@@ -1199,7 +1197,7 @@ void ShowShinobuCsmHitareas(Su::UserConfig& uc, LAppModel* lam)
         strcat_s(input_buf, sizeof(input_buf), han);
         ImGui::Text(input_buf);
         ImGui::Separator();
-        static const char* anim_list[DEFSIZEK16] = { 0 };
+        static const char* anim_list[DEFSIZEK16];
         const char** ex_name = anim_list;
 
         if (ImGui::BeginTabBar("###BeginTabBar___ShowShinobuInteractively_Anim", ImGuiTabBarFlags_None)) {
