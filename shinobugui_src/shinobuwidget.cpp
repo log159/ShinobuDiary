@@ -8,8 +8,8 @@
 #include "../imgui_src/imgui.h"
 #include "../imgui_impl_win32.h"
 #include "../imgui_impl_dx11.h"
-#include "../implot/implot.h"
-#include "../implot/implot_internal.h"
+#include "../implot_src/implot.h"
+#include "../implot_src/implot_internal.h"
 #include "../translator.h"
 #include "../shinobugui_src/sufunction.h"
 #include "../cubism_src/CubismLoom.h"
@@ -802,6 +802,7 @@ void ShowShinobuCsmLook(Su::UserConfig& uc, LAppModel* lam)
     lam->GetLookTargetDamping() = uc.cubism_config.damping;
     ImGui::SameLine(); Su::HelpMarker(TT_298);
     if (ImGui::TreeNode(GETGUIID(TT_299))) {
+        ImGui::InputText(TT_422, lam->filter_param_buf, sizeof(lam->filter_param_buf), ImGuiInputTextFlags_None);
         static ImGuiTableFlags flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoSavedSettings;
         if (ImGui::BeginTable("###Table___ShowShinobuInteractively_LookingMouse", 5, flags, ImVec2(0.0f, ImGui::GetTextLineHeightWithSpacing() * 5)))
         {
@@ -814,10 +815,11 @@ void ShowShinobuCsmLook(Su::UserConfig& uc, LAppModel* lam)
             for (int paramid = 0; paramid < lam->GetModel()->GetParameterCount(); paramid++) {
                 LookParam& cubism_lp = lam->GetLookTargetParams()[paramid];
                 LookParam& user_lp = uc.cubism_config.look_target_params[paramid];
+                strcpy_s(input_buf, sizeof(input_buf), lam->GetModel()->GetParameterId(paramid)->GetString().GetRawString());
+                if (!Su::IsSubstring(input_buf, lam->filter_param_buf))continue;
                 ImGui::PushID(paramid);
                 ImGui::TableNextColumn();
                 ImGui::PushItemWidth(-1);
-                strcpy_s(input_buf, sizeof(input_buf), lam->GetModel()->GetParameterId(paramid)->GetString().GetRawString());
                 ImGui::InputText("###InputText___ShowShinobuCsmLook_Id", input_buf, sizeof(input_buf), ImGuiInputTextFlags_ReadOnly);
                 ImGui::TableNextColumn();
                 ImGui::PushItemWidth(-1);
@@ -876,6 +878,7 @@ void ShowShinobuCsmBreath(Su::UserConfig& uc, LAppModel* lam)
     lam->GetCanBreath() = uc.cubism_config.enable_breath;
     ImGui::Separator();
     if (ImGui::TreeNode(GETGUIID(TT_309))) {
+        ImGui::InputText(TT_422, lam->filter_param_buf, sizeof(lam->filter_param_buf), ImGuiInputTextFlags_None);
         static ImGuiTableFlags flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoSavedSettings;
         if (ImGui::BeginTable("###Table___ShowShinobuInteractively_Breath", 7, flags, ImVec2(0.0f, ImGui::GetTextLineHeightWithSpacing() * 5)))
         {
@@ -890,10 +893,11 @@ void ShowShinobuCsmBreath(Su::UserConfig& uc, LAppModel* lam)
             for (int paramid = 0; paramid < lam->GetModel()->GetParameterCount(); paramid++) {
                 Csm::CubismBreath::BreathParameterData& cubism_cb = lam->GetBreathParameters()[paramid];
                 Csm::CubismBreath::BreathParameterData& user_cb = uc.cubism_config.breath_params[paramid];
+                strcpy_s(input_buf, sizeof(input_buf), lam->GetModel()->GetParameterId(paramid)->GetString().GetRawString());
+                if (!Su::IsSubstring(input_buf, lam->filter_param_buf))continue;
                 ImGui::PushID(paramid);
                 ImGui::TableNextColumn();
                 ImGui::PushItemWidth(-1);
-                strcpy_s(input_buf, sizeof(input_buf), lam->GetModel()->GetParameterId(paramid)->GetString().GetRawString());
                 ImGui::InputText("###InputText___ShowShinobuCsmBreath_Id", input_buf, sizeof(input_buf), ImGuiInputTextFlags_ReadOnly);
                 ImGui::TableNextColumn();
                 ImGui::PushItemWidth(-1);
@@ -1240,8 +1244,10 @@ void ShowShinobuCsmRendering(Su::UserConfig& uc, LAppModel* lam)
                 }
             }
             ImGui::Separator();
+            ImGui::InputText(TT_423, lam->filter_drawable_buf, sizeof(lam->filter_drawable_buf), ImGuiInputTextFlags_None);
             for (int i = 0; i < lam->GetModel()->GetDrawableCount(); i++)
             {
+                if (!Su::IsSubstring(lam->GetModel()->GetDrawableId(i)->GetString().GetRawString(), lam->filter_drawable_buf))continue;
                 ImGui::PushID(i);
                 if (ImGui::Button("?"))
                     lam->StartFlashColor(0, i);
@@ -1273,8 +1279,10 @@ void ShowShinobuCsmRendering(Su::UserConfig& uc, LAppModel* lam)
                 }
             }
             ImGui::Separator();
+            ImGui::InputText(TT_423, lam->filter_drawable_buf, sizeof(lam->filter_drawable_buf), ImGuiInputTextFlags_None);
             for (int i = 0; i < lam->GetModel()->GetDrawableCount(); i++)
             {
+                if (!Su::IsSubstring(lam->GetModel()->GetDrawableId(i)->GetString().GetRawString(), lam->filter_drawable_buf))continue;
                 ImGui::PushID(i);
                 if (ImGui::Button("?"))
                     lam->StartFlashColor(1, i);
@@ -1318,8 +1326,10 @@ void ShowShinobuCsmRendering(Su::UserConfig& uc, LAppModel* lam)
                 }
             }
             ImGui::Separator();
+            ImGui::InputText(TT_424, lam->filter_part_buf, sizeof(lam->filter_part_buf), ImGuiInputTextFlags_None);
             for (int i = 0; i < lam->GetModel()->GetPartCount(); i++)
             {
+                if (!Su::IsSubstring(lam->GetModel()->GetPartId(i)->GetString().GetRawString(), lam->filter_part_buf))continue;
                 ImGui::PushID(i);
                 if (ImGui::Button("?"))
                     lam->StartFlashColor(2, i);
@@ -1370,8 +1380,10 @@ void ShowShinobuCsmRendering(Su::UserConfig& uc, LAppModel* lam)
                 }
             }
             ImGui::Separator();
+            ImGui::InputText(TT_424, lam->filter_part_buf, sizeof(lam->filter_part_buf), ImGuiInputTextFlags_None);
             for (int i = 0; i < lam->GetModel()->GetPartCount(); i++)
             {
+                if (!Su::IsSubstring(lam->GetModel()->GetPartId(i)->GetString().GetRawString(), lam->filter_part_buf))continue;
                 ImGui::PushID(i);
                 if (ImGui::Button("?"))
                     lam->StartFlashColor(3, i);
@@ -1394,7 +1406,6 @@ void ShowShinobuCsmRendering(Su::UserConfig& uc, LAppModel* lam)
         if (ImGui::BeginTabItem(GETGUIID(TT_381))) {
             ImGui::SeparatorText(TT_382);
             if (ImGui::Button(TT_50, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
-
                 lam->InitPartOpacity();
             }
             Su::JoinGuiMark(edit_name, sizeof(edit_name),TT_383, u8"___PartOpacity_Synchronize_ColorEdit4");
@@ -1408,8 +1419,10 @@ void ShowShinobuCsmRendering(Su::UserConfig& uc, LAppModel* lam)
                     lam->drawable_part_opacity[i] = lam->group_opacity;
             }
             ImGui::Separator();
+            ImGui::InputText(TT_424, lam->filter_part_buf, sizeof(lam->filter_part_buf), ImGuiInputTextFlags_None);
             for (int i = 0; i < lam->GetModel()->GetPartCount(); i++)
             {
+                if (!Su::IsSubstring(lam->GetModel()->GetPartId(i)->GetString().GetRawString(), lam->filter_part_buf))continue;
                 ImGui::PushID(i);
                 if (ImGui::Button("?")) 
                     lam->StartFlashOpacity(i);
@@ -1462,9 +1475,12 @@ void ShowShinobuCsmObserveItems(Su::UserConfig& uc, LAppModel* lam)
     ImGui::SliderFloat(TT_378, &lam->history_t, 1.0f, 30.f, TT_379);
     ImGui::SameLine();
     ImGui::Checkbox(TT_385, &lam->sdatal_ui_mark);
+    ImGui::Separator();
+    ImGui::InputText(TT_422, lam->filter_param_buf, sizeof(lam->filter_param_buf), ImGuiInputTextFlags_None);
     Csm::CubismModel* cml = lam->GetModel();
     for (int i = 0; i < cml->GetParameterCount(); ++i) {
         Su::ShinobuScrollingBuffer& sdata1 = lam->sdatal_v[i];
+        if (!Su::IsSubstring(cml->GetParameterId(i)->GetString().GetRawString(), lam->filter_param_buf))continue;
         ImGui::PushID(i);
         if (ImPlot::BeginPlot("##Scrolling___ShowShinobuCsmObserve", ImVec2(-1, 150))) {
             ImPlot::SetupAxes(nullptr, nullptr, flags, flags);

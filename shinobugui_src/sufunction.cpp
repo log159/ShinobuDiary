@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <cmath>
 #include <sstream>
-#include <map>
+#include <cstring>
 #include <algorithm>
 #include "../global.h"
 #include "../translator.h"
@@ -260,5 +260,7 @@ namespace Su {
         case 5: default: out_r = v; out_g = p; out_b = q; break;
         }
     }
-
+    bool IsSubstring(const char* haystack, const char* needle) {
+        return std::strstr(haystack, needle) != nullptr;
+    }
 }

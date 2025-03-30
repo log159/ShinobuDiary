@@ -1,24 +1,19 @@
-﻿// Dear ImGui: standalone example application for DirectX 11
-
-// Learn about Dear ImGui:
-// - FAQ                  https://dearimgui.com/faq
-// - Getting Started      https://dearimgui.com/getting-started
-// - Documentation        https://dearimgui.com/docs (same as your local docs/ folder).
-// - Introduction, links and more at the top of imgui.cpp
-
-#include <d3d11.h>
+﻿#include <d3d11.h>
 #include <tchar.h>
 #include <windows.h>
 #include <iostream>
 #include <sstream>
 #include <thread>
+#include <shellapi.h>
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include "./shinobugui_src/shinobuwidget.h"
-#include "./implot/implot.h"
+#include "./implot_src/implot.h"
 #include "./cubism_src/LAppDelegate.hpp"
+#define WM_TRAYICON (WM_APP + 1)
 
+NOTIFYICONDATA nid;
 static ID3D11Device*            g_pd3dDevice            = nullptr;
 static ID3D11DeviceContext*     g_pd3dDeviceContext     = nullptr;
 static IDXGISwapChain*          g_pSwapChain            = nullptr;
@@ -103,10 +98,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
         //WINDOWS BEGIN--------------------------------------------------------------------------
-
         //ImGui::ShowDemoWindow();//Demo Window
         //ShowShinobuDebugWindow();//Debug Window
-
         //MAIN WINDOWS
         static bool show_shinobu_window = true;
         ShowShinobuWindow(&show_shinobu_window);
@@ -188,6 +181,16 @@ void FrontPart() {
     ::RegisterClassExW(&wc);
     static int currentX = 0, currentY = 0, resWidth = GetSystemMetrics(SM_CXSCREEN), resHeight = GetSystemMetrics(SM_CYSCREEN);
     HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Dear Shinobu", WS_OVERLAPPEDWINDOW, currentX, currentY, resWidth, resHeight, nullptr, nullptr, wc.hInstance, nullptr);
+    nid.cbSize = sizeof(nid);
+    nid.hWnd = hwnd;
+    nid.uID = 1;
+    nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+    nid.uCallbackMessage = WM_TRAYICON;
+    nid.hIcon = (HICON)LoadImage(NULL, L"./Icon/icon.ico", IMAGE_ICON, 32, 32, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+    wcscpy_s(nid.szTip, ARRAYSIZE(nid.szTip), L"程序正在运行...");
+    Shell_NotifyIcon(NIM_ADD, &nid);
+
+
     GlobalTemp::WindowMainWc = wc;
     GlobalTemp::WindowMainHandle = hwnd;
     ImGui_ImplWin32_EnableAlphaCompositing(hwnd);
@@ -308,6 +311,21 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
     switch (msg)
     {
+    case WM_TRAYICON:
+        if (lParam == WM_RBUTTONUP) {
+            HMENU hMenu = CreatePopupMenu();
+            AppendMenu(hMenu, MF_STRING, 1, L"退出");
+            POINT pt;
+            GetCursorPos(&pt);
+            TrackPopupMenu(hMenu, TPM_LEFTBUTTON, pt.x, pt.y, 0, hWnd, NULL);
+            DestroyMenu(hMenu);
+        }
+        break;
+    case WM_COMMAND:
+        if (wParam == 1) {
+            PostQuitMessage(0);
+        }
+        break;
     case WM_SIZE:
         if (wParam == SIZE_MINIMIZED)
             return 0;

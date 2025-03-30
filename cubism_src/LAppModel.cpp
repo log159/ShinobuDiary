@@ -339,6 +339,10 @@ LAppModel::LAppModel()
     //_idParamEyeBallX = CubismFramework::GetIdManager()->GetId(ParamEyeBallX);
     //_idParamEyeBallY = CubismFramework::GetIdManager()->GetId(ParamEyeBallY);
 
+    //查询缓存区
+    Su::MemsetStr(this->filter_param_buf, sizeof(this->filter_param_buf));
+    Su::MemsetStr(this->filter_drawable_buf, sizeof(this->filter_drawable_buf));
+    Su::MemsetStr(this->filter_part_buf, sizeof(this->filter_part_buf));
 }
 
 LAppModel::~LAppModel()

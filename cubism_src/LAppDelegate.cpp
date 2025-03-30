@@ -600,7 +600,7 @@ LRESULT WINAPI LAppDelegate::MsgProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM l
         return 0;
 
     case WM_MOUSEMOVE:
-        //Shinobu Debug
+        //delete
         //if(s_instance!=NULL)
         //{
         //    s_instance->_mouseX = static_cast<float>(LOWORD(lParam));

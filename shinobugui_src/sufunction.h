@@ -43,7 +43,7 @@ namespace Su {
     };
     extern void MemsetStr(char* str, size_t size);
     extern void JoinGuiMark(char* markbuf, size_t size, const char* name, const char* id);
-
+    extern bool IsSubstring(const char* haystack, const char* needle);
     extern void StringSplit(std::string str, const char split, std::vector<std::string>& sv);
     extern void HelpMarker(const char* desc);
     extern void ColorConvertHSVtoRGB(float h, float s, float v, float& out_r, float& out_g, float& out_b);

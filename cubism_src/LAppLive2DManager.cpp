@@ -551,7 +551,6 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
         vls.push_back(new LAppSprite(gx_r - lineThickness * 0.5f, gy_b + rectHeight * 0.5f, lineThickness, rectHeight, rightTexture->id, shader, device));
         lam->hitareas[std::string(drawID->GetString().GetRawString())] = vls;
     }
-
     for (int i = 0; i<lcms->GetHitAreasCount();i++)
     {
         Su::ShinobuExList& m_sel = uc->cubism_config.hit_areas_motion_map[lcms->GetHitAreaId(i)->GetString().GetRawString()];
@@ -591,7 +590,10 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
 
     //观测
     lam->sdatal_v.resize(lam->GetModel()->GetParameterCount());
+    
 
+
+    
 
     ////预期初始化
     //if (!uc->need_init_cubism) {

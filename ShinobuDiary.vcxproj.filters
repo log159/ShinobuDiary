@@ -135,15 +135,6 @@
     <ClCompile Include="cubism_src\CubismLoom.cpp">
       <Filter>cubism_src</Filter>
     </ClCompile>
-    <ClCompile Include="implot\implot.cpp">
-      <Filter>implot_src</Filter>
-    </ClCompile>
-    <ClCompile Include="implot\implot_demo.cpp">
-      <Filter>implot_src</Filter>
-    </ClCompile>
-    <ClCompile Include="implot\implot_items.cpp">
-      <Filter>implot_src</Filter>
-    </ClCompile>
     <ClCompile Include="shinobugui_src\shinobuwidget.cpp">
       <Filter>shinobugui_src</Filter>
     </ClCompile>
@@ -158,6 +149,15 @@
     </ClCompile>
     <ClCompile Include="llm_src\sparkdesk.cpp">
       <Filter>llm_src</Filter>
+    </ClCompile>
+    <ClCompile Include="implot_src\implot.cpp">
+      <Filter>implot_src</Filter>
+    </ClCompile>
+    <ClCompile Include="implot_src\implot_demo.cpp">
+      <Filter>implot_src</Filter>
+    </ClCompile>
+    <ClCompile Include="implot_src\implot_items.cpp">
+      <Filter>implot_src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -296,12 +296,6 @@
     <ClInclude Include="cubism_src\CubismLoom.h">
       <Filter>cubism_src</Filter>
     </ClInclude>
-    <ClInclude Include="implot\implot.h">
-      <Filter>implot_src</Filter>
-    </ClInclude>
-    <ClInclude Include="implot\implot_internal.h">
-      <Filter>implot_src</Filter>
-    </ClInclude>
     <ClInclude Include="shinobugui_src\shinobuwidget.h">
       <Filter>shinobugui_src</Filter>
     </ClInclude>
@@ -326,5 +320,19 @@
     <ClInclude Include="llm_src\sparkdesk.h">
       <Filter>llm_src</Filter>
     </ClInclude>
+    <ClInclude Include="implot_src\implot.h">
+      <Filter>implot_src</Filter>
+    </ClInclude>
+    <ClInclude Include="implot_src\implot_internal.h">
+      <Filter>implot_src</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ShinobuDiary.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

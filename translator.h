@@ -435,5 +435,9 @@
 #define TT_419 AT(u8"刻度线", u8"Tick Marks")
 #define TT_420 AT(u8"刻度标签", u8"Tick Labels")
 #define TT_421 AT(u8"项目地址",u8"Project Address")
+#define TT_422 AT(u8"筛选参数",u8"Filter parameter")
+#define TT_423 AT(u8"筛选渲染",u8"Filter rendering")
+#define TT_424 AT(u8"筛选渲染组",u8"Filter rendering group")
+
 
 

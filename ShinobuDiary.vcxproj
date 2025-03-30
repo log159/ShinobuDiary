@@ -187,9 +187,9 @@
     <ClCompile Include="cubism_src\TouchManager.cpp" />
     <ClCompile Include="filesetting.cpp" />
     <ClCompile Include="global.cpp" />
-    <ClCompile Include="implot\implot.cpp" />
-    <ClCompile Include="implot\implot_demo.cpp" />
-    <ClCompile Include="implot\implot_items.cpp" />
+    <ClCompile Include="implot_src\implot.cpp" />
+    <ClCompile Include="implot_src\implot_demo.cpp" />
+    <ClCompile Include="implot_src\implot_items.cpp" />
     <ClCompile Include="llm_src\llmhome.cpp" />
     <ClCompile Include="llm_src\sparkdesk.cpp" />
     <ClCompile Include="shinobugui_src\shinobuwidget.cpp" />
@@ -232,10 +232,11 @@
     <ClInclude Include="global.h" />
     <ClInclude Include="imgui_impl_dx11.h" />
     <ClInclude Include="imgui_impl_win32.h" />
-    <ClInclude Include="implot\implot.h" />
-    <ClInclude Include="implot\implot_internal.h" />
+    <ClInclude Include="implot_src\implot.h" />
+    <ClInclude Include="implot_src\implot_internal.h" />
     <ClInclude Include="llm_src\llmhome.h" />
     <ClInclude Include="llm_src\sparkdesk.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="shinobugui_src\compoundgui.h" />
     <ClInclude Include="shinobugui_src\shinobuwidget.h" />
     <ClInclude Include="shinobugui_src\sizedef.h" />
@@ -266,6 +267,9 @@
     <ProjectReference Include="FrameworkObj\FrameworkObj.vcxproj">
       <Project>{699b1578-4b3c-44ac-8f83-4acf4224a54e}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ShinobuDiary.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

@@ -152,6 +152,10 @@ public:
     bool                                            sdatal_ui_mark          = false;
     float                                           add_t                   = 0.f;
     float                                           history_t               = 10.0f;
+    char                                            filter_param_buf[DEFSIZE];
+    char                                            filter_drawable_buf[DEFSIZE];
+    char                                            filter_part_buf[DEFSIZE];
+
 
     CCG                                                 def_cubism_cg;
     std::vector<LookParam>                              def_look_target_params;
