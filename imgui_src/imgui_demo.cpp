@@ -8034,18 +8034,21 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
     ImGui::SameLine();
     { bool border = (style.PopupBorderSize > 0.0f);  if (ImGui::Checkbox(TT_48,  &border)) { style.PopupBorderSize  = border ? 1.0f : 0.0f; } }
 
+    static float window_scale = 1.0f;
     // Save/Revert button
     if (ImGui::Button(TT_49, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
-        //*ref = ref_saved_style = style;
+        //*ref = ref_saved_style = style;//delete
         ::GlobalConfig::GlobalConfigSave();
     }
 
     ImGui::SameLine();
     if (ImGui::Button(TT_50, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
-        //style = *ref;
+        //style = *ref;//delete
         style = ::GlobalConfig::getInstance()->defaultStyle;
         ::GlobalConfig::getInstance()->select_theme_id = 0;
         ImGui::GetIO().FontGlobalScale = 1.0f;
+        window_scale = 1.0f;
+        ImGui::SetWindowFontScale(window_scale);
     }
     ImGui::SameLine();
     //HelpMarker(
@@ -8215,7 +8218,7 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
             //    "However, the _correct_ way of scaling your UI is currently to reload your font at the designed size, "
             //    "rebuild the font atlas, and call style.ScaleAllSizes() on a reference ImGuiStyle structure.\n"
             //    "Using those settings here will give you poor quality results.");
-            static float window_scale = 1.0f;
+
             ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
             if (ImGui::DragFloat(TT_120, &window_scale, 0.005f, MIN_SCALE, MAX_SCALE, "%.2f", ImGuiSliderFlags_AlwaysClamp)) // Scale only this window
                 ImGui::SetWindowFontScale(window_scale);

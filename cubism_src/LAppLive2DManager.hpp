@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "../global.h"
+#include "../shinobugui_src/global.h"
 #include "../shinobugui_src/suconfig.h"
 
 struct ModelJsonConfig {

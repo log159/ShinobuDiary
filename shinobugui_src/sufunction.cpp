@@ -1,4 +1,7 @@
-﻿#include "sufunction.h"
+﻿/* 兼容C++17 */
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+
+#include "sufunction.h"
 #include <iostream>
 #include <chrono>
 #include <iomanip>
@@ -7,7 +10,8 @@
 #include <sstream>
 #include <cstring>
 #include <algorithm>
-#include "../global.h"
+#include <codecvt>
+#include "./global.h"
 #include "../translator.h"
 #include "../shinobugui_src/sizedef.h"
 
@@ -259,6 +263,10 @@ namespace Su {
         case 4: out_r = t; out_g = p; out_b = v; break;
         case 5: default: out_r = v; out_g = p; out_b = q; break;
         }
+    }
+    std::wstring Utf8ToWstring(const std::string& utf8_str) {
+        std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+        return converter.from_bytes(utf8_str);
     }
     bool IsSubstring(const char* haystack, const char* needle) {
         return std::strstr(haystack, needle) != nullptr;

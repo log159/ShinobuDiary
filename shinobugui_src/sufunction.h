@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <locale>
 
 namespace Su {
     extern std::string getCurrentTime();
@@ -52,4 +53,7 @@ namespace Su {
     T Clamp(T value, T min, T max) {
         return (value < min) ? min : (value > max ? max : value);
     }
+
+    extern std::wstring Utf8ToWstring(const std::string& utf8_str);
+
 }

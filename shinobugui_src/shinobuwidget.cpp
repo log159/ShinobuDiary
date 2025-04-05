@@ -12,7 +12,6 @@
 #include "../implot_src/implot_internal.h"
 #include "../translator.h"
 #include "../shinobugui_src/sufunction.h"
-#include "../cubism_src/CubismLoom.h"
 #include "../cubism_src/LAppLive2DManager.hpp"
 #include "../cubism_src/LAppModel.hpp"
 #include "../cubism_src/LAppDefine.hpp"
@@ -144,12 +143,12 @@ void ShowShinobuStart()
             ImGui::EndTable();
         }
 
-        if (ImGui::Button(TT_117, ImVec2(GlobalTemp::GuiButtonWidth,0))) {
+        if (ImGui::Button(TT_8, ImVec2(GlobalTemp::GuiButtonWidth,0))) {
             GlobalTemp::RefreshCubism = true;
             Su::AllConfigSave();
         }
         ImGui::SameLine();
-        if (ImGui::Button(TT_266, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
+        if (ImGui::Button(TT_294, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
             std::vector<Su::UserConfig>& vu = Su::UserConfig::getUserVector();
             for (int i = 0; i < int(vu.size()); ++i)
                 if (vu[i].enable_cubism)
@@ -327,23 +326,31 @@ void ShowShinobuGlobal()
 {
     if (ImGui::CollapsingHeader(GETGUIID(TT_224)))
     {
+        ImGuiStyle& sty = ImGui::GetStyle();
         float halfWidth = ImGui::GetWindowSize().x / 2.0f;
 
         if (ImGui::TreeNode(GETGUIID(TT_231))) {
 
             ImGuiIO& io = ImGui::GetIO(); (void)io;
-            ImGui::SeparatorText(TT_232);
-            static int ws_t = ::GlobalConfig::getInstance()->window_main_style_id,
+            static int 
+                ws_c = ::GlobalConfig::getInstance()->window_main_close,
+                ws_t = ::GlobalConfig::getInstance()->window_main_style_id,
                 ws_d = ::GlobalConfig::getInstance()->window_main_dock_id,
                 ws_dt = ::GlobalConfig::getInstance()->window_main_transparent_id,
                 ws_f = ::GlobalConfig::getInstance()->window_main_fast_id;
-            ImGui::RadioButton(TT_234, &ws_t, 0); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth);
+            ImGui::SeparatorText(TT_431);
+            ImGui::RadioButton(TT_432, &ws_c, 0); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth + sty.IndentSpacing);
+            ImGui::RadioButton(TT_433, &ws_c, 1);
+            if (GlobalConfig::getInstance()->window_main_close != ws_c) {
+                GlobalConfig::getInstance()->window_main_close = ws_c;
+            }
+            ImGui::SeparatorText(TT_232);
+            ImGui::RadioButton(TT_234, &ws_t, 0); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth + sty.IndentSpacing);
             ImGui::RadioButton(TT_235, &ws_t, 1);
-
             ImGui::SeparatorText(TT_239);
-            ImGui::RadioButton(TT_240, &ws_d, 0); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth);
+            ImGui::RadioButton(TT_240, &ws_d, 0); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth + sty.IndentSpacing);
             ImGui::RadioButton(TT_241, &ws_d, 1);
-            ImGui::RadioButton(TT_242, &ws_dt, 0); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth);
+            ImGui::RadioButton(TT_242, &ws_dt, 0); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth + sty.IndentSpacing);
             ImGui::RadioButton(TT_243, &ws_dt, 1);
 
             if (::GlobalConfig::getInstance()->window_main_style_id != ws_t){
@@ -352,52 +359,49 @@ void ShowShinobuGlobal()
                     ::SetWindowPos(GlobalTemp::WindowMainHandle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
                 else if(ws_t ==1)
                     ::SetWindowPos(GlobalTemp::WindowMainHandle, HWND_TOPMOST , 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-                ::GlobalConfig::GlobalConfigSave();
             }
             if (::GlobalConfig::getInstance()->window_main_dock_id != ws_d) {
                 ::GlobalConfig::getInstance()->window_main_dock_id = ws_d;
                 if (ws_d == 0)  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
                 else if(ws_d==1) io.ConfigFlags &= (~ImGuiConfigFlags_DockingEnable); 
-                ::GlobalConfig::GlobalConfigSave();
             }
             if (::GlobalConfig::getInstance()->window_main_transparent_id != ws_dt) {
                 ::GlobalConfig::getInstance()->window_main_transparent_id = ws_dt;
                 if (ws_dt == 0)  io.ConfigDockingTransparentPayload = true;
                 else if (ws_dt == 1) io.ConfigDockingTransparentPayload = false;;
-                ::GlobalConfig::GlobalConfigSave();
             }
             ImGui::SeparatorText(TT_276);
             ImGui::RadioButton(TT_274, &ws_f, 0);
-            ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth);
+            ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth + sty.IndentSpacing);
             ImGui::RadioButton(TT_275, &ws_f, 1);
             if (::GlobalConfig::getInstance()->window_main_fast_id != ws_f) {
                 ::GlobalConfig::getInstance()->window_main_fast_id = ws_f;
-                ::GlobalConfig::GlobalConfigSave();
             }
+            ImGui::SeparatorText(TT_434);
+            ImGui::SliderFloat(TT_113, &GlobalConfig::getInstance()->window_main_alpha, 30.0f, 100.0f, "%.2f", ImGuiSliderFlags_None);
+
             ImGui::SeparatorText(TT_233);
             ImGui::SliderFloat(TT_236, &GlobalConfig::getInstance()->window_main_forecastfps, 10.0f, 120.0f, "%.2f fps", ImGuiSliderFlags_None);
             ImGui::SliderInt(TT_237, &GlobalConfig::getInstance()->window_main_addtimefps, 0, 100, TT_247, ImGuiSliderFlags_None);
             ImGui::SameLine(); Su::HelpMarker(TT_246);
             ImGui::Text(TT_42, 1000.0f / io.Framerate, io.Framerate);
+
             ImGui::TreePop();
         }
         if (ImGui::TreeNode(GETGUIID(TT_225))) {
             ImGui::SeparatorText(TT_230);
             static int e = ::GlobalConfig::getInstance()->window_cubism_style_id;
-            ImGui::RadioButton(TT_226, &e, 0); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth * 0.5f);
-            ImGui::RadioButton(TT_227, &e, 1); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth);
-            ImGui::RadioButton(TT_228, &e, 2); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth * 1.5f);
+            ImGui::RadioButton(TT_226, &e, 0); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth * 0.5f+ sty.IndentSpacing);
+            ImGui::RadioButton(TT_227, &e, 1); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth+ sty.IndentSpacing);
+            ImGui::RadioButton(TT_228, &e, 2); ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth * 1.5f+ sty.IndentSpacing);
             ImGui::RadioButton(TT_229, &e, 3);
             if (GlobalConfig::getInstance()->window_cubism_style_id != e) {
-                CubismLoom::addMessageList(::window_group_mark, ::window_style_mark, std::to_string(e).c_str());
-                ::GlobalConfig::GlobalConfigSave();
+                GlobalConfig::getInstance()->window_cubism_style_id = e;
             }
             ImGui::SeparatorText(TT_248);
             ImGui::Text(TT_250);
-
             ImGui::SliderInt(TT_237, &GlobalConfig::getInstance()->window_cubism_addtimefps, 0, 100, TT_247, ImGuiSliderFlags_None);
             ImGui::SameLine(); Su::HelpMarker(TT_246);
-
             ImGui::Text(TT_249, GlobalTemp::CubismFrameCount);
             ImGui::TreePop();
         }

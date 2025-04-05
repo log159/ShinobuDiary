@@ -18,7 +18,7 @@
 #include <unordered_set>
 #include "../native_src/include/Live2DCubismCore.h"
 #include "LAppWavFileHandler.hpp"
-#include "../global.h"
+#include "../shinobugui_src/global.h"
 #include "./LAppSprite.hpp"
 #include "./LAppTextureManager.hpp"
 #include <CubismCdiJson.hpp>

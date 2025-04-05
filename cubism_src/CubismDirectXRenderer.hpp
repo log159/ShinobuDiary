@@ -11,7 +11,7 @@
 
 #include "CubismTextureManager.hpp"
 #include "Model/CubismUserModel.hpp"
-#include "../global.h"
+#include "../shinobugui_src/global.h"
 using namespace Csm;
 
 class CubismDirectXView;

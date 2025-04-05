@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "../global.h"
+#include "./global.h"
 #include "./suconfig.h"
 
 enum SUERROR : int{

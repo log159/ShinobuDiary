@@ -1,14 +1,22 @@
 ﻿#include "CubismWindowStyle.h"
 #include <dwmapi.h>
-#include "../global.h"
+#include "../shinobugui_src/global.h"
 
-WINSTYLE CubismWindowStyle::ws= WINSTYLE::WinTop;
-WINSTYLE CubismWindowStyle::winStyle= WINSTYLE::WinTop;
-bool CubismWindowStyle::canTrans=true;
+WINSTYLE CubismWindowStyle::    winStyle    = WINSTYLE::WinTop;
+bool CubismWindowStyle::        canTrans    = true;
 
 void CubismWindowStyle::SetWindowTopApha(HWND hwnd, bool isTop, bool isApha)
 {
+    if (GlobalTemp::WindowCubismShow == false) {
+        ShowWindow(hwnd, SW_HIDE);
+        return;
+    }
     int intExTemp = GetWindowLong(hwnd, GWL_EXSTYLE);
+
+    // 使窗口不在任务栏显示
+    intExTemp |= WS_EX_TOOLWINDOW;  // 关键：设为工具窗口，防止出现在任务栏
+    intExTemp &= ~WS_EX_APPWINDOW;  // 移除 APPWINDOW 标志，确保不显示在任务栏
+
     if (isTop)
     {
         intExTemp |= WS_EX_TOPMOST;
@@ -21,6 +29,8 @@ void CubismWindowStyle::SetWindowTopApha(HWND hwnd, bool isTop, bool isApha)
         if (isApha) intExTemp |= (WS_EX_LAYERED | WS_EX_TRANSPARENT);
         else intExTemp &= ~(WS_EX_TRANSPARENT | WS_EX_LAYERED);
     }
+
+
     SetWindowLong(hwnd, GWL_EXSTYLE, intExTemp);
     if (isTop) SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE);
     else SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE);
@@ -31,6 +41,9 @@ void CubismWindowStyle::SetWindowTopApha(HWND hwnd, bool isTop, bool isApha)
 
 BOOL CubismWindowStyle::GetPixelRGBA(HWND hwnd, int x, int y, BYTE& r, BYTE& g, BYTE& b, BYTE& a)
 {
+    if (GlobalTemp::WindowCubismShow == false) {
+        return TRUE;
+    }
     // 获取窗口设备上下文
     HDC hdcWindow = GetDC(hwnd);
     if (!hdcWindow) {
@@ -115,12 +128,12 @@ void CubismWindowStyle::WindowStyleUpdate(HWND hwnd)
 
 void CubismWindowStyle::Update(HWND hwnd)
 {
+    static WINSTYLE ws;
     ws = static_cast<WINSTYLE>(GlobalConfig::getInstance()->window_cubism_style_id);
     if (ws != winStyle) {
         winStyle = ws;
     }
-    POINT Mouse_X_Y;	//存放鼠标坐标结构体
-    //获取鼠标坐标
+    POINT Mouse_X_Y;
     if (FALSE == GetCursorPos(&Mouse_X_Y)) {
     }
     else {

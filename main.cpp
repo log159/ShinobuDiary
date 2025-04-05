@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <thread>
+#include <string>
 #include <shellapi.h>
 #include "imgui.h"
 #include "imgui_impl_win32.h"
@@ -11,6 +12,11 @@
 #include "./shinobugui_src/shinobuwidget.h"
 #include "./implot_src/implot.h"
 #include "./cubism_src/LAppDelegate.hpp"
+#include "./translator.h"
+
+#define WIN_CLASS_NAME L"Shinobu Example"
+#define WIN_TITLE_NAME L"Dear Shinobu"
+#define WIN_ICON_WAY L"./Icon/icon.ico"
 #define WM_TRAYICON (WM_APP + 1)
 
 NOTIFYICONDATA nid;
@@ -21,7 +27,9 @@ static bool                     g_SwapChainOccluded     = false;
 static UINT                     g_ResizeWidth           = 0;
 static UINT                     g_ResizeHeight          = 0;
 static ID3D11RenderTargetView*  g_mainRenderTargetView  = nullptr;
+static bool                     show_shinobu_window     = true;
 static bool                     while_done              = false;
+static bool                     while_show              = true;
 
 bool            CreateDeviceD3D(HWND hWnd);
 void            CleanupDeviceD3D();
@@ -61,9 +69,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MSG msg;
     std::cout << u8"全局开始执行" << std::endl;
     do{
-        if (while_done == true)break;
         //高性能绘制
-        if (GlobalConfig::getInstance()->window_main_fast_id==0) {
+        if (GlobalConfig::getInstance()->window_main_fast_id == 0 ) {
             while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE)){
                 ::TranslateMessage(&msg);
                 ::DispatchMessage(&msg);
@@ -101,14 +108,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         //ImGui::ShowDemoWindow();//Demo Window
         //ShowShinobuDebugWindow();//Debug Window
         //MAIN WINDOWS
-        static bool show_shinobu_window = true;
-        ShowShinobuWindow(&show_shinobu_window);
-        ShowShinobuStyleEditor();
-        ShowShinobuInteractively();
-        ShowShinobuErrorWindow();//Error Window
+        if (while_show) {
+            ShowShinobuWindow(&show_shinobu_window);
+            ShowShinobuStyleEditor();
+            ShowShinobuInteractively();
+            ShowShinobuErrorWindow();//Error Window
+        }
 
         //WINDOWS END--------------------------------------------------------------------------
-        if (show_shinobu_window == false)QuitHandle();
+        if (show_shinobu_window == false) {
+
+            if (GlobalConfig::getInstance()->window_main_close == 0) QuitHandle();
+            else if (GlobalConfig::getInstance()->window_main_close == 1)(void*)(NULL);
+            else QuitHandle();
+        }
         //限制帧率
         if (ImGui::GetIO().Framerate > GlobalConfig::getInstance()->window_main_forecastfps)
             std::this_thread::sleep_for(std::chrono::milliseconds(GlobalConfig::getInstance()->window_main_addtimefps));
@@ -129,7 +142,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         HRESULT hr = g_pSwapChain->Present(1, 0);
         g_SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
-    }while (GlobalConfig::getInstance()->window_main_fast_id==0 ||GetMessage(&msg, NULL, 0, 0));
+        if (while_done == true)break;
+    }while (GlobalConfig::getInstance()->window_main_fast_id==0 || GetMessage(&msg, NULL, 0, 0));
 
     //---------------------------------------------------后部分
     PosteriorPart();
@@ -177,19 +191,17 @@ void FrontPart() {
     // DPI 感知启用,防止Cubism界面模糊
     SetProcessDPIAware();
 
-    WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"Shinobu Example", nullptr };
+    WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, WIN_CLASS_NAME, nullptr };
     ::RegisterClassExW(&wc);
     static int currentX = 0, currentY = 0, resWidth = GetSystemMetrics(SM_CXSCREEN), resHeight = GetSystemMetrics(SM_CYSCREEN);
-    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Dear Shinobu", WS_OVERLAPPEDWINDOW, currentX, currentY, resWidth, resHeight, nullptr, nullptr, wc.hInstance, nullptr);
+    HWND hwnd = ::CreateWindowW(wc.lpszClassName,WIN_TITLE_NAME, WS_OVERLAPPEDWINDOW, currentX, currentY, resWidth, resHeight, nullptr, nullptr, wc.hInstance, nullptr);
     nid.cbSize = sizeof(nid);
     nid.hWnd = hwnd;
     nid.uID = 1;
     nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
     nid.uCallbackMessage = WM_TRAYICON;
-    nid.hIcon = (HICON)LoadImage(NULL, L"./Icon/icon.ico", IMAGE_ICON, 32, 32, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-    wcscpy_s(nid.szTip, ARRAYSIZE(nid.szTip), L"程序正在运行...");
+    nid.hIcon = (HICON)LoadImage(NULL, WIN_ICON_WAY, IMAGE_ICON, 32, 32, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
     Shell_NotifyIcon(NIM_ADD, &nid);
-
 
     GlobalTemp::WindowMainWc = wc;
     GlobalTemp::WindowMainHandle = hwnd;
@@ -225,6 +237,7 @@ void FrontPart() {
     ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 }
 void PosteriorPart() {
+
     // Cleanup
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
@@ -312,20 +325,63 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     switch (msg)
     {
     case WM_TRAYICON:
-        if (lParam == WM_RBUTTONUP) {
-            HMENU hMenu = CreatePopupMenu();
-            AppendMenu(hMenu, MF_STRING, 1, L"退出");
-            POINT pt;
-            GetCursorPos(&pt);
-            TrackPopupMenu(hMenu, TPM_LEFTBUTTON, pt.x, pt.y, 0, hWnd, NULL);
-            DestroyMenu(hMenu);
+        switch (lParam) {
+            case WM_RBUTTONUP: {
+                wcscpy_s(nid.szTip, ARRAYSIZE(nid.szTip), Su::Utf8ToWstring(TT_425).c_str());
+                Shell_NotifyIcon(NIM_MODIFY, &nid);
+                HMENU hMenu = CreatePopupMenu();
+                UINT flag_1 = MF_STRING;
+                UINT flag_2 = MF_STRING;
+                UINT flag_3 = MF_STRING;
+                UINT flag_4 = MF_STRING;
+                if (GlobalConfig::getInstance()->window_main_close == 0) {
+                    if (while_show) flag_1 |= MF_CHECKED;
+                    else flag_2|= MF_CHECKED;
+                }
+                else if (GlobalConfig::getInstance()->window_main_close == 1) {
+                    if (show_shinobu_window && while_show) flag_1 |= MF_CHECKED;
+                    else flag_2 |= MF_CHECKED;
+                }
+                if (GlobalTemp::WindowCubismShow) flag_3 |= MF_CHECKED;
+                else flag_4 |= MF_CHECKED;
+                AppendMenu(hMenu, flag_1, 1, Su::Utf8ToWstring(TT_427).c_str());
+                AppendMenu(hMenu, flag_2, 2, Su::Utf8ToWstring(TT_428).c_str());
+                AppendMenu(hMenu, flag_3, 3, Su::Utf8ToWstring(TT_429).c_str());
+                AppendMenu(hMenu, flag_4, 4, Su::Utf8ToWstring(TT_430).c_str());
+                AppendMenu(hMenu, MF_STRING, 99, Su::Utf8ToWstring(TT_426).c_str());
+                POINT pt;
+                GetCursorPos(&pt);
+                SetForegroundWindow(hWnd);
+                TrackPopupMenu(hMenu, TPM_LEFTBUTTON, pt.x, pt.y, 0, hWnd, NULL);
+                DestroyMenu(hMenu);
+                break;
+            }
+            case WM_LBUTTONDOWN: {
+                PostMessage(hWnd, WM_CANCELMODE, 0, 0);
+                break;
+            }
         }
-        break;
+    break;
     case WM_COMMAND:
         if (wParam == 1) {
-            PostQuitMessage(0);
+            while_show = true;
+            if (GlobalConfig::getInstance()->window_main_close == 1)
+                show_shinobu_window = true;
+                
         }
-        break;
+        else if (wParam == 2) {
+            while_show = false;
+        }
+        else if (wParam == 3) {
+            GlobalTemp::WindowCubismShow = true;
+        }
+        else if (wParam == 4) {
+            GlobalTemp::WindowCubismShow = false;
+        }
+        else if (wParam == 99) {
+            QuitHandle();
+        }
+    break;
     case WM_SIZE:
         if (wParam == SIZE_MINIMIZED)
             return 0;

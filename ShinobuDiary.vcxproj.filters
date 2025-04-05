@@ -60,12 +60,6 @@
     <ClCompile Include="imgui_src\imgui_widgets.cpp">
       <Filter>imgui_src</Filter>
     </ClCompile>
-    <ClCompile Include="filesetting.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="global.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="simpleini-4.22_src\ConvertUTF.cpp">
       <Filter>simpleini-4.22_src</Filter>
     </ClCompile>
@@ -132,9 +126,6 @@
     <ClCompile Include="cubism_src\CubismWindowStyle.cpp">
       <Filter>cubism_src</Filter>
     </ClCompile>
-    <ClCompile Include="cubism_src\CubismLoom.cpp">
-      <Filter>cubism_src</Filter>
-    </ClCompile>
     <ClCompile Include="shinobugui_src\shinobuwidget.cpp">
       <Filter>shinobugui_src</Filter>
     </ClCompile>
@@ -159,6 +150,12 @@
     <ClCompile Include="implot_src\implot_items.cpp">
       <Filter>implot_src</Filter>
     </ClCompile>
+    <ClCompile Include="shinobugui_src\filesetting.cpp">
+      <Filter>shinobugui_src</Filter>
+    </ClCompile>
+    <ClCompile Include="shinobugui_src\global.cpp">
+      <Filter>shinobugui_src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui_src\imconfig.h">
@@ -179,9 +176,6 @@
     <ClInclude Include="imgui_src\imstb_truetype.h">
       <Filter>imgui_src</Filter>
     </ClInclude>
-    <ClInclude Include="filesetting.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="imgui_impl_dx11.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -189,9 +183,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="translator.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="global.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="simpleini-4.22_src\ConvertUTF.h">
@@ -293,9 +284,6 @@
     <ClInclude Include="cubism_src\CubismWindowStyle.h">
       <Filter>cubism_src</Filter>
     </ClInclude>
-    <ClInclude Include="cubism_src\CubismLoom.h">
-      <Filter>cubism_src</Filter>
-    </ClInclude>
     <ClInclude Include="shinobugui_src\shinobuwidget.h">
       <Filter>shinobugui_src</Filter>
     </ClInclude>
@@ -328,6 +316,15 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="shinobugui_src\mark.h">
+      <Filter>shinobugui_src</Filter>
+    </ClInclude>
+    <ClInclude Include="shinobugui_src\filesetting.h">
+      <Filter>shinobugui_src</Filter>
+    </ClInclude>
+    <ClInclude Include="shinobugui_src\global.h">
+      <Filter>shinobugui_src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

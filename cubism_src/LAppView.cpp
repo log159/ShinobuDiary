@@ -18,7 +18,7 @@
 #include "LAppSprite.hpp"
 #include "LAppSpriteShader.hpp"
 #include "LAppModel.hpp"
-#include "../global.h"
+#include "../shinobugui_src/global.h"
 
 using namespace std;
 using namespace LAppDefine;

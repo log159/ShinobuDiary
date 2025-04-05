@@ -18,9 +18,8 @@ enum WINSTYLE: int
 
 class CubismWindowStyle {
 public:
-    static WINSTYLE ws;
     static WINSTYLE winStyle;
-    static bool canTrans;
+    static bool     canTrans;
 public:
     static void Update(HWND hwnd);
     static void SetWinStyle(const WINSTYLE& ws);

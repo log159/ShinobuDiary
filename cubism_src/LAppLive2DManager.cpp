@@ -123,9 +123,6 @@ void LAppLive2DManager::ReleaseOneModel(int userid)
 
 void LAppLive2DManager::SetUpModel()
 {
-    // ResourcesPathの中にあるフォルダ名を全てクロールし、モデルが存在するフォルダを定義する。
-    // フォルダはあるが同名の.model3.jsonが見つからなかった場合はリストに含めない。
-    // 一部文字が受け取れないためワイド文字で受け取ってUTF8に変換し格納する。
 
     csmString crawlPath(ResourcesPath);
     crawlPath += "*.*";

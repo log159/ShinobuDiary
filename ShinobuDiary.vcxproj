@@ -120,6 +120,8 @@
       <AdditionalIncludeDirectories>./imgui_src;./simpleini-4.22_src;./framework_src/include;./directxtk_src/include;./native_src/include;./sparkdesk/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -165,7 +167,6 @@
   <ItemGroup>
     <ClCompile Include="cubism_src\CubismDirectXRenderer.cpp" />
     <ClCompile Include="cubism_src\CubismDirectXView.cpp" />
-    <ClCompile Include="cubism_src\CubismLoom.cpp" />
     <ClCompile Include="cubism_src\CubismSampleViewMatrix.cpp" />
     <ClCompile Include="cubism_src\CubismSprite.cpp" />
     <ClCompile Include="cubism_src\CubismSpriteShader.cpp" />
@@ -185,13 +186,13 @@
     <ClCompile Include="cubism_src\LAppWavFileHandler.cpp" />
     <ClCompile Include="cubism_src\MouseActionManager.cpp" />
     <ClCompile Include="cubism_src\TouchManager.cpp" />
-    <ClCompile Include="filesetting.cpp" />
-    <ClCompile Include="global.cpp" />
     <ClCompile Include="implot_src\implot.cpp" />
     <ClCompile Include="implot_src\implot_demo.cpp" />
     <ClCompile Include="implot_src\implot_items.cpp" />
     <ClCompile Include="llm_src\llmhome.cpp" />
     <ClCompile Include="llm_src\sparkdesk.cpp" />
+    <ClCompile Include="shinobugui_src\filesetting.cpp" />
+    <ClCompile Include="shinobugui_src\global.cpp" />
     <ClCompile Include="shinobugui_src\shinobuwidget.cpp" />
     <ClCompile Include="shinobugui_src\suconfig.cpp" />
     <ClCompile Include="shinobugui_src\sufunction.cpp" />
@@ -208,7 +209,6 @@
   <ItemGroup>
     <ClInclude Include="cubism_src\CubismDirectXRenderer.hpp" />
     <ClInclude Include="cubism_src\CubismDirectXView.hpp" />
-    <ClInclude Include="cubism_src\CubismLoom.h" />
     <ClInclude Include="cubism_src\CubismSampleViewMatrix.hpp" />
     <ClInclude Include="cubism_src\CubismSprite.hpp" />
     <ClInclude Include="cubism_src\CubismSpriteShader.hpp" />
@@ -228,8 +228,6 @@
     <ClInclude Include="cubism_src\LAppWavFileHandler.hpp" />
     <ClInclude Include="cubism_src\MouseActionManager.hpp" />
     <ClInclude Include="cubism_src\TouchManager.hpp" />
-    <ClInclude Include="filesetting.h" />
-    <ClInclude Include="global.h" />
     <ClInclude Include="imgui_impl_dx11.h" />
     <ClInclude Include="imgui_impl_win32.h" />
     <ClInclude Include="implot_src\implot.h" />
@@ -238,6 +236,9 @@
     <ClInclude Include="llm_src\sparkdesk.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="shinobugui_src\compoundgui.h" />
+    <ClInclude Include="shinobugui_src\filesetting.h" />
+    <ClInclude Include="shinobugui_src\global.h" />
+    <ClInclude Include="shinobugui_src\mark.h" />
     <ClInclude Include="shinobugui_src\shinobuwidget.h" />
     <ClInclude Include="shinobugui_src\sizedef.h" />
     <ClInclude Include="shinobugui_src\somemacros.h" />
