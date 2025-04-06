@@ -257,7 +257,7 @@ Index of this file:
 // - TableSetupScrollFreeze()
 //-----------------------------------------------------------------------------
 
-#include "../translator.h"
+#include "../shinobugui_src/translator.h"
 
 // Configuration
 static const int TABLE_DRAW_CHANNEL_BG0 = 0;

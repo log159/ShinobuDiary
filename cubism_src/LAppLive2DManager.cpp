@@ -393,7 +393,7 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
         }
     }
     if (uc == nullptr) {
-        std::cout << u8"UserConfig为空 无法初始化Cubism参数" << std::endl;
+        std::cout << u8"UserConfig为空或无法找到对应用户 无法初始化Cubism参数" << std::endl;
         return;
     }
 
@@ -404,26 +404,22 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
     lam->def_cubism_cg.cubism_ts_s = 1.0f;
     lam->def_cubism_cg.cubism_tx_t = lam->GetModelMatrix()->GetArray()[12];
     lam->def_cubism_cg.cubism_ty_t = lam->GetModelMatrix()->GetArray()[13];
-    lam->def_cubism_cg.cubism_ts_x = lam->GetModelMatrix()->GetArray()[0] * lam->def_cubism_cg.cubism_ts_s;
-    lam->def_cubism_cg.cubism_ts_y = lam->GetModelMatrix()->GetArray()[5] * lam->def_cubism_cg.cubism_ts_s;
+    lam->def_cubism_cg.cubism_ts_x = lam->GetModelMatrix()->GetArray()[0];
+    lam->def_cubism_cg.cubism_ts_y = lam->GetModelMatrix()->GetArray()[5];
     lam->def_cubism_cg.cubism_tx_s = lam->GetModelMatrix()->GetArray()[4];
     lam->def_cubism_cg.cubism_ty_s = lam->GetModelMatrix()->GetArray()[1];
     lam->def_cubism_cg.cubism_tx_p = lam->GetModelMatrix()->GetArray()[7];
     lam->def_cubism_cg.cubism_ty_p = lam->GetModelMatrix()->GetArray()[3];
-
-    uc->cubism_config.cubism_cg = lam->def_cubism_cg;
+    lam->modelSize = lam->def_cubism_cg.cubism_ts_s;
+    lam->modelSizeX = lam->GetModelMatrix()->GetArray()[0];
+    lam->modelSizeY = lam->GetModelMatrix()->GetArray()[5];
 
     //目标看向
-    uc->cubism_config.enable_look_mouse = true;
-    uc->cubism_config.damping = 0.15f;
-    uc->cubism_config.look_target_params.clear();
-    lam->canLookMouse = uc->cubism_config.enable_look_mouse;
-    lam->GetLookTargetDamping() = uc->cubism_config.damping;
+    lam->canLookMouse = true;
+    lam->GetLookTargetDamping() = 0.15f;
     lam->GetLookTargetParams().clear();
     //呼吸
-    uc->cubism_config.enable_breath = true;
-    uc->cubism_config.breath_params.clear();
-    lam->GetCanBreath() = uc->cubism_config.enable_breath;
+    lam->GetCanBreath() = true;
     lam->GetBreathParameters().Clear();
     for (int paramid = 0; paramid < lam->GetModel()->GetParameterCount(); paramid++) {
         const char* pid = lam->GetModel()->GetParameterId(paramid)->GetString().GetRawString();
@@ -438,7 +434,7 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
                 lp.param = PARAM_DEF.at(cid_str).first;
                 lp.xyzpos = PARAM_DEF.at(cid_str).second;
             }
-            uc->cubism_config.look_target_params.push_back(lp);
+            lam->def_look_target_params.push_back(lp);
         } while (0);
         //呼吸ITEM
         do {
@@ -452,58 +448,46 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
             else {
                 bp.Enable = false;bp.Offset = 0.0f;bp.Peak = 0.0f;bp.Cycle = 3.0f;bp.Weight = 0.5f;
             }
-            uc->cubism_config.breath_params.push_back(bp);
+            lam->def_breath_params.push_back(bp);
         } while (0);
     }
-    lam->def_look_target_params = uc->cubism_config.look_target_params;
-    lam->def_breath_params = uc->cubism_config.breath_params;
-    lam->GetLookTargetParams() = uc->cubism_config.look_target_params;
-    for (const Csm::CubismBreath::BreathParameterData& bpd : uc->cubism_config.breath_params)
-        lam->GetBreathParameters().PushBack(bpd);
+    for (const LookParam& val : lam->def_look_target_params)
+        lam->GetLookTargetParams().push_back(val);
+    for (const Csm::CubismBreath::BreathParameterData& val : lam->def_breath_params)
+        lam->GetBreathParameters().PushBack(val);
 
     //自动眨眼
-    uc->cubism_config.enable_blink = true;
-    uc->cubism_config.blink_sel_list.Items[0].clear();
-    uc->cubism_config.blink_sel_list.Items[1].clear();
-    uc->cubism_config.blinking_interval_seconds = 4.0f;
-    uc->cubism_config.closing_seconds = 0.10f;
-    uc->cubism_config.closed_seconds = 0.05f;
-    uc->cubism_config.opening_seconds = 0.15f;
-    lam->canEyeBlink = uc->cubism_config.enable_blink;
+    lam->canEyeBlink = true;
+    lam->blink_sel_list.Items[0].clear();
+    lam->blink_sel_list.Items[1].clear();
     lam->GetEyeBlinkIds().Clear();
-    lam->GetBlinkingIntervalSeconds() = uc->cubism_config.blinking_interval_seconds;
-    lam->GetClosingSeconds()= uc->cubism_config.closing_seconds;
-    lam->GetClosedSeconds() = uc->cubism_config.closed_seconds;
-    lam->GetOpeningSeconds() = uc->cubism_config.opening_seconds;
+    lam->GetBlinkingIntervalSeconds() = 4.0f;
+    lam->GetClosingSeconds() = 0.10f;
+    lam->GetClosedSeconds() = 0.05f;
+    lam->GetOpeningSeconds() = 0.15f;
 
     for (int paramid = 0; paramid < lam->GetModel()->GetParameterCount(); paramid++) {
         std::string param_str = lam->GetModel()->GetParameterId(paramid)->GetString().GetRawString();
-        if (EYEBLINK_DEF.find(param_str) != EYEBLINK_DEF.end()) {
-            CubismIdHandle handle = CubismFramework::GetIdManager()->GetId(param_str.c_str());
-            uc->cubism_config.blink_sel_list.Items[1].push_back((ImGuiID)paramid);
-        }
-        else {
-            uc->cubism_config.blink_sel_list.Items[0].push_back((ImGuiID)paramid);
-        }
+        if (EYEBLINK_DEF.find(param_str) != EYEBLINK_DEF.end())
+            lam->def_blink_list_ids[1].push_back((ImGuiID)paramid);
+        else
+            lam->def_blink_list_ids[0].push_back((ImGuiID)paramid);
     }
-    for (const ImGuiID& pid : uc->cubism_config.blink_sel_list.Items[1]) {
+    for (const ImGuiID& pid: lam->def_blink_list_ids[0]) 
+        lam->blink_sel_list.Items[0].push_back((ImGuiID)pid);
+    for (const ImGuiID& pid : lam->def_blink_list_ids[1])
+        lam->blink_sel_list.Items[1].push_back((ImGuiID)pid);
+    for (const ImGuiID& pid : lam->def_blink_list_ids[1]) {
         std::string param_str = lam->GetModel()->GetParameterId(pid)->GetString().GetRawString();
         lam->GetEyeBlinkIds().PushBack(CubismFramework::GetIdManager()->GetId(param_str.c_str()));
     }
-    for (const ImGuiID& pid : uc->cubism_config.blink_sel_list.Items[1])
-        lam->def_blink_list_ids[1].push_back(pid);
-    for (const ImGuiID& pid : uc->cubism_config.blink_sel_list.Items[0]) 
-        lam->def_blink_list_ids[0].push_back(pid);
 
     //动画
-    uc->cubism_config.enable_anim_autoplay = false;
-    lam->animationAutoPlay = uc->cubism_config.enable_anim_autoplay;
+    lam->animationAutoPlay = false;
 
     //触发
-    uc->cubism_config.enable_hitareas = true;
-    uc->cubism_config.enable_preview_hitareas = false;
-    lam->canHitareas = uc->cubism_config.enable_hitareas;
-    lam->previewHitareas = uc->cubism_config.enable_preview_hitareas;
+    lam->canHitareas = true;
+    lam->previewHitareas = false;
     Csm::ICubismModelSetting* lcms = lam->GetModelSetting();
     CubismModel* lamcm = lam->GetModel();
     LAppTextureManager* textureManager = LAppDelegate::GetInstance()->GetTextureManager();
@@ -550,26 +534,20 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
     }
     for (int i = 0; i<lcms->GetHitAreasCount();i++)
     {
-        Su::ShinobuExList& m_sel = uc->cubism_config.hit_areas_motion_map[lcms->GetHitAreaId(i)->GetString().GetRawString()];
-        m_sel.Items[0].clear();m_sel.Items[1].clear();
         Su::ShinobuExList& cm_sel=lam->hit_areas_motion_map[lcms->GetHitAreaId(i)->GetString().GetRawString()];
         cm_sel.Items[0].clear(); cm_sel.Items[1].clear();
         int m_pos = 0;
         for (int i = 0; i < lam->GetModelSetting()->GetMotionGroupCount(); ++i) {
             for (int j = 0; j < lcms->GetMotionCount(lam->GetModelSetting()->GetMotionGroupName(i)); ++j) {
                 lam->motion_map[m_pos] = std::pair<int, int>(i, j);
-                m_sel.Items[1].push_back((ImGuiID)m_pos);
                 cm_sel.Items[1].push_back((ImGuiID)m_pos);
                 m_pos++;
             }
         }
-        Su::ShinobuExList& e_sel = uc->cubism_config.hit_areas_expression_map[lcms->GetHitAreaId(i)->GetString().GetRawString()];
-        e_sel.Items[0].clear(); e_sel.Items[1].clear();
         Su::ShinobuExList& ce_sel = lam->hit_areas_expression_map[lcms->GetHitAreaId(i)->GetString().GetRawString()];
         ce_sel.Items[0].clear(); ce_sel.Items[1].clear();
         for (int i = 0; i < lam->GetModelSetting()->GetExpressionCount(); ++i) {
             lam->expression_map[i] = i;
-            e_sel.Items[1].push_back((ImGuiID)i);
             ce_sel.Items[1].push_back((ImGuiID)i);
         }
     }
@@ -583,27 +561,11 @@ void LAppLive2DManager::RefreshScene(int userid, std::string modelname)
     //屏幕色组
     lam->InitPartScreenColor();
     //透明组
+    lam->canOpacityGroup = false;
     lam->InitPartOpacity();
 
     //观测
     lam->sdatal_v.resize(lam->GetModel()->GetParameterCount());
-    
-
-
-    
-
-    ////预期初始化
-    //if (!uc->need_init_cubism) {
-    //    lam->GetModelMatrix()->GetArray()[12] = uc->cubism_config.cubism_cg.cubism_tx_t;
-    //    lam->GetModelMatrix()->GetArray()[13] = uc->cubism_config.cubism_cg.cubism_ty_t;
-    //    lam->GetModelMatrix()->GetArray()[0] = uc->cubism_config.cubism_cg.cubism_ts_x * uc->cubism_config.cubism_cg.cubism_ts_s;
-    //    lam->GetModelMatrix()->GetArray()[5] = uc->cubism_config.cubism_cg.cubism_ts_y * uc->cubism_config.cubism_cg.cubism_ts_s;
-    //    lam->GetModelMatrix()->GetArray()[4] = uc->cubism_config.cubism_cg.cubism_tx_s;
-    //    lam->GetModelMatrix()->GetArray()[1] = uc->cubism_config.cubism_cg.cubism_ty_s;
-    //    lam->GetModelMatrix()->GetArray()[7] = uc->cubism_config.cubism_cg.cubism_tx_p;
-    //    lam->GetModelMatrix()->GetArray()[3] = uc->cubism_config.cubism_cg.cubism_ty_p;
-    //}
-
 
     std::string cdifile = mjc.modelPath.GetRawString();
     cdifile += lam->GetModelSetting()->GetDisplayInfoFileName();

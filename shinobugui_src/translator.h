@@ -1,12 +1,10 @@
 ﻿#pragma once
-#include "shinobugui_src/global.h"
-
+#include "./global.h"
 #define GETGUIMARK(TT_) ([]() -> const char* { \
     static char buffer[DEFSIZE] = {0}; \
     snprintf(buffer, sizeof(buffer), "%s##%s", TT_, #TT_); \
     return buffer; \
 })()
-
 #define GETGUIID(TT_) ([]() -> const char* { \
     static char buffer[DEFSIZE] = {0}; \
     snprintf(buffer, sizeof(buffer), "%s###%s", TT_, #TT_); \
@@ -128,7 +126,7 @@
 #define TT_112 AT(u8"不透明", u8"Opaque",u8"不透明")
 #define TT_113 AT(u8"透明度", u8"Alpha",u8"透明度")
 #define TT_114 AT(u8"混合的", u8"Both",u8"両方")
-#define TT_115 AT(u8"在颜色列表中：\n左键单击颜色方块以打开颜色选择器，\n右键单击打开编辑选项菜单。", u8"In the color list:\nLeft-click on color square to open color picker,\nRight-click to open edit options menu.",u8"カラーのリストで：\nカラーの四角を左クリックしてカラーピッカーを開く、\n右クリックして編集オプションメニューを開く。")
+#define TT_115 AT(u8"在颜色列表中：\n左键单击颜色方块以打开颜色选择器,\n右键单击打开编辑选项菜单。", u8"In the color list:\nLeft-click on color square to open color picker,\nRight-click to open edit options menu.",u8"カラーのリストで：\nカラーの四角を左クリックしてカラーピッカーを開く、\n右クリックして編集オプションメニューを開く。")
 #define TT_116 AT(u8"闪烁指定颜色以标识其使用位置。", u8"Flash given color to identify places where it is used.",u8"指定のカラーを点滅させて使用場所を識別する。")
 #define TT_117 AT(u8"保存", u8"Save",u8"保存")
 #define TT_118 AT(u8"恢复", u8"Revert",u8"元に戻す")
@@ -147,8 +145,8 @@
 #define TT_131 AT(u8"为禁用项添加的额外透明度乘数(在当前 Alpha 值基础上叠加)。", u8"Additional alpha multiplier for disabled items (multiply over current value of Alpha).",u8"無効な項目に追加される透明度の倍率(現在の Alpha 値に重ね合わせる)。")
 #define TT_132 AT(u8"颜色按钮位置",u8"ColorButtonPosition",u8"カラーのボタンの位置")
 #define TT_133 AT(u8"左\0右\0", "Left\0Right\0",u8"左\0右\0")
-#define TT_134 AT(u8"应用于常规窗口:当移动到屏幕边缘附近时，我们强制保持可见的量。",u8"Apply to regular windows: amount which we enforce to keep visible when moving near edges of your screen.",u8"通常のウィンドウに適用：画面の端に近づいたとき、強制的に表示する量。")
-#define TT_135 AT(u8"适用于每个窗口，菜单，弹出窗口，工具提示:我们避免显示内容的数量。如果看不到屏幕边缘，请进行调整(例如，在未配置缩放的TV)。","Apply to every windows, menus, popups, tooltips: amount where we avoid displaying contents. Adjust if you cannot see the edges of your screen (e.g. on a TV where scaling has not been configured).",u8"すべてのウィンドウ、メニュー、ポップアップ、ツールチップに適用：表示を避ける量。画面の端が見えていない場合は調整してください(例えば、スケール設定がされていないテレビなど)。")
+#define TT_134 AT(u8"应用于常规窗口:当移动到屏幕边缘附近时,我们强制保持可见的量。",u8"Apply to regular windows: amount which we enforce to keep visible when moving near edges of your screen.",u8"通常のウィンドウに適用：画面の端に近づいたとき、強制的に表示する量。")
+#define TT_135 AT(u8"适用于每个窗口,菜单,弹出窗口,工具提示:我们避免显示内容的数量。如果看不到屏幕边缘,请进行调整(例如,在未配置缩放的TV)。","Apply to every windows, menus, popups, tooltips: amount where we avoid displaying contents. Adjust if you cannot see the edges of your screen (e.g. on a TV where scaling has not been configured).",u8"すべてのウィンドウ、メニュー、ポップアップ、ツールチップに適用：表示を避ける量。画面の端が見えていない場合は調整してください(例えば、スケール設定がされていないテレビなど)。")
 #define TT_136 AT(u8"文本", u8"Text",u8"テキスト")
 #define TT_137 AT(u8"问号提示文本", u8"TextDisabled",u8"質問マークの説明テキスト")
 #define TT_138 AT(u8"窗口背景", u8"WindowBg",u8"ウィンドウの背景")
@@ -208,18 +206,18 @@
 #define TT_192 AT(u8"导航窗口背景变暗", u8"NavWindowingDimBg",u8"ナビゲートウィンドウの背景を暗くする")
 #define TT_193 AT(u8"模态窗口背景变暗", u8"ModalWindowDimBg",u8"モーダルウィンドウの背景を暗くする")
 #define TT_194 AT(u8"未知的",u8"Unknown",u8"不明")
-#define TT_195 AT(u8"当禁用抗锯齿线条时，您可能还想禁用样式中的边框。", u8"When disabling anti - aliasing lines, you'll probably want to disable borders in your style as well.",u8"アンチエイリアシングされたラインを無効にした場合、スタイルの枠線も無効にしたいかもしれません。")
+#define TT_195 AT(u8"当禁用抗锯齿线条时,您可能还想禁用样式中的边框。", u8"When disabling anti - aliasing lines, you'll probably want to disable borders in your style as well.",u8"アンチエイリアシングされたラインを無効にした場合、スタイルの枠線も無効にしたいかもしれません。")
 #define TT_196 AT(u8"更快的线条使用纹理数据。要求后端使用双线性过滤进行渲染(不是点/最近过滤)。",u8"Faster lines using texture data. Require backend to render with bilinear filtering (not point/nearest filtering).",u8"より速いラインはテクスチャデータを使用します。バックエンドはバイリニアフィルタリング(ポイント/ニアレストフィルタリングではなく)を使用してレンダリングする必要があります。")
-#define TT_197 AT(u8"(R =半径，N =分段的大概数量)",u8"(R = radius, N = approx number of segments)",u8"(R = 半径、N = 分割の概数)")
+#define TT_197 AT(u8"(R =半径,N =分段的大概数量)",u8"(R = radius, N = approx number of segments)",u8"(R = 半径、N = 分割の概数)")
 #define TT_198 AT(u8"字体: \"%s\"\n%.2f 像素, %d 字形, %d 个文件(s)",u8"Font: \"%s\"\n%.2f px, %d glyphs, %d file(s)",u8"フォント: \"%s\"\n%.2f px, %d グリフ, %d ファイル(s)")
 #define TT_199 AT(u8"设为默认值",u8"Set as default",u8"デフォルトとして設定")
 #define TT_200 AT(u8"那只敏捷的棕色狐狸跳过了那只懒狗",u8"The quick brown fox jumps over the lazy dog",u8"素早い茶色の狐は怠け者の犬を飛び越える")
 #define TT_201 AT(u8"字体比例",u8"Font scale",u8"フォントのスケール")
-#define TT_202 AT(u8"上升:%f，下降:%f，高度:%f",u8"Ascent: %f, Descent: %f, Height: %f",u8"上昇:%f、下降:%f、高さ:%f")
+#define TT_202 AT(u8"上升:%f,下降:%f,高度:%f",u8"Ascent: %f, Descent: %f, Height: %f",u8"上昇:%f、下降:%f、高さ:%f")
 #define TT_203 AT(u8"回退字符: '%s' (U+%04X)",u8"Fallback character: '%s' (U+%04X)",u8"フォールバックキャラクター: '%s' (U+%04X)")
 #define TT_204 AT(u8"省略号字符: '%s' (U+%04X)",u8"Ellipsis character: '%s' (U+%04X)",u8"省略記号キャラクター: '%s' (U+%04X)")
 #define TT_205 AT(u8"纹理区域:关于 %d 像素 ~%dx%d 像素",u8"Texture Area: about %d px ~%dx%d px",u8"テクスチャ領域: 約 %d px ~%dx%d px")
-#define TT_206 AT(u8"输入%d: \'%s\'，过采样:(%d，%d)，像素快照: %d，偏移量:(%.1f，%.1f)",u8"Input %d: \'%s\', Oversample: (%d,%d), PixelSnapH: %d, Offset: (%.1f,%.1f)",u8"入力%d: \'%s\'、オーバーサンプリング:(%d、%d)、ピクセルスナップ:%d、オフセット:(%.1f、%.1f)")
+#define TT_206 AT(u8"输入%d: \'%s\',过采样:(%d,%d),像素快照: %d,偏移量:(%.1f,%.1f)",u8"Input %d: \'%s\', Oversample: (%d,%d), PixelSnapH: %d, Offset: (%.1f,%.1f)",u8"入力%d: \'%s\'、オーバーサンプリング:(%d、%d)、ピクセルスナップ:%d、オフセット:(%.1f、%.1f)")
 #define TT_207 AT(u8"字形",u8"Glyphs",u8"グリフ")
 #define TT_208 AT(u8"字形 (%d)",u8"Glyphs (%d)",u8"グリフ (%d)")
 #define TT_209 AT(u8"字形",u8"glyphs",u8"グリフ")
@@ -259,7 +257,7 @@
 #define TT_243 AT(u8"停靠时不透明",u8"Docked Nontransparent",u8"ドッキング時に不透明")
 #define TT_244 AT(u8"字体字号大小",u8"Font Pixel Size",u8"フォントのピクセルサイズ")
 #define TT_245 AT(u8"字体字号",u8"Font Size",u8"フォントサイズ")
-#define TT_246 AT(u8"如果时间未达到目标帧时间间隔，进行短暂的休眠以减少CPU占用。",u8"If the time does not reach the target frame interval, a short sleep is performed to reduce CPU occupation.",u8"時間間隔が目標フレーム間隔に達しない場合、CPU使用量を減らすために短時間のスリープを行います。")
+#define TT_246 AT(u8"如果时间未达到目标帧时间间隔,进行短暂的休眠以减少CPU占用。",u8"If the time does not reach the target frame interval, a short sleep is performed to reduce CPU occupation.",u8"時間間隔が目標フレーム間隔に達しない場合、CPU使用量を減らすために短時間のスリープを行います。")
 #define TT_247 AT(u8"%d 毫秒",u8"%d ms",u8"%d ミリ秒")
 #define TT_248 AT(u8"Live2d 的窗体帧率",u8"Live2d's window fps",u8"Live2dのウィンドウフレームレート")
 #define TT_249 AT(u8"Live2d 实际帧率(%d FPS)","Live2d frame (%d FPS)",u8"Live2dの実際のフレームレート(%d FPS)")
@@ -448,4 +446,7 @@
 #define TT_432 AT(u8"关闭时退出",u8"Exit When Closed",u8"閉じるときに終了する")
 #define TT_433 AT(u8"关闭时缩放",u8"Zoom When Closed",u8"閉じるときに最小化する")
 #define TT_434 AT(u8"Windows 的窗体透明", u8"Windows's alpha", u8"Windowsのウィンドウ透明度")
-
+#define TT_435 AT(u8"启用透明组", u8"Enable opacity", u8"透明グループを有効にする")
+#define TT_436 AT(u8"在播放动画时,Live2D 需要正确地计算模型的透明度。\n如果你启用了透明组,那么动画之间将不能有渐变效果。\n如果模型在翻转时候出现背面不显示的情况,请启用剔除规则。",\
+u8"Live2D needs to correctly calculate the model's opacity while playing the animation.\nIf you have enabled the opacity group, there will be no fade effect between animations.\nIf the model shows no back face when flipping, please enable culling rules.",\
+u8"アニメーションを再生する際、Live2Dはモデルの不透明度を正しく計算する必要があります。\n透明グループを有効にした場合、アニメーション間にフェード効果はありません。\nモデルが反転する際に裏面が表示されない場合は、カリングルールを有効にしてください。")

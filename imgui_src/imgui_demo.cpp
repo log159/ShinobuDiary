@@ -206,7 +206,7 @@ Index of this file:
 
 #if !defined(IMGUI_DISABLE_DEMO_WINDOWS)
 
-#include "../translator.h"
+#include "../shinobugui_src/translator.h"
 
 // Forward Declarations
 struct ImGuiDemoWindowData;

@@ -12,7 +12,7 @@
 #include "./shinobugui_src/shinobuwidget.h"
 #include "./implot_src/implot.h"
 #include "./cubism_src/LAppDelegate.hpp"
-#include "./translator.h"
+#include "./shinobugui_src/translator.h"
 
 #define WIN_CLASS_NAME L"Shinobu Example"
 #define WIN_TITLE_NAME L"Dear Shinobu"
@@ -31,15 +31,15 @@ static bool                     show_shinobu_window     = true;
 static bool                     while_done              = false;
 static bool                     while_show              = true;
 
-bool            CreateDeviceD3D(HWND hWnd);
-void            CleanupDeviceD3D();
-void            CreateRenderTarget();
-void            CleanupRenderTarget();
-void            FrontPart();
-void            PosteriorPart();
-void            QuitHandle();
-LRESULT WINAPI  WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-DWORD WINAPI    CubismThread(LPVOID lpParam);
+bool                            CreateDeviceD3D(HWND hWnd);
+void                            CleanupDeviceD3D();
+void                            CreateRenderTarget();
+void                            CleanupRenderTarget();
+void                            FrontPart();
+void                            PosteriorPart();
+void                            QuitHandle();
+LRESULT WINAPI                  WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+DWORD WINAPI                    CubismThread(LPVOID lpParam);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -58,7 +58,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     ::GlobalConfig::getInstance();
     // 初始化用户配置
     Su::AllConfigInit();
-
     DWORD cubismThreadId;
     CreateThread(NULL, 0, CubismThread, NULL, 0, &cubismThreadId);
 
@@ -112,6 +111,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             ShowShinobuWindow(&show_shinobu_window);
             ShowShinobuStyleEditor();
             ShowShinobuInteractively();
+            //ShowShinobuDebugWindow();//Shinobu Debug
             ShowShinobuErrorWindow();//Error Window
         }
 
@@ -122,6 +122,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             else if (GlobalConfig::getInstance()->window_main_close == 1)(void*)(NULL);
             else QuitHandle();
         }
+        if (while_show && show_shinobu_window) GlobalTemp::WindowMainShow = true;
+        else GlobalTemp::WindowMainShow = false;
         //限制帧率
         if (ImGui::GetIO().Framerate > GlobalConfig::getInstance()->window_main_forecastfps)
             std::this_thread::sleep_for(std::chrono::milliseconds(GlobalConfig::getInstance()->window_main_addtimefps));
@@ -173,7 +175,7 @@ DWORD WINAPI CubismThread(LPVOID lpParam)
         std::vector<Su::UserConfig>& vu = Su::UserConfig::getUserVector();
         for (int i = 0; i < int(vu.size()); ++i) 
             if (vu[i].enable_cubism) 
-                GlobalTemp::CubismModelMessage.push(std::make_pair(vu[i].user_id, vu[i].cubism_config.model_dir));
+                GlobalTemp::CubismModelMessage.push(std::make_pair(vu[i].user_id, vu[i].cubism_model_dir));
         std::cout << u8"Cubism 开始执行" << std::endl;
         GlobalTemp::CubismIsRunning = true;
         LAppDelegate::GetInstance()->Run();
@@ -344,6 +346,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 }
                 if (GlobalTemp::WindowCubismShow) flag_3 |= MF_CHECKED;
                 else flag_4 |= MF_CHECKED;
+
                 AppendMenu(hMenu, flag_1, 1, Su::Utf8ToWstring(TT_427).c_str());
                 AppendMenu(hMenu, flag_2, 2, Su::Utf8ToWstring(TT_428).c_str());
                 AppendMenu(hMenu, flag_3, 3, Su::Utf8ToWstring(TT_429).c_str());
@@ -367,7 +370,6 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             while_show = true;
             if (GlobalConfig::getInstance()->window_main_close == 1)
                 show_shinobu_window = true;
-                
         }
         else if (wParam == 2) {
             while_show = false;

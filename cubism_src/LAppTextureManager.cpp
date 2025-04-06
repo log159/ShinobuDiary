@@ -107,7 +107,6 @@ LAppTextureManager::TextureInfo* LAppTextureManager::CreateTextureFromRGBA(float
     return textureInfo;
 }
 
-
 LAppTextureManager::TextureInfo* LAppTextureManager::CreateTextureFromPngFile(std::string fileName, bool isPreMult, UINT maxSize)
 {
     ID3D11Device* device = LAppDelegate::GetD3dDevice();
@@ -124,7 +123,7 @@ LAppTextureManager::TextureInfo* LAppTextureManager::CreateTextureFromPngFile(st
 
     HRESULT hr = S_OK;
 
-    if(isPreMult)
+    if (isPreMult)
     {
         hr = DirectX::CreateWICTextureFromFileEx(device,
             NULL,   // NULLにするとMIP=1となる
@@ -149,7 +148,7 @@ LAppTextureManager::TextureInfo* LAppTextureManager::CreateTextureFromPngFile(st
             &texture, &textureView);
     }
 
-    if(SUCCEEDED(hr))
+    if (SUCCEEDED(hr))
     {
         do
         {
@@ -213,7 +212,6 @@ LAppTextureManager::TextureInfo* LAppTextureManager::CreateTextureFromPngFile(st
                 _textures.PushBack(texture);
                 _textureView.PushBack(textureView);
 
-
                 if (isPreMult)
                 {
                     D3D11_MAPPED_SUBRESOURCE subRes;
@@ -227,9 +225,9 @@ LAppTextureManager::TextureInfo* LAppTextureManager::CreateTextureFromPngFile(st
                         ULONG* pixel32 = static_cast<ULONG*>(subRes.pData);
                         for (unsigned int htLoop = 0; htLoop < texHeight; htLoop++)
                         {
-                            unsigned char* pixel4 = reinterpret_cast<unsigned char*>(pdd) + subRes.RowPitch*htLoop;
+                            unsigned char* pixel4 = reinterpret_cast<unsigned char*>(pdd) + subRes.RowPitch * htLoop;
                             unsigned int* pixel32 =
-                                reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(subRes.pData) + subRes.RowPitch*htLoop);
+                                reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(subRes.pData) + subRes.RowPitch * htLoop);
 
                             for (UINT i = 0; i < subRes.RowPitch; i += 4)
                             {

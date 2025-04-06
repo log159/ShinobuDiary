@@ -29,9 +29,9 @@ Csm::CubismMatrix44* LAppView::GetDeviceToScreen() const
 }
 
 LAppView::LAppView():
-    _back(NULL),
-    _gear(NULL),
-    _power(NULL),
+    //_back(NULL),
+    //_gear(NULL),
+    //_power(NULL),
     _renderSprite(NULL),
     _renderTarget(SelectTarget_None),
     _shader(NULL)
@@ -130,25 +130,34 @@ void LAppView::Render()
     // デバイスコンテキスト取得
     ID3D11DeviceContext* renderContext = LAppDelegate::GetD3dContext();
 
-    if (_back)
-    {
+    //if (_back)
+    //{
+    //    ID3D11ShaderResourceView* textureView = NULL;
+    //    LAppDelegate::GetInstance()->GetTextureManager()->GetTexture(_back->GetTextureId(), textureView);
+    //    _back->RenderImmidiate(width, height, textureView, renderContext);
+    //}
+    //if (_gear)
+    //{
+    //    ID3D11ShaderResourceView* textureView = NULL;
+    //    LAppDelegate::GetInstance()->GetTextureManager()->GetTexture(_gear->GetTextureId(), textureView);
+    //    _gear->RenderImmidiate(width, height, textureView, renderContext);
+    //}
+    //if (_power)
+    //{
+    //    ID3D11ShaderResourceView* textureView = NULL;
+    //    LAppDelegate::GetInstance()->GetTextureManager()->GetTexture(_power->GetTextureId(), textureView);
+    //    _power->RenderImmidiate(width, height, textureView, renderContext);
+    //}
+    if (_shinobu_image && GlobalTemp::WindowMainShow) {
         ID3D11ShaderResourceView* textureView = NULL;
-        LAppDelegate::GetInstance()->GetTextureManager()->GetTexture(_back->GetTextureId(), textureView);
-        _back->RenderImmidiate(width, height, textureView, renderContext);
-    }
-    if (_gear)
-    {
-        ID3D11ShaderResourceView* textureView = NULL;
-        LAppDelegate::GetInstance()->GetTextureManager()->GetTexture(_gear->GetTextureId(), textureView);
-        _gear->RenderImmidiate(width, height, textureView, renderContext);
-    }
-    if (_power)
-    {
-        ID3D11ShaderResourceView* textureView = NULL;
-        LAppDelegate::GetInstance()->GetTextureManager()->GetTexture(_power->GetTextureId(), textureView);
-        _power->RenderImmidiate(width, height, textureView, renderContext);
+        LAppDelegate::GetInstance()->GetTextureManager()->GetTexture(_shinobu_image->GetTextureId(), textureView);
+        _shinobu_image->ResetOffsetRect(GlobalTemp::ShinobuWindowRect.x + (GlobalTemp::ShinobuWindowRect.w * 0.7f), LAppDefine::RenderTargetHeight - GlobalTemp::ShinobuWindowRect.y + 9.f, 1.f, 1.f);
+        _shinobu_image->RenderImmidiate(width, height, textureView, renderContext);
     }
 
+    if (GlobalTemp::WindowCubismShow == false) {
+        return;
+    }
     // Cubism更新・描画
     live2DManager->OnUpdate();
 
@@ -196,6 +205,8 @@ void LAppView::Render()
             }
         }
     }
+
+
 }
 void LAppView::InitializeSprite()
 {
@@ -239,9 +250,17 @@ void LAppView::InitializeSprite()
     //fHeight = static_cast<float>(powerTexture->height);
     //_power = new LAppSprite(x, y, fWidth, fHeight, powerTexture->id, _shader, device);
 
-    _back = nullptr;
-    _gear = nullptr;
-    _power = nullptr;
+    //_back = nullptr;
+    //_gear = nullptr;
+    //_power = nullptr;
+
+    //_shinobu_image
+    LAppTextureManager::TextureInfo* powerTexture = textureManager->CreateTextureFromPngFile("./Icon/su_t.png", false);
+    x = 0.f;
+    y = 0.f;
+    fWidth = static_cast<float>(powerTexture->width) * 0.33f;
+    fHeight = static_cast<float>(powerTexture->height) * 0.33f;
+    _shinobu_image = new LAppSprite(x, y, fWidth, fHeight, powerTexture->id, _shader, device);
 
     x = width * 0.5f;
     y = height * 0.5f;
@@ -259,27 +278,34 @@ void LAppView::ReleaseSprite()
     delete _renderSprite;
     _renderSprite = NULL;
 
-    if (_gear)
-    {
-        textureManager->ReleaseTexture(_gear->GetTextureId());
-    }
-    delete _gear;
-    _gear = NULL;
+    //if (_gear)
+    //{
+    //    textureManager->ReleaseTexture(_gear->GetTextureId());
+    //}
+    //delete _gear;
+    //_gear = NULL;
 
-    if (_power)
-    {
-        textureManager->ReleaseTexture(_power->GetTextureId());
-    }
-    delete _power;
-    _power = NULL;
+    //if (_power)
+    //{
+    //    textureManager->ReleaseTexture(_power->GetTextureId());
+    //}
+    //delete _power;
+    //_power = NULL;
 
-    if (_back)
-    {
-        textureManager->ReleaseTexture(_back->GetTextureId());
-    }
-    delete _back;
-    _back = NULL;
+    //if (_back)
+    //{
+    //    textureManager->ReleaseTexture(_back->GetTextureId());
+    //}
+    //delete _back;
+    //_back = NULL;
 
+
+    if (_shinobu_image)
+    {
+        textureManager->ReleaseTexture(_shinobu_image->GetTextureId());
+    }
+    delete _shinobu_image;
+    _shinobu_image = NULL;
 }
 
 void LAppView::ResizeSprite()
@@ -299,47 +325,47 @@ void LAppView::ResizeSprite()
     float fWidth = 0.0f;
     float fHeight = 0.0f;
 
-    if(_back)
-    {
-        Csm::csmUint64 id = _back->GetTextureId();
-        LAppTextureManager::TextureInfo* texInfo = textureManager->GetTextureInfoById(id);
-        if(texInfo)
-        {
-            x = width * 0.5f;
-            y = height * 0.5f;
-            fWidth = static_cast<float>(texInfo->width * 2);
-            fHeight = static_cast<float>(height) * 0.95f;
-            _back->ResetRect(x, y, fWidth, fHeight);
-        }
-    }
+    //if(_back)
+    //{
+    //    Csm::csmUint64 id = _back->GetTextureId();
+    //    LAppTextureManager::TextureInfo* texInfo = textureManager->GetTextureInfoById(id);
+    //    if(texInfo)
+    //    {
+    //        x = width * 0.5f;
+    //        y = height * 0.5f;
+    //        fWidth = static_cast<float>(texInfo->width * 2);
+    //        fHeight = static_cast<float>(height) * 0.95f;
+    //        _back->ResetRect(x, y, fWidth, fHeight);
+    //    }
+    //}
 
-    if (_power)
-    {
-        Csm::csmUint64 id = _power->GetTextureId();
-        LAppTextureManager::TextureInfo* texInfo = textureManager->GetTextureInfoById(id);
-        if (texInfo)
-        {
-            x = static_cast<float>(width - texInfo->width * 0.5f);
-            y = static_cast<float>(texInfo->height * 0.5f);
-            fWidth = static_cast<float>(texInfo->width);
-            fHeight = static_cast<float>(texInfo->height);
-            _power->ResetRect(x, y, fWidth, fHeight);
-        }
-    }
+    //if (_power)
+    //{
+    //    Csm::csmUint64 id = _power->GetTextureId();
+    //    LAppTextureManager::TextureInfo* texInfo = textureManager->GetTextureInfoById(id);
+    //    if (texInfo)
+    //    {
+    //        x = static_cast<float>(width - texInfo->width * 0.5f);
+    //        y = static_cast<float>(texInfo->height * 0.5f);
+    //        fWidth = static_cast<float>(texInfo->width);
+    //        fHeight = static_cast<float>(texInfo->height);
+    //        _power->ResetRect(x, y, fWidth, fHeight);
+    //    }
+    //}
 
-    if (_gear)
-    {
-        Csm::csmUint64 id = _gear->GetTextureId();
-        LAppTextureManager::TextureInfo* texInfo = textureManager->GetTextureInfoById(id);
-        if (texInfo)
-        {
-            x = static_cast<float>(width - texInfo->width * 0.5f);
-            y = static_cast<float>(height - texInfo->height * 0.5f);
-            fWidth = static_cast<float>(texInfo->width);
-            fHeight = static_cast<float>(texInfo->height);
-            _gear->ResetRect(x, y, fWidth, fHeight);
-        }
-    }
+    //if (_gear)
+    //{
+    //    Csm::csmUint64 id = _gear->GetTextureId();
+    //    LAppTextureManager::TextureInfo* texInfo = textureManager->GetTextureInfoById(id);
+    //    if (texInfo)
+    //    {
+    //        x = static_cast<float>(width - texInfo->width * 0.5f);
+    //        y = static_cast<float>(height - texInfo->height * 0.5f);
+    //        fWidth = static_cast<float>(texInfo->width);
+    //        fHeight = static_cast<float>(texInfo->height);
+    //        _gear->ResetRect(x, y, fWidth, fHeight);
+    //    }
+    //}
     if (_renderSprite)
     {
         x = width * 0.5f;

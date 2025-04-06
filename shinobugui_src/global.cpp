@@ -13,13 +13,15 @@ std::ostringstream GlobalTemp:: DebugOss;
 bool GlobalTemp::               ShowStyleEditor                 = false;
 HWND GlobalTemp::               WindowMainHandle;
 WNDCLASSEXW GlobalTemp::        WindowMainWc;
+bool GlobalTemp::               WindowMainShow                  = false;
 int GlobalTemp::                CubismFrameCount                = 0;
 bool GlobalTemp::               RefreshTable                    = true;
 bool GlobalTemp::               RefreshCubism                   = true;
 bool GlobalTemp::               CubismIsRunning                 = false;
 bool GlobalTemp::               TableBools[DEFSIZE][DEFSIZEK16] = {false};
-float  GlobalTemp::             GuiButtonWidth                  = 200.f;
-bool   GlobalTemp::             WindowCubismShow                = true;
+float GlobalTemp::              GuiButtonWidth                  = 200.f;
+bool  GlobalTemp::              WindowCubismShow                = true;
+RectF GlobalTemp::              ShinobuWindowRect               = { 0.f,0.f,0.f,0.f };
 
 
 const LPCWSTR GlobalTemp::CubismDirectXClassName    = L"Cubism DirectX11 Sample";

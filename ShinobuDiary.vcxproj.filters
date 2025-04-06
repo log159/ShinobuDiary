@@ -182,9 +182,6 @@
     <ClInclude Include="imgui_impl_win32.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="translator.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="simpleini-4.22_src\ConvertUTF.h">
       <Filter>simpleini-4.22_src</Filter>
     </ClInclude>
@@ -324,6 +321,9 @@
       <Filter>shinobugui_src</Filter>
     </ClInclude>
     <ClInclude Include="shinobugui_src\global.h">
+      <Filter>shinobugui_src</Filter>
+    </ClInclude>
+    <ClInclude Include="shinobugui_src\translator.h">
       <Filter>shinobugui_src</Filter>
     </ClInclude>
   </ItemGroup>

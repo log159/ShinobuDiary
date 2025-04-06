@@ -22,12 +22,13 @@ extern void ShowShinobuAbout();                 /*项目关于*/
 extern void ShowShinobuErrorWindow();			/*错误内容*/
 extern void ShowShinobuDebugWindow();			/*输出内容*/
 
-extern void ShowShinobuError(SUERROR se);		/*错误内容输出*/
-extern void ShowShinobuCSM(Su::UserConfig* _uc);/*Live2d配置项*/
-extern void ShowShinobuLLM(Su::UserConfig* _uc);/*LLM配置项*/
-extern void ShowShinibuTTS(Su::UserConfig* _uc);/*TTS配置项*/
-extern void ShowShinobuSTT(Su::UserConfig* _uc);/*STT配置项*/
-extern void ShowShinobuMT(Su::UserConfig* _uc);	/*MT配置项*/
+
+extern void ShowShinobuError(SUERROR se);									/*错误内容输出*/
+extern void ShowShinobuCSM(Su::UserConfig* _uc);							/*Live2d配置项*/
+extern void ShowShinobuLLM(Su::UserConfig* _uc);							/*LLM配置项*/
+extern void ShowShinibuTTS(Su::UserConfig* _uc);							/*TTS配置项*/
+extern void ShowShinobuSTT(Su::UserConfig* _uc);							/*STT配置项*/
+extern void ShowShinobuMT(Su::UserConfig* _uc);								/*MT配置项*/
 extern void ShowShinobuCsmGeometry(Su::UserConfig& uc,LAppModel* lam);
 extern void ShowShinobuCsmLook(Su::UserConfig& uc, LAppModel* lam);
 extern void ShowShinobuCsmBreath(Su::UserConfig& uc, LAppModel* lam);

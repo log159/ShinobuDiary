@@ -7,10 +7,6 @@ bool CubismWindowStyle::        canTrans    = true;
 
 void CubismWindowStyle::SetWindowTopApha(HWND hwnd, bool isTop, bool isApha)
 {
-    if (GlobalTemp::WindowCubismShow == false) {
-        ShowWindow(hwnd, SW_HIDE);
-        return;
-    }
     int intExTemp = GetWindowLong(hwnd, GWL_EXSTYLE);
 
     // 使窗口不在任务栏显示
@@ -41,9 +37,7 @@ void CubismWindowStyle::SetWindowTopApha(HWND hwnd, bool isTop, bool isApha)
 
 BOOL CubismWindowStyle::GetPixelRGBA(HWND hwnd, int x, int y, BYTE& r, BYTE& g, BYTE& b, BYTE& a)
 {
-    if (GlobalTemp::WindowCubismShow == false) {
-        return TRUE;
-    }
+
     // 获取窗口设备上下文
     HDC hdcWindow = GetDC(hwnd);
     if (!hdcWindow) {

@@ -6,6 +6,7 @@
 #include "./sizedef.h"
 #include "./somemacros.h"
 #include "./sufunction.h"
+
 enum class LAN : int;
 #define MARK_LIST \
     X(LANGUAGESEL_ID) \
@@ -39,7 +40,7 @@ enum class LAN : int;
     X(ENABLE_MT) \
     X(ENABLE_ORIGINAL) \
     X(ENABLE_STT) \
-    X(CUBISM_CONFIG_MODEL_DIR) \
+    X(CUBISM_MODEL_DIR) \
     X(CUBISM_CG_CUBISM_TS_S) \
     X(CUBISM_CG_CUBISM_TX_T) \
     X(CUBISM_CG_CUBISM_TY_T) \
@@ -67,7 +68,6 @@ static std::map<INIMARK, const char*> inimark_map = {
 #undef X
 };
 
-static const char* INIGROUPMARKSTR = "INIMARKGROUP%d";
 static const char* vits_simple_api_model_list[] = { "vits","bert-vits2","w2v2-vits" };
 static const char* gpt_sovits_target_language_list[] = { "zh","ja","en" };
 
@@ -78,6 +78,7 @@ public:
     static int                                              CubismFrameCount;
     static HWND                                             WindowMainHandle;
     static WNDCLASSEXW                                      WindowMainWc;
+    static bool                                             WindowMainShow;
     static bool                                             RefreshTable;
     static bool                                             RefreshCubism;
     static const LPCWSTR                                    CubismDirectXClassName;
@@ -89,7 +90,7 @@ public:
     static bool                                             TableBools[DEFSIZE][DEFSIZEK16];
     static float                                            GuiButtonWidth;
     static bool                                             WindowCubismShow;
-
+    static RectF                                            ShinobuWindowRect;
 };
 
 class GlobalConfig {

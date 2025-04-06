@@ -9,6 +9,8 @@
 
 #include "filesetting.h"
 #include <iostream>
+#include "../shinobugui_src/sizedef.h"
+#include "../shinobugui_src/somemacros.h"
 using std::cout;
 using std::endl;
 
@@ -55,15 +57,20 @@ void FileSetting::SetValue(int id, const char* s, const char* k, const char* wn)
     std::string str = wn;
     std::string target = " ";
     std::string replacement = "~SPACE~";
-
     size_t pos = 0;
     while ((pos = str.find(target, pos)) != std::string::npos) {
         str.replace(pos, target.length(), replacement);
         pos += replacement.length();
     }
-
     const char* n = str.c_str();
     SS(SetValue);
+}
+void FileSetting::ClearFile()
+{
+    if (std::remove(INITFILE_WAY) == 0)
+        std::cout << "File " << INITFILE_WAY << " deleted successfully." << std::endl;
+    else
+        std::cout << "Error deleting file." << std::endl;
 }
 std::string FileSetting::GetValue(int id, const char* s, const char* k, const char* n) {
     CSimpleIniA ini;
@@ -102,10 +109,4 @@ bool FileSetting::GetBoolValue(int id, const char* s, const char* k, bool n) {
     SG(GetBoolValue, bool)
 }
 
-void FileSetting::ClearFile()
-{
-    if (std::remove(INITFILE_WAY) == 0)
-        std::cout << "File " << INITFILE_WAY << " deleted successfully." << std::endl;
-    else 
-        std::cout << "Error deleting file." << std::endl;
-}
+

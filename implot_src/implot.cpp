@@ -160,7 +160,7 @@ You can read releases logs https://github.com/epezent/implot/releases for more d
 #ifndef GImPlot
 ImPlotContext* GImPlot = nullptr;
 #endif
-#include "../translator.h"
+#include "../shinobugui_src/translator.h"
 //-----------------------------------------------------------------------------
 // Struct Implementations
 //-----------------------------------------------------------------------------

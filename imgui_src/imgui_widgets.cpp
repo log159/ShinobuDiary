@@ -92,7 +92,7 @@ Index of this file:
 #pragma GCC diagnostic ignored "-Wcast-qual"                        // warning: cast from type 'const xxxx *' to type 'xxxx *' casts away qualifiers
 #endif
 
-#include "../translator.h"
+#include "../shinobugui_src/translator.h"
 
 //-------------------------------------------------------------------------
 // Data

@@ -116,94 +116,124 @@ struct FLICKER_OPACITY {
     float*                  flash_color     = nullptr;
     float                   rgb_backup      = 1.0f;
 };
+//lam->modelSize;                                                 // 大小缩放
+//lam->modelSizeX;                                                // 横轴缩放
+//lam->modelSizeY;                                                // 纵轴缩放
+//lam->GetModelMatrix()->GetArray()[12];                          // 水平坐标
+//lam->GetModelMatrix()->GetArray()[13];                          // 垂直坐标
+//lam->GetModelMatrix()->GetArray()[4];                           // 水平拉伸
+//lam->GetModelMatrix()->GetArray()[1];                           // 垂直拉伸
+//lam->GetModelMatrix()->GetArray()[7];                           // 水平透视
+//lam->GetModelMatrix()->GetArray()[3];                           // 垂直透视
+//lam->canLookMouse;                                              // 是否看向鼠标
+//lam->GetLookTargetDamping();                                    // 看向鼠标阻尼
+//lam->GetLookTargetParams();                                     // 看向鼠标参数详细
+//lam->GetCanBreath();                                            // 是否呼吸
+//lam->GetBreathParameters();                                     // 呼吸参数详细
+//lam->canEyeBlink;                                               // 是否眨眼
+//lam->GetBlinkingIntervalSeconds();                              // 眨眼的时间间隔
+//lam->GetClosingSeconds();                                       // 闭眼所需的时间
+//lam->GetClosedSeconds();                                        // 完全闭合状态的持续时间
+//lam->GetOpeningSeconds();                                       // 闭合到完全睁开的过渡时间
+//lam->GetEyeBlinkIds();                                          // 眨眼参数详细
+//lam->animationAutoPlay;                                         // 是否自动播放动画
+//lam->canHitareas;                                               // 是否启用触发
+//lam->previewHitareas;                                           // 预览触发区域
+//lam->hit_areas_motion_map;                                      // 触发动作详细
+//lam->hit_areas_expression_map;                                  // 触发表情详细
+//lam->GetModel()->GetOverwriteFlagForModelMultiplyColorsRef();   // 正片叠底色覆盖标志
+//lam->GetModel()->GetOverwriteFlagForModelScreenColorsRef();     // 屏幕色覆盖标志
+//lam->canOpacityGroup;                                           // 透明组覆盖标志
+//lam->GetModel()->GetOverwriteFlagForModelCullingsRef();         // 剔除规则标志
+//lam->drawable_multiply_color;                                   // 正片叠底参数详细
+//lam->drawable_screen_color;                                     // 屏幕色参数详细
+//lam->drawable_part_multiply_color;                              // 正片叠底组参数详细
+//lam->drawable_part_screen_color;                                // 屏幕色组参数详细
+//lam->drawable_part_opacity;                                     // 透明组参数详细
 
 class LAppModel : public Csm::CubismUserModel
 {
-private:
-    //对于颜色标识位置
-    std::vector<FLICKER>                            flicker_v;
-    //对于透明标识位置
-    std::vector<FLICKER_OPACITY>                    flicker_opacity_v;
 public:
-    long long                                       hit_num             = 0;
-    std::string                                     hit_name;
-    std::string                                     hit_id;
-    int                                             hit_ui_selected     = -1;
-    int                                             function_selected   = 0;
-    std::unordered_map<int, std::pair<int, int>>    motion_map;
-    std::unordered_map<int, int>                    expression_map;
-    std::string                                     hit_motion_name;
-    std::string                                     hit_expression_name;
-    std::string                                     current_motion_name;
-    std::string                                     current_expression_name;
-    float                                           multiply_color[4]       = { 1.0f,1.0f, 1.0f, 1.0f };
-    float                                           screen_color[4]         = { 0.0f,0.0f, 0.0f, 1.0f };
-    float                                           multiply_group_color[4] = { 1.0f,1.0f, 1.0f, 1.0f };
-    float                                           screen_group_color[4]   = { 0.0f,0.0f, 0.0f, 1.0f };
-    float                                           group_opacity           = 1.0f;
-    bool                                            set_all_m_mark          = false;
-    bool                                            set_all_s_mark          = false;
-    bool                                            set_all_mp_mark         = false;
-    bool                                            set_all_sp_mark         = false;
-    bool                                            set_all_po_mark         = false;
-    Csm::CubismCdiJson*                             cdi_json                = nullptr;
-    bool                                            cdi_exist               = false;
-    std::vector<Su::ShinobuScrollingBuffer>         sdatal_v;
-    bool                                            sdatal_ui_mark          = false;
-    float                                           add_t                   = 0.f;
-    float                                           history_t               = 10.0f;
-    char                                            filter_param_buf[DEFSIZE];
-    char                                            filter_drawable_buf[DEFSIZE];
-    char                                            filter_part_buf[DEFSIZE];
 
-
-    CCG                                                 def_cubism_cg;
-    std::vector<LookParam>                              def_look_target_params;
-    std::vector<Csm::CubismBreath::BreathParameterData> def_breath_params;
-    std::vector<ImGuiID>                                def_blink_list_ids[2];
-
+    long long                                                       hit_num             = 0;
+    std::string                                                     hit_name;
+    std::string                                                     hit_id;
+    int                                                             hit_ui_selected     = -1;
+    int                                                             function_selected   = 0;
+    std::unordered_map<int, std::pair<int, int>>                    motion_map;
+    std::unordered_map<int, int>                                    expression_map;
+    std::string                                                     hit_motion_name;
+    std::string                                                     hit_expression_name;
+    std::string                                                     current_motion_name;
+    std::string                                                     current_expression_name;
+    float                                                           multiply_color[4]       = { 1.0f,1.0f, 1.0f, 1.0f };
+    float                                                           screen_color[4]         = { 0.0f,0.0f, 0.0f, 1.0f };
+    float                                                           multiply_group_color[4] = { 1.0f,1.0f, 1.0f, 1.0f };
+    float                                                           screen_group_color[4]   = { 0.0f,0.0f, 0.0f, 1.0f };
+    float                                                           group_opacity           = 1.0f;
+    bool                                                            set_all_m_mark          = false;
+    bool                                                            set_all_s_mark          = false;
+    bool                                                            set_all_mp_mark         = false;
+    bool                                                            set_all_sp_mark         = false;
+    bool                                                            set_all_po_mark         = false;
+    Csm::CubismCdiJson*                                             cdi_json                = nullptr;
+    bool                                                            cdi_exist               = false;
+    std::vector<Su::ShinobuScrollingBuffer>                         sdatal_v;
+    bool                                                            sdatal_ui_mark          = false;
+    float                                                           add_t                   = 0.f;
+    float                                                           history_t               = 10.0f;
+    char                                                            filter_param_buf[DEFSIZE];
+    char                                                            filter_drawable_buf[DEFSIZE];
+    char                                                            filter_part_buf[DEFSIZE];
+    std::vector<FLICKER>                                            flicker_v;
+    std::vector<FLICKER_OPACITY>                                    flicker_opacity_v;
+    std::unordered_map<std::string, std::vector<LAppSprite*>>       hitareas;
+    Su::ShinobuExList                                               blink_sel_list;
+    CCG                                                             def_cubism_cg;
+    std::vector<LookParam>                                          def_look_target_params;
+    std::vector<Csm::CubismBreath::BreathParameterData>             def_breath_params;
+    std::vector<ImGuiID>                                            def_blink_list_ids[2];
 public:
-    bool                canLookMouse                                = false;    //是否看向
-    bool                canEyeBlink                                 = false;    //是否自动眨眼
-    bool                canHitareas                                 = true;     //是否启用触发
-    bool                previewHitareas                             = false;    //预览触发区域
-    bool                animationAutoPlay                           = false;    //启用动画自动播放
-
-    float               drawable_multiply_color[DEFSIZEK16][4];                 //正片叠底参数
-    float               drawable_screen_color[DEFSIZEK16][4];                   //屏幕色参数
-    float               drawable_part_multiply_color[DEFSIZEK16][4];            //正片叠底组参数
-    float               drawable_part_screen_color[DEFSIZEK16][4];              //屏幕色组参数
-    float               drawable_part_opacity[DEFSIZEK16];                      //透明组参数
-
-    std::unordered_map<std::string, std::vector<LAppSprite*>>       hitareas;   //点击触发预览区域 对应 N * 4 个矩形
+    bool                                                            canLookMouse;
+    bool                                                            canEyeBlink;
+    bool                                                            animationAutoPlay;
+    bool                                                            canHitareas; 
+    bool                                                            previewHitareas;
+    bool                                                            canOpacityGroup;
+    float                                                           modelSize;                                          
+    float                                                           modelSizeX;                                         
+    float                                                           modelSizeY;                                         
+    float                                                           drawable_multiply_color[DEFSIZEK16][4];
+    float                                                           drawable_screen_color[DEFSIZEK16][4];
+    float                                                           drawable_part_multiply_color[DEFSIZEK16][4];
+    float                                                           drawable_part_screen_color[DEFSIZEK16][4];
+    float                                                           drawable_part_opacity[DEFSIZEK16];
     std::unordered_map<std::string, Su::ShinobuExList>              hit_areas_motion_map;
     std::unordered_map<std::string, Su::ShinobuExList>              hit_areas_expression_map;
-
+    float&                                                          GetLookTargetDamping();
+    bool&                                                           GetCanBreath();
+    Csm::csmFloat32&                                                GetBlinkingIntervalSeconds();
+    Csm::csmFloat32&                                                GetClosingSeconds();
+    Csm::csmFloat32&                                                GetClosedSeconds();
+    Csm::csmFloat32&                                                GetOpeningSeconds();
+    std::vector<LookParam>&                                         GetLookTargetParams();
+    Csm::csmVector<Csm::CubismIdHandle>&                            GetEyeBlinkIds();
+    Csm::csmVector<Csm::CubismBreath::BreathParameterData>&         GetBreathParameters();
     //初始化
-    void                                    InitMultiplyColor();
-    void                                    InitScreenColor();
-    void                                    InitPartMultiplyColor();
-    void                                    InitPartScreenColor();
-    void                                    InitPartOpacity();
-    //颜色闪烁
-    void                                    StartFlashColor(int mark,int index);
-    void                                    StartFlashOpacity(int index);
-    void                                    UpdateFlashColor();
-    void                                    UpdateFlashOpacity();
-    void                                    UpdateAllColor();
+    void                                                            InitMultiplyColor();
+    void                                                            InitScreenColor();
+    void                                                            InitPartMultiplyColor();
+    void                                                            InitPartScreenColor();
+    void                                                            InitPartOpacity();
     //对象实例获取
-    Csm::ICubismModelSetting*               GetModelSetting() const;
-    Csm::CubismTargetPoint*                 GetModelDragManager()const;
-    //参数获取
-    float&                                  GetLookTargetDamping();                             //看向目标阻尼
-    bool&                                   GetCanBreath();                                     //是否呼吸
-    Csm::csmFloat32&                        GetBlinkingIntervalSeconds();                       //眨眼的时间间隔
-    Csm::csmFloat32&                        GetClosingSeconds();                                //闭眼所需的时间
-    Csm::csmFloat32&                        GetClosedSeconds();                                 //完全闭合状态的持续时间
-    Csm::csmFloat32&                        GetOpeningSeconds();                                //闭合到完全睁开的过渡时间
-    std::vector<LookParam>&                 GetLookTargetParams();                              //看向参数
-    Csm::csmVector<Csm::CubismIdHandle>&    GetEyeBlinkIds();                                   //眨眼参数
-    Csm::csmVector<Csm::CubismBreath::BreathParameterData>& GetBreathParameters();              //呼吸参数
+    Csm::ICubismModelSetting*                                       GetModelSetting() const;
+    Csm::CubismTargetPoint*                                         GetModelDragManager()const;
+    //颜色闪烁
+    void                                                            StartFlashColor(int mark, int index);
+    void                                                            StartFlashOpacity(int index);
+    void                                                            UpdateFlashColor();
+    void                                                            UpdateFlashOpacity();
+    void                                                            UpdateAllColor();
     /**
      * @brief コンストラクタ
      */

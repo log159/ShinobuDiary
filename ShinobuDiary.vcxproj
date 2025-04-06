@@ -244,6 +244,7 @@
     <ClInclude Include="shinobugui_src\somemacros.h" />
     <ClInclude Include="shinobugui_src\suconfig.h" />
     <ClInclude Include="shinobugui_src\sufunction.h" />
+    <ClInclude Include="shinobugui_src\translator.h" />
     <ClInclude Include="simpleini-4.22_src\ConvertUTF.h" />
     <ClInclude Include="simpleini-4.22_src\SimpleIni.h" />
     <ClInclude Include="imgui_src\imconfig.h" />
@@ -262,7 +263,6 @@
     <ClInclude Include="sparkdesk_src\include\sc_qachain.h" />
     <ClInclude Include="sparkdesk_src\include\sc_type.h" />
     <ClInclude Include="sparkdesk_src\include\sparkchain.h" />
-    <ClInclude Include="translator.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="FrameworkObj\FrameworkObj.vcxproj">

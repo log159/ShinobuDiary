@@ -163,13 +163,15 @@ public:
     LAppSpriteShader* GetShader();
 
 private:
-    TouchManager* _touchManager;                 ///< タッチマネージャー
+    TouchManager* _touchManager;                ///< タッチマネージャー
     Csm::CubismMatrix44* _deviceToScreen;    ///< デバイスからスクリーンへの行列
     Csm::CubismViewMatrix* _viewMatrix;      ///< viewMatrix
 
-    LAppSprite* _back;                       ///< 背景画像
-    LAppSprite* _gear;                       ///< ギア画像
-    LAppSprite* _power;                      ///< 電源画像
+    //LAppSprite* _back;                       ///< 背景画像
+    //LAppSprite* _gear;                       ///< ギア画像
+    //LAppSprite* _power;                      ///< 電源画像
+    LAppSprite* _shinobu_image;                ///< shinobu image
+
 
     // レンダリング先を別ターゲットにする方式の場合に使用
     LAppSprite* _renderSprite;                                  ///< モードによっては_renderBufferのテクスチャを描画

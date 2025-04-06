@@ -253,8 +253,9 @@ void LAppModel::UpdateAllColor()
         float ps_a = this->drawable_part_screen_color[i][3];
         this->GetModel()->SetPartScreenColor(i, ps_r, ps_g, ps_b, ps_a);
 
-        this->GetModel()->SetPartOpacity(i, this->drawable_part_opacity[i]);
-
+        if (canOpacityGroup) {
+            this->GetModel()->SetPartOpacity(i, this->drawable_part_opacity[i]);
+        }
     }
 
 

@@ -11,9 +11,8 @@
 #include <cstring>
 #include <algorithm>
 #include <codecvt>
-#include "./global.h"
-#include "../translator.h"
-#include "../shinobugui_src/sizedef.h"
+#include "./translator.h"
+#include "./sizedef.h"
 
 #define GETCURRENT(S)\
 auto now = std::chrono::system_clock::now();\
