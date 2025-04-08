@@ -22,7 +22,6 @@ extern void ShowShinobuAbout();                 /*项目关于*/
 extern void ShowShinobuErrorWindow();			/*错误内容*/
 extern void ShowShinobuDebugWindow();			/*输出内容*/
 
-
 extern void ShowShinobuError(SUERROR se);									/*错误内容输出*/
 extern void ShowShinobuCSM(Su::UserConfig* _uc);							/*Live2d配置项*/
 extern void ShowShinobuLLM(Su::UserConfig* _uc);							/*LLM配置项*/

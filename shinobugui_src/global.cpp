@@ -65,6 +65,9 @@ void GlobalConfig::GlobalConfigInit(GlobalConfig* gc) {
     gc->window_main_addtimefps = FileSetting::GetLongValue(0, INIGROUPMARKSTR, inimark_map[::INIMARK::WINDOW_MAIN_ADDTIMEFPS], 0);
     gc->window_cubism_addtimefps = FileSetting::GetLongValue(0, INIGROUPMARKSTR, inimark_map[::INIMARK::WINDOW_CUBISM_ADDTIMEFPS], 0);
     gc->window_main_fast_id = FileSetting::GetLongValue(0, INIGROUPMARKSTR, inimark_map[::INIMARK::WINDOW_MAIN_FAST_ID], INITINT);
+    gc->window_main_icon_offs = (float)FileSetting::GetDoubleValue(0, INIGROUPMARKSTR, inimark_map[::INIMARK::WINDOW_MAIN_ICON_OFFS], 0.30f);
+    gc->window_main_icon_offx = (float)FileSetting::GetDoubleValue(0, INIGROUPMARKSTR, inimark_map[::INIMARK::WINDOW_MAIN_ICON_OFFX], 30.0f);
+    gc->window_main_icon_offy = (float)FileSetting::GetDoubleValue(0, INIGROUPMARKSTR, inimark_map[::INIMARK::WINDOW_MAIN_ICON_OFFY], 8.0f);
 
 #ifdef IS_WINDOWS
     gc->select_font = (std::string)FileSetting::GetValue(0, INIGROUPMARKSTR, inimark_map[::INIMARK::FONTSEL_NAME], INITSTR);
@@ -167,9 +170,11 @@ void GlobalConfig::GlobalConfigSave(GlobalConfig* gc)
     FileSetting::SetLongValue(0, INIGROUPMARKSTR, inimark_map[::INIMARK::WINDOW_MAIN_ADDTIMEFPS],::GlobalConfig::getInstance()->window_main_addtimefps);
     FileSetting::SetLongValue(0, INIGROUPMARKSTR, inimark_map[::INIMARK::WINDOW_CUBISM_ADDTIMEFPS], ::GlobalConfig::getInstance()->window_cubism_addtimefps);
     FileSetting::SetLongValue(0, INIGROUPMARKSTR, inimark_map[::INIMARK::WINDOW_MAIN_FAST_ID], ::GlobalConfig::getInstance()->window_main_fast_id);
+    FileSetting::SetDoubleValue(0, INIGROUPMARKSTR, inimark_map[::INIMARK::WINDOW_MAIN_ICON_OFFS], (double)::GlobalConfig::getInstance()->window_main_icon_offs);
+    FileSetting::SetDoubleValue(0, INIGROUPMARKSTR, inimark_map[::INIMARK::WINDOW_MAIN_ICON_OFFX], (double)::GlobalConfig::getInstance()->window_main_icon_offx);
+    FileSetting::SetDoubleValue(0, INIGROUPMARKSTR, inimark_map[::INIMARK::WINDOW_MAIN_ICON_OFFY], (double)::GlobalConfig::getInstance()->window_main_icon_offy);
     FileSetting::SetValue(0, INIGROUPMARKSTR, inimark_map[::INIMARK::FONTSEL_NAME], ::GlobalConfig::getInstance()->select_font.c_str());
     FileSetting::SetDoubleValue(0, INIGROUPMARKSTR, inimark_map[::INIMARK::FONT_GLOBAL_SCALE], (double)io.FontGlobalScale);
-
     FileSetting::EndSave(ini);
     GlobalTemp::RefreshTable = true;
 }

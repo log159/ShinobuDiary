@@ -46,18 +46,18 @@ public:
 
 static const char* XYZAXIS[3] = { "X","Y","Z" };
 static const std::unordered_map<std::string, std::pair<float,int>>PARAM_DEF = {
-    {"ParamAngleX",{30.f,0}},
-    {"PARAM_ANGLE_X",{30.f,0}},
-    {"ParamAngleY",{30.f,1}},
-    {"PARAM_ANGLE_Y",{30.f,1}},
-    {"ParamAngleZ",{1.f,2}},
-    {"PARAM_ANGLE_Z",{1.f,2}},
-    {"ParamBodyAngleX",{10.f,0}},
-    {"PARAM_BODY_ANGLE_X",{10.f,0}},
-    {"ParamEyeBallX",{1.f,0}},
-    {"PARAM_EYE_BALL_X",{1.f,0}},
-    {"ParamEyeBallY",{1.f,1}},
-    {"PARAM_EYE_BALL_Y",{1.f,1}},
+    {"ParamAngleX",         {30.0f,0}},
+    {"PARAM_ANGLE_X",       {30.0f,0}},
+    {"ParamAngleY",         {30.0f,1}},
+    {"PARAM_ANGLE_Y",       {30.0f,1}},
+    {"ParamAngleZ",         {1.0f,2}},
+    {"PARAM_ANGLE_Z",       {1.0f,2}},
+    {"ParamBodyAngleX",     {10.0f,0}},
+    {"PARAM_BODY_ANGLE_X",  {10.0f,0}},
+    {"ParamEyeBallX",       {1.0f,0}},
+    {"PARAM_EYE_BALL_X",    {1.0f,0}},
+    {"ParamEyeBallY",       {1.0f,1}},
+    {"PARAM_EYE_BALL_Y",    {1.0f,1}},
 };
 class BreathParam {
 public:
@@ -73,16 +73,16 @@ public:
     {}
 };
 static const std::unordered_map<std::string, BreathParam>BREATH_DEF = {
-    {"ParamAngleX",BreathParam(0.0f, 15.0f, 6.5345f, 0.5f)},
-    {"PARAM_ANGLE_X",BreathParam(0.0f, 15.0f, 6.5345f, 0.5f)},
-    {"ParamAngleY",BreathParam(0.0f, 8.0f, 3.5345f, 0.5f)},
-    {"PARAM_ANGLE_Y",BreathParam(0.0f, 8.0f, 3.5345f, 0.5f)},
-    {"ParamAngleZ",BreathParam(0.0f, 10.0f, 5.5345f, 0.5f)},
-    {"PARAM_ANGLE_Z",BreathParam(0.0f, 10.0f, 5.5345f, 0.5f)},
-    {"ParamBodyAngleX",BreathParam(0.0f, 4.0f, 15.5345f, 0.5f)},
-    {"PARAM_BODY_ANGLE_X",BreathParam(0.0f, 4.0f, 15.5345f, 0.5f)},
-    {"ParamBreath",BreathParam(0.5f, 0.5f, 3.2345f, 0.5f)},
-    {"PARAM_BREATH",BreathParam(0.5f, 0.5f, 3.2345f, 0.5f)},
+    {"ParamAngleX",         BreathParam(0.0f, 15.0f, 6.5345f, 0.5f)},
+    {"PARAM_ANGLE_X",       BreathParam(0.0f, 15.0f, 6.5345f, 0.5f)},
+    {"ParamAngleY",         BreathParam(0.0f, 8.0f, 3.5345f, 0.5f)},
+    {"PARAM_ANGLE_Y",       BreathParam(0.0f, 8.0f, 3.5345f, 0.5f)},
+    {"ParamAngleZ",         BreathParam(0.0f, 10.0f, 5.5345f, 0.5f)},
+    {"PARAM_ANGLE_Z",       BreathParam(0.0f, 10.0f, 5.5345f, 0.5f)},
+    {"ParamBodyAngleX",     BreathParam(0.0f, 4.0f, 15.5345f, 0.5f)},
+    {"PARAM_BODY_ANGLE_X",  BreathParam(0.0f, 4.0f, 15.5345f, 0.5f)},
+    {"ParamBreath",         BreathParam(0.5f, 0.5f, 3.2345f, 0.5f)},
+    {"PARAM_BREATH",        BreathParam(0.5f, 0.5f, 3.2345f, 0.5f)},
 };
 
 static const std::unordered_set<std::string> EYEBLINK_DEF = {
@@ -155,11 +155,11 @@ class LAppModel : public Csm::CubismUserModel
 {
 public:
 
-    long long                                                       hit_num             = 0;
+    long long                                                       hit_num                 = 0;
     std::string                                                     hit_name;
     std::string                                                     hit_id;
-    int                                                             hit_ui_selected     = -1;
-    int                                                             function_selected   = 0;
+    int                                                             hit_ui_selected         = -1;
+    int                                                             function_selected       = 0;
     std::unordered_map<int, std::pair<int, int>>                    motion_map;
     std::unordered_map<int, int>                                    expression_map;
     std::string                                                     hit_motion_name;

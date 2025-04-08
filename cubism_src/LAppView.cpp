@@ -19,6 +19,7 @@
 #include "LAppSpriteShader.hpp"
 #include "LAppModel.hpp"
 #include "../shinobugui_src/global.h"
+#include "../shinobugui_src/somemacros.h"
 
 using namespace std;
 using namespace LAppDefine;
@@ -148,11 +149,20 @@ void LAppView::Render()
     //    LAppDelegate::GetInstance()->GetTextureManager()->GetTexture(_power->GetTextureId(), textureView);
     //    _power->RenderImmidiate(width, height, textureView, renderContext);
     //}
-    if (_shinobu_image && GlobalTemp::WindowMainShow) {
-        ID3D11ShaderResourceView* textureView = NULL;
-        LAppDelegate::GetInstance()->GetTextureManager()->GetTexture(_shinobu_image->GetTextureId(), textureView);
-        _shinobu_image->ResetOffsetRect(GlobalTemp::ShinobuWindowRect.x + (GlobalTemp::ShinobuWindowRect.w * 0.7f), LAppDefine::RenderTargetHeight - GlobalTemp::ShinobuWindowRect.y + 9.f, 1.f, 1.f);
-        _shinobu_image->RenderImmidiate(width, height, textureView, renderContext);
+    if (GlobalConfig::getInstance()->window_main_style_id && _shinobu_image && GlobalTemp::WindowMainShow) {
+        if (fabs(GlobalConfig::getInstance()->window_main_icon_offs) > ZEROFLOAT) {
+            ID3D11ShaderResourceView* textureView = NULL;
+            LAppDelegate::GetInstance()->GetTextureManager()->GetTexture(_shinobu_image->GetTextureId(), textureView);
+            float offX = GlobalTemp::ShinobuWindowRect.x + (GlobalTemp::ShinobuWindowRect.w * 0.7f) - width * 0.5f;
+            float offY = LAppDefine::RenderTargetHeight - GlobalTemp::ShinobuWindowRect.y - height * 0.5f;
+            _shinobu_image->ResetOffsetRect(
+                offX + GlobalConfig::getInstance()->window_main_icon_offx,
+                offY + GlobalConfig::getInstance()->window_main_icon_offy,
+                1.f * GlobalConfig::getInstance()->window_main_icon_offs,
+                1.f * GlobalConfig::getInstance()->window_main_icon_offs
+            );
+            _shinobu_image->RenderImmidiate(width, height, textureView, renderContext);
+        }
     }
 
     if (GlobalTemp::WindowCubismShow == false) {
@@ -200,7 +210,7 @@ void LAppView::Render()
                 LAppSprite*& _hitarea = las;
                 ID3D11ShaderResourceView* textureView = NULL;
                 LAppDelegate::GetInstance()->GetTextureManager()->GetTexture(_hitarea->GetTextureId(), textureView);
-                _hitarea->ResetOffsetRect(offx, offy, ts_x/(lam->def_cubism_cg.cubism_ts_x), ts_y / (lam->def_cubism_cg.cubism_ts_y));
+                _hitarea->ResetOffsetRect(offx, offy, ts_x / (lam->def_cubism_cg.cubism_ts_x), ts_y / (lam->def_cubism_cg.cubism_ts_y));
                 _hitarea->RenderImmidiate(width, height, textureView, renderContext);
             }
         }
@@ -254,12 +264,11 @@ void LAppView::InitializeSprite()
     //_gear = nullptr;
     //_power = nullptr;
 
-    //_shinobu_image
-    LAppTextureManager::TextureInfo* powerTexture = textureManager->CreateTextureFromPngFile("./Icon/su_t.png", false);
-    x = 0.f;
-    y = 0.f;
-    fWidth = static_cast<float>(powerTexture->width) * 0.33f;
-    fHeight = static_cast<float>(powerTexture->height) * 0.33f;
+    LAppTextureManager::TextureInfo* powerTexture = textureManager->CreateTextureFromPngFile(TITLE_IMAGE_WAY, false);
+    x = width * 0.5f;
+    y = height * 0.5f;
+    fWidth = static_cast<float>(powerTexture->width);
+    fHeight = static_cast<float>(powerTexture->height);
     _shinobu_image = new LAppSprite(x, y, fWidth, fHeight, powerTexture->id, _shader, device);
 
     x = width * 0.5f;

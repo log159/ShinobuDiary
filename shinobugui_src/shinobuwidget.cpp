@@ -362,6 +362,12 @@ void ShowShinobuGlobal()
                 if (ws_dt == 0)  io.ConfigDockingTransparentPayload = true;
                 else if (ws_dt == 1) io.ConfigDockingTransparentPayload = false;;
             }
+
+            ImGui::SeparatorText(TT_437);
+            ImGui::SliderFloat(TT_438, &GlobalConfig::getInstance()->window_main_icon_offs, 0.0f, 3.0f, "%.2f", ImGuiSliderFlags_None);
+            ImGui::SliderFloat(TT_439, &GlobalConfig::getInstance()->window_main_icon_offx, -200.0f, 200.0f, "%.2f", ImGuiSliderFlags_None);
+            ImGui::SliderFloat(TT_440, &GlobalConfig::getInstance()->window_main_icon_offy, -200.0f, 200.0f, "%.2f", ImGuiSliderFlags_None);
+
             ImGui::SeparatorText(TT_276);
             ImGui::RadioButton(TT_274, &ws_f, 0);
             ImGui::SameLine(); ImGui::SetCursorPosX(halfWidth + sty.IndentSpacing);
@@ -370,7 +376,7 @@ void ShowShinobuGlobal()
                 ::GlobalConfig::getInstance()->window_main_fast_id = ws_f;
             }
             ImGui::SeparatorText(TT_434);
-            ImGui::SliderFloat(TT_113, &GlobalConfig::getInstance()->window_main_alpha, 30.0f, 100.0f, "%.2f", ImGuiSliderFlags_None);
+            ImGui::SliderFloat(TT_113, &GlobalConfig::getInstance()->window_main_alpha, 20.0f, 100.0f, "%.2f", ImGuiSliderFlags_None);
 
             ImGui::SeparatorText(TT_233);
             ImGui::SliderFloat(TT_236, &GlobalConfig::getInstance()->window_main_forecastfps, 10.0f, 120.0f, "%.2f fps", ImGuiSliderFlags_None);
@@ -709,6 +715,7 @@ void ShowShinobuDebugWindow()
     }
     ImGui::End();
 }
+
 void ShowShinobuCsmGeometry(Su::UserConfig& uc, LAppModel* lam)
 {
     static char name_buf[DEFSIZE];
@@ -1208,6 +1215,7 @@ void ShowShinobuCsmRendering(Su::UserConfig& uc, LAppModel* lam)
     if (ImGui::Button(name_buf, ImVec2(GlobalTemp::GuiButtonWidth, 0))) {
         lam->GetModel()->GetOverwriteFlagForModelMultiplyColorsRef() = false;
         lam->GetModel()->GetOverwriteFlagForModelScreenColorsRef() = false;
+        lam->canOpacityGroup = false;
         lam->GetModel()->GetOverwriteFlagForModelCullingsRef() = false;
         lam->InitMultiplyColor();
         lam->InitScreenColor();
@@ -1478,7 +1486,7 @@ void ShowShinobuCsmObserveItems(Su::UserConfig& uc, LAppModel* lam)
         Su::ShinobuScrollingBuffer& sdata1 = lam->sdatal_v[i];
         if (!Su::IsSubstring(cml->GetParameterId(i)->GetString().GetRawString(), lam->filter_param_buf))continue;
         ImGui::PushID(i);
-        if (ImPlot::BeginPlot("##Scrolling___ShowShinobuCsmObserve", ImVec2(-1, 150))) {
+        if (ImPlot::BeginPlot("##BeginPlot___ShowShinobuCsmObserve", ImVec2(-1, 150))) {
             ImPlot::SetupAxes(nullptr, nullptr, flags, flags);
             ImPlot::SetupAxisLimits(ImAxis_X1, lam->add_t - lam->history_t, lam->add_t, ImGuiCond_Always);
             ImPlot::SetupAxisLimits(ImAxis_Y1, cml->GetParameterMinimumValue(i), cml->GetParameterMaximumValue(i));
@@ -1536,9 +1544,4 @@ void ShowShinobuWindow(bool* p_open) {
     ShowShinobuHelp();
     ShowShinobuAbout();
     ImGui::End();
-
-
-   
-
-
 }

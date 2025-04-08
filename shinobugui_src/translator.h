@@ -450,3 +450,7 @@
 #define TT_436 AT(u8"在播放动画时,Live2D 需要正确地计算模型的透明度。\n如果你启用了透明组,那么动画之间将不能有渐变效果。\n如果模型在翻转时候出现背面不显示的情况,请启用剔除规则。",\
 u8"Live2D needs to correctly calculate the model's opacity while playing the animation.\nIf you have enabled the opacity group, there will be no fade effect between animations.\nIf the model shows no back face when flipping, please enable culling rules.",\
 u8"アニメーションを再生する際、Live2Dはモデルの不透明度を正しく計算する必要があります。\n透明グループを有効にした場合、アニメーション間にフェード効果はありません。\nモデルが反転する際に裏面が表示されない場合は、カリングルールを有効にしてください。")
+#define TT_437 AT(u8"Windows 置顶模式下的贴图", u8"Windows's top texture", u8"Windows最前面モードでのテクスチャ")
+#define TT_438 AT(u8"大小缩放",u8"Size scaling",u8"サイズスケール")
+#define TT_439 AT(u8"横轴偏移", u8"Horizontal offset", u8"横軸オフセット")
+#define TT_440 AT(u8"纵轴偏移", u8"Vertical offset", u8"縦軸オフセット")

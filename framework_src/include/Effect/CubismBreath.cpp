@@ -9,6 +9,7 @@
 #include <math.h>
 #include "../Math/CubismMath.hpp"
 #include <cmath>
+#include "../../../shinobugui_src/somemacros.h"
 
 namespace Live2D {
     namespace Cubism {
@@ -53,7 +54,7 @@ namespace Live2D {
                 for (csmUint32 i = 0; i < _breathParameters.GetSize(); ++i)
                 {
                     BreathParameterData* data = &_breathParameters[i];
-                    if(data->Enable && fabs(data->Cycle)>(1e-6))
+                    if(data->Enable && fabs(data->Cycle)>ZEROFLOAT)
                         model->AddParameterValue(data->ParameterId, data->Offset + (data->Peak * sinf(t / data->Cycle)), data->Weight);
                 }
             }

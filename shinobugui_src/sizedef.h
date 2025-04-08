@@ -9,9 +9,3 @@
 #define DEFSIZEK16 DEFSIZEK * 16
 #define DEFPATHSIZE DEFSIZEK16
 
-struct RectF {
-    float x, y, w, h;
-    RectF(float x, float y, float w, float h)
-        : x(x), y(y), w(x), h(y) {
-    }
-};

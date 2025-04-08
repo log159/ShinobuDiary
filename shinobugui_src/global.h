@@ -35,27 +35,32 @@ enum class LAN : int;
     X(WINDOW_CUBISM_ADDTIMEFPS) \
     X(ENABLE_WIDGET) \
     X(ENABLE_CUBISM) \
-    X(ENABLE_TEMPLATE) \
-    X(ENABLE_TTS) \
-    X(ENABLE_MT) \
-    X(ENABLE_ORIGINAL) \
-    X(ENABLE_STT) \
     X(CUBISM_MODEL_DIR) \
-    X(CUBISM_CG_CUBISM_TS_S) \
-    X(CUBISM_CG_CUBISM_TX_T) \
-    X(CUBISM_CG_CUBISM_TY_T) \
-    X(CUBISM_CG_CUBISM_TS_X) \
-    X(CUBISM_CG_CUBISM_TS_Y) \
-    X(CUBISM_CG_CUBISM_TX_S) \
-    X(CUBISM_CG_CUBISM_TY_S) \
-    X(CUBISM_CG_CUBISM_TX_P) \
-    X(CUBISM_CG_CUBISM_TY_P) \
     X(KEY) \
     X(APPID) \
     X(SECRET) \
     X(BASEURL) \
     X(ADDRESS) \
-    X(PORT)
+    X(PORT) \
+    X(WINDOW_MAIN_ICON_OFFS) \
+    X(WINDOW_MAIN_ICON_OFFX) \
+    X(WINDOW_MAIN_ICON_OFFY) \
+
+    //X(ENABLE_TEMPLATE) \
+    //X(ENABLE_TTS) \
+    //X(ENABLE_MT) \
+    //X(ENABLE_ORIGINAL) \
+    //X(ENABLE_STT) \
+    //X(CUBISM_CG_CUBISM_TS_S) \
+    //X(CUBISM_CG_CUBISM_TX_T) \
+    //X(CUBISM_CG_CUBISM_TY_T) \
+    //X(CUBISM_CG_CUBISM_TS_X) \
+    //X(CUBISM_CG_CUBISM_TS_Y) \
+    //X(CUBISM_CG_CUBISM_TX_S) \
+    //X(CUBISM_CG_CUBISM_TY_S) \
+    //X(CUBISM_CG_CUBISM_TX_P) \
+    //X(CUBISM_CG_CUBISM_TY_P) \
+
 
 enum INIMARK {
 #define X(name) name,
@@ -68,8 +73,8 @@ static std::map<INIMARK, const char*> inimark_map = {
 #undef X
 };
 
-static const char* vits_simple_api_model_list[] = { "vits","bert-vits2","w2v2-vits" };
-static const char* gpt_sovits_target_language_list[] = { "zh","ja","en" };
+static const char* vits_simple_api_model_list[]         = { "vits","bert-vits2","w2v2-vits" };
+static const char* gpt_sovits_target_language_list[]    = { "zh","ja","en" };
 
 class GlobalTemp {
 public:
@@ -103,11 +108,15 @@ public:
     int             window_main_dock_id            = 0;         /*{ 0,1 }*/
     int             window_main_transparent_id     = 0;         /*{ 0,1 }*/
     float           window_main_forecastfps        = 120.0f;    /*10.0f-120.0f*/
-    float           window_main_alpha              = 100.0f;    /*30.0f-100.0f*/
+    float           window_main_alpha              = 100.0f;    /*20.0f-100.0f*/
     int             window_main_addtimefps         = 0;         /* 0-100 */
     int             window_main_fast_id            = 0;         /*{ 0,1 }*/
     int             window_cubism_style_id         = 0;         /*{ 0,1,2,3 }*/
     int             window_cubism_addtimefps       = 0;         /*0-100*/
+    float           window_main_icon_offs          = 0.30f;     /*0.0f-3.0f*/
+    float           window_main_icon_offx          = 30.0f;     /*-200.0f-200.0f*/
+    float           window_main_icon_offy          = 8.0f;      /*-200.0f-200.0f*/
+
     std::string     select_font                    = "";
     int             fonts_size                     = 0;
     ImGuiStyle      defaultStyle;
